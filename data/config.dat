@@ -1,0 +1,12 @@
+## dat file configuration
+## line starting with # are ignored
+## empty lines as well
+## implement context [CTRLMNG]
+
+[CTRLMNG]
+
+mode=0
+serverAddress=192.168.0.1
+serverPort=5000
+#clientPorts=5001,5002-5010
+clientPorts=5001-5010

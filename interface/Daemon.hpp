@@ -1,12 +1,21 @@
 #include "interface/StandardIncludes.hpp"
 
-#include "interface/EventBuilder.hpp"
-#include "interface/ControlManager.hpp"
-#include "interface/Configurator.hpp"
+#ifndef DAEMON_H
+#define DAEMON_H
+
+class ControlManager;
+class Daemon;
+class EventBuilder;
+class Configurator;
+
+//#include "interface/EventBuilder.hpp"
+//#include "interface/ControlManager.hpp"
+//#include "interface/Configurator.hpp"
 
 
-enum CMD_t {WWE=0,WE,EE,WBE,BT,WBT,EBT};
+enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT};
 /* Command description:
+ * NOP : No Operation. Need for dummy messages that goes around
  * WWE : SPS command of Warning Warning Ejection: 1s 
  * WE  : SPS command of Warining Ejection: 10ms
  * WBE : SPS command of Warning Bad Ejection
@@ -29,9 +38,9 @@ friend class ControlManager;
 
 private:
 	//private variable each word is capital execpt the first. Underscore at the end
-EventBuilder eventBuilder_; 
-ControlManager controlManager_;
-Configurator configurator_;
+EventBuilder 	*eventBuilder_; 
+ControlManager 	*controlManager_;
+Configurator 	*configurator_;
 
 pid_t pid_;
 
@@ -53,3 +62,6 @@ public:
 
 
 };
+
+
+#endif

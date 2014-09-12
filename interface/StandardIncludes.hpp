@@ -6,7 +6,7 @@
 #include <vector> //LIFO -> use stack
 #include <queue> //FIFO
 #include <map>
-#include <algorithms>
+#include <algorithm>
 #include <exception>
 #include <iostream>
 using namespace std;
@@ -22,7 +22,8 @@ using namespace std;
 
 #ifndef NO_ZMQ
 //ZQM
-	#include <zmq.h>
+	#include <zmq.hpp>
+	//#include <zmq_utils.h>
 #endif
 
 #ifndef NO_ROOT

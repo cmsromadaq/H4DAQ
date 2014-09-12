@@ -1,10 +1,8 @@
-#include <vector>
-#include <map>
-#include <exceptions>
+#include "interface/StandardIncludes.hpp"
+
 
 using namespace std;
 
-#include "TTree.h"
 
 #ifndef EVTBLD_H
 #define EVTBLD_H
@@ -25,28 +23,41 @@ class dataType{
 	//string is null terminated = bad!!! 
 	//the syntax is the same of string
 private:
-	char *dataStream_;
+	void *dataStream_;
 	unsigned int size_; // store the used size of dataStream
 	unsigned int reserved_; //store the actual dimension in memory of dataStream
 public:
 	// --- Constructor
 	dataType();
-	dataType(const char*);//init with a null terminated string
-	dataType(int N, const char*);//init with a dataType
+	//dataType(const char*);//init with a null terminated string
+	dataType(int N, void* );//init with a dataType
 	// --- Destructor
 	~dataType();
 	// --- Get size
 	unsigned int size(){return size_;}
 	// --- reserve N bytes in memory
 	void reserve(int N);
+	// --- shrink N bytes in memory
+	void shrink(int N);
 	// --- return stream pointer
-	const char* c_str()(return (const char*)dataStream_;}
+	const void* c_str(){return (const void*)dataStream_;}
+	void* data(){
+		return ( void*)dataStream_;
+		}
 	// --- append
-	// --- remove
+	void append(void* data, int N);
+	// --- remove [A,B)
+	void erase(int A,int B);
 	// --- clear
-	void clear(){ delete dataStream_; size_=0;reserved_=0; dataStream_=NULL;}
+	void clear();
+	// --- copy
+	void copy(void * data, int N);
+	// --- release ownership of data. This will lost control of data and location
+	void release();
 
 };
+
+const bool operator==(dataType &x, dataType &y);
 
 class EventBuilder {
 // ---binary stream of the event -- 1char = 1byte
@@ -63,7 +74,7 @@ public:
 	~EventBuilder();
 	// 
 	void AppendToStream();
-	const char* GetStream(){ return dataStream_.c_str();}
+	const void* GetStream(){ return dataStream_.c_str();}
 	int  GetSize(){return dataStream_.size();}
 
 };
