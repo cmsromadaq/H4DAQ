@@ -26,13 +26,13 @@ int main(int argc,char**argv)
 
  printf("-> Constructing Publisher\n");
 	 Publisher pub;
- printf("-> Constructing Context\n");
-	 zmq::context_t context(2);
+ //printf("-> Constructing Context\n");
+	 //zmq::context_t context(2);
 
  // ActivateLog
  printf("-> Config Log\n");
 	l.SetLogLevel(3);
- 	//l.SetAsync();
+ 	l.SetAsync();
  	l.SetFileName("/tmp/log.txt");
  	l.Init();
  printf("-> Activate Logs\n");
@@ -40,8 +40,8 @@ int main(int argc,char**argv)
  //Configure
  printf("-> Setting port\n");
  	pub.SetPort(port);
- printf("-> Setting Context\n");
- 	pub.SetContext(&context);
+ //printf("-> Setting Context\n");
+ 	//pub.SetContext(&context);
 
  //pub.SetAsync();
  //Init Sockets
@@ -70,5 +70,18 @@ int main(int argc,char**argv)
 
  sleep(1);
  printf("-> Calling Destructors and exit\n");
+// printf("---> Pub\n");
+// pub.~Publisher();
+// printf("---> Log\n");
+// l.~Logger();
+// printf("---> Mex\n");
+// mexSend.~dataType();
+// mexRecv.~dataType();
+// printf("---> Context\n");
+// context.~context_t();
+ printf("---> Everything Else\n");
+// printf("---> Log\n");
+// l.~Logger();
+
  return 0;
 }

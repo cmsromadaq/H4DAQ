@@ -5,19 +5,27 @@
 
 #ifndef CONNMNG_H
 #define CONNMNG_H
+
+#ifndef CONTEXT_THREAD
+	#define CONTEXT_THREAD 2
+#endif
 // 0MQ Implementation
 class Configurator;
-class Context{
+
+
+//create a class that contains the context, keep track of the SetContext and destroy them in the right order: context last
+class HasContext{
 protected:
-	zmq::context_t *context; //common in the whole event
+	static zmq::context_t *context; //common in the whole event
 public:
-	void SetContext(zmq::context_t *c);
+	//void SetContext(zmq::context_t *c);
 	
 };
 
+
 class Publisher: 	public Configurable,
 			public LogUtility,
-			public Context {
+			public HasContext {
 private:
 	//zmq::context_t *context; //common in the whole event
 	zmq::socket_t *socket;
@@ -36,7 +44,7 @@ public:
 
 class Subscriber: 	public Configurable,
 			public LogUtility, 
-			public Context{
+			public HasContext{
 private:
 	//zmq::context_t *context;
 	zmq::socket_t *socket;

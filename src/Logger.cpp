@@ -15,8 +15,45 @@ Logger::Logger()
 }
 // Destructor
 Logger::~Logger(){ 
-	Log("[3] Logger::Destructor",3);
+	// Disconnect Utilities
+	for(int i=0;i<registered_.size();i++)
+		{
+		printf("~Logger %p\n",registered_[i]); //DEBUG
+		if(registered_[i]!=NULL)registered_[i]->LogClearDirty(); //remove utility from logging -- don't call LogUtility->Release; it's the clear after
+		}
+	registered_.clear();
 	Close();
+}
+// Destructor
+LogUtility::~LogUtility(){
+	LogClear();
+} // dont delete it - disable loggin
+void LogUtility::LogInit(Logger *l){
+	//register utility
+	log=l;
+	log->Register(this);
+}
+void LogUtility::LogClear(){
+		if(log!=NULL)log->Release(this);
+		log=NULL;
+} //disable logging
+
+//Register Log Utilities
+void Logger::Register(LogUtility*u) { 
+	printf("Register %p i=%d\n",u,registered_.size()); //DEBUG
+	registered_.push_back(u);
+}
+void Logger::Release(LogUtility *u) { 
+	printf("Releasing %p\n",u); //DEBUG
+	int i=0;
+	for(i=0;i<registered_.size();i++)
+		{
+		if ( registered_[i] == u ) 
+			{ 
+			printf("Releasing Utility i=%d\n",i); //DEBUG
+			registered_[i]=NULL;
+			}
+		}
 }
 
 void Logger::Init(){

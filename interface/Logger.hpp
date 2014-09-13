@@ -5,7 +5,10 @@
 #define LOGGER_H
 
 
+class LogUtility;
+
 class Logger: public Configurable{
+friend class LogUtility;
 
 // --- fileName where to log to
 string fileName_;
@@ -24,6 +27,12 @@ long int counter_;
 long int maxlines_;
 long int logNumber_;
 short logLevel_;
+
+vector<LogUtility*> registered_;
+// --- Register a LogUtility
+void Register(LogUtility*u); 
+// --- Release a LogUtility
+void Release(LogUtility *u); 
 
 public:
 	// --- Constructor
@@ -56,13 +65,17 @@ public:
 
 class LogUtility
 {
+	friend class Logger;
 	// class that each stuff that should log inheriths from
 	Logger *log;
 	public:
 	LogUtility(){log=NULL;}
-	~LogUtility(){log=NULL;} // dont delete it
+	~LogUtility();//{log=NULL;} // dont delete it - disable logging
 	void Log(string line,short level){ if(log!=NULL) log->Log(line,level);}
-	void LogInit(Logger *l){log=l;}
+	void LogInit(Logger *l);//{log=l;}
+	// --- Disable logging
+	void LogClear();
+	void LogClearDirty(){log=NULL;}
 };
 
 #endif

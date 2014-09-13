@@ -26,8 +26,8 @@ int main(int argc,char**argv)
 
  printf("-> Constructing Subscriber\n");
 	 Subscriber sub;
- printf("-> Constructing Context\n");
-	 zmq::context_t context(2);
+ //printf("-> Constructing Context\n");
+	// zmq::context_t context(2);
 
  // ActivateLog
  printf("-> Config Log\n");
@@ -40,8 +40,8 @@ int main(int argc,char**argv)
  //Configure
  printf("-> Setting port/address\n");
  	sub.SetAddress(address,port);
- printf("-> Setting Context\n");
- 	sub.SetContext(&context);
+ //printf("-> Setting Context\n");
+ 	//sub.SetContext(&context);
 
  //pub.SetAsync();
  //Init Sockets
@@ -69,5 +69,5 @@ int main(int argc,char**argv)
 
  sleep(1);
  printf("-> Calling Destructors and exit\n");
- //abort();
+ //sub.~Subscriber(); // destroy everything that use the context
 }

@@ -4,7 +4,6 @@
 //
 Publisher::Publisher(){
 	socket=NULL;
-	context=NULL;
 	Port="";
 	async_=false;
 }
@@ -74,7 +73,6 @@ void Publisher::Config(Configurator &){}; //TODO
 // ---------------- SUBSCRIBER ------------------
 Subscriber::Subscriber(){
 	socket=NULL;
-	context=NULL;
 	Clear();
 };
 Subscriber::~Subscriber(){
@@ -111,7 +109,7 @@ void Subscriber::SetAddress(string ip,int port)
 	return;
 
 }
-//void Subscriber::SetContext(zmq::context_t *c){context=c;} // 1 context per program
+
 void Subscriber::Clear(){
 	// context should not be destroyed
 	if(socket != NULL) delete socket;
@@ -125,10 +123,11 @@ void Subscriber::Init(){
 } 
 void Subscriber::Config(Configurator &){} //TODO
 // ------------ CONTEXT ------------
-void Context::SetContext(zmq::context_t *c){
-	//Log("[3] Publisher::SetContext",3);
-	context=c;
-} // 1 context per program
+//  MADE STATIC TO BE CORRECTLY DESTROYED
+//void HasContext::SetContext(zmq::context_t *c){
+//	context=c;
+//} // 1 context per program
+zmq::context_t* HasContext::context=new zmq::context_t( CONTEXT_THREAD );
 
 // ---------------- CONNECTION MANAGER
 //

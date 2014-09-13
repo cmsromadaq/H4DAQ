@@ -29,8 +29,8 @@ int main(int argc,char**argv)
 	 Publisher pub;
  printf("-> Constructing Subscriber\n");
 	 Subscriber sub;
- printf("-> Constructing Context\n");
-	 zmq::context_t context(2);
+ //printf("-> Constructing Context\n");
+	 //zmq::context_t context(2);
 
  // ActivateLog
  printf("-> Config Log\n");
@@ -46,9 +46,9 @@ int main(int argc,char**argv)
  	pub.SetPort(port);
  printf("-> Setting port/address\n");
  	sub.SetAddress(address,port);
- printf("-> Setting Context\n");
- 	pub.SetContext(&context);
- 	sub.SetContext(&context);
+ //printf("-> Setting Context\n");
+ 	//pub.SetContext(&context);
+ 	//sub.SetContext(&context);
 
  //pub.SetAsync();
  //Init Sockets
