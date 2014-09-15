@@ -18,7 +18,7 @@ DllSuf        = so
 StatSuf       = a
 ### ----- OPTIONS ABOVE ----- ####
 
-include MakeFile.ROOT
+include Makefile.ROOT
 
 BASEDIR=$(shell pwd)
 BINDIR=$(BASEDIR)/bin
