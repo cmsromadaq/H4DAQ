@@ -18,7 +18,7 @@ Logger::~Logger(){
 	// Disconnect Utilities
 	for(int i=0;i<registered_.size();i++)
 		{
-		printf("~Logger %p\n",registered_[i]); //DEBUG
+		//printf("~Logger %p\n",registered_[i]); //DEBUG
 		if(registered_[i]!=NULL)registered_[i]->LogClearDirty(); //remove utility from logging -- don't call LogUtility->Release; it's the clear after
 		}
 	registered_.clear();
@@ -40,17 +40,17 @@ void LogUtility::LogClear(){
 
 //Register Log Utilities
 void Logger::Register(LogUtility*u) { 
-	printf("Register %p i=%d\n",u,registered_.size()); //DEBUG
+	//printf("Register %p i=%d\n",u,registered_.size()); //DEBUG
 	registered_.push_back(u);
 }
 void Logger::Release(LogUtility *u) { 
-	printf("Releasing %p\n",u); //DEBUG
+	//printf("Releasing %p\n",u); //DEBUG
 	int i=0;
 	for(i=0;i<registered_.size();i++)
 		{
 		if ( registered_[i] == u ) 
 			{ 
-			printf("Releasing Utility i=%d\n",i); //DEBUG
+			//printf("Releasing Utility i=%d\n",i); //DEBUG
 			registered_[i]=NULL;
 			}
 		}
@@ -144,10 +144,11 @@ void Logger::Log(string line,short level){
     if (async_) 
     {
 	//fork copies the memories you write;
-   	pid_t childpid=fork(); 
+   	//pid_t childpid=fork(); 
+   	pid_t childpid=Fork(); 
 	if (childpid==0) //child
 		{
-		printf("DEBUG Child in logger: mypid=%d\n",getpid());
+		//printf("DEBUG Child in logger: mypid=%d\n",getpid());
 		Write(line);
 		_exit(0); // kill the child process, w/o flushing anything != Exit(); Exit is C++11 , exit is unistd
 		//_Exit(0); // kill the child process, w/o flushing anything != Exit(); Exit is C++11 , exit is unistd
@@ -155,13 +156,13 @@ void Logger::Log(string line,short level){
 		}
 	else if(childpid > 0 ) //parent
 		{
-		printf("DEBUG Parent in logger %d parentpid=%d\n",childpid,getpid());
+		//printf("DEBUG Parent in logger %d parentpid=%d\n",childpid,getpid());
 		return;
 		}
-	else // childpid <0 //parent but didn't fork
+	else // childpid <0 //parent but didn't fork - changed behaviour in AsyncUtils, -1 is also more than max
 		{
 		Write( line );
-		throw fork_exception();
+		//throw fork_exception();
 		}
     }
     else Write(line);

@@ -6,7 +6,7 @@ SOFLAGS		=-fPIC -shared
 SHELL		=bash
 
 Packages	=controller testDataTypeServer testDataTypeClient testDataType
-Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager
+Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager AsyncUtils
 LibName		=H4DAQ
 
 ###

@@ -30,11 +30,11 @@ private:
 	//zmq::context_t *context; //common in the whole event
 	zmq::socket_t *socket;
 	string Port;
-	bool async_;
+	//bool async_; -- use async utility iff needed
 public:
 	Publisher();
 	~Publisher();
-	void SetAsync(bool async=true){async_=async;}
+	//void SetAsync(bool async=true){async_=async;} 
 	int  SendMessage(dataType &mex); //  return 0 if correct
 	void SetPort(int p);
 	void Clear();

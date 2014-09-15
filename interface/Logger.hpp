@@ -1,5 +1,6 @@
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
+#include "interface/AsyncUtils.hpp"
 
 #ifndef LOGGER_H
 #define LOGGER_H
@@ -7,7 +8,7 @@
 
 class LogUtility;
 
-class Logger: public Configurable{
+class Logger: public Configurable, public AsyncUtils{
 friend class LogUtility;
 
 // --- fileName where to log to
@@ -22,7 +23,7 @@ FILE *fw_;
 #endif
 
 bool compress_;
-bool async_;
+//bool async_;
 long int counter_;
 long int maxlines_;
 long int logNumber_;
@@ -46,7 +47,7 @@ public:
 	// --- Set Compression of the log
 	void SetCompress(bool compress=true);
 	// --- Set Asyncronous logging
-	void SetAsync(bool async=true) { async_=async;};
+	//void SetAsync(bool async=true) { async_=async;};
 	// --- Set Max n. of lines in a log file
 	void SetMaxLines(long n) { maxlines_=n;};
 	// --- Set Log Level 0-> quite 1-> normal 3->verbose
@@ -76,6 +77,7 @@ class LogUtility
 	// --- Disable logging
 	void LogClear();
 	void LogClearDirty(){log=NULL;}
+	short int GetLogLevel(){ return log->logLevel_ ;}
 };
 
 #endif

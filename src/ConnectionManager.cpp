@@ -5,7 +5,7 @@
 Publisher::Publisher(){
 	socket=NULL;
 	Port="";
-	async_=false;
+	//async_=false;
 }
 
 Publisher::~Publisher(){ 
@@ -36,16 +36,16 @@ int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 	Log("[3] Publisher::SendMessage",3);
 	pid_t childpid;
 	char buffer[16];
-	if (async_){
-		childpid=fork();
-		sprintf(buffer,"%d",childpid);
-		Log( string("[3] Publisher::SendMessage Async: pid=")+buffer,3);
-		if (childpid==0) //CHILD
-			{} //nope
-		else if (childpid>0) //PARENT
-			return 0; //asyncronous: don't know if message delivered or not
-		else throw fork_exception() ;
-		}
+	//if (async_){  ZMQ is already async
+	//	childpid=fork();
+	//	sprintf(buffer,"%d",childpid);
+	//	Log( string("[3] Publisher::SendMessage Async: pid=")+buffer,3);
+	//	if (childpid==0) //CHILD
+	//		{} //nope
+	//	else if (childpid>0) //PARENT
+	//		return 0; //asyncronous: don't know if message delivered or not
+	//	else throw fork_exception() ;
+	//	}
 	//create the message and put it in the send
 	//zmq::message_t message( mex.data() ,mex.size() ,myzmq_nofree) ;
 	zmq::message_t message( mex.data() ,mex.size() , NULL ) ;
@@ -55,13 +55,13 @@ int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 	//   zmq::message_t message( myMsg ,mySize , NULL ) ; // should take ownership
 	socket->send(message);
 	//
-	if(async_ && childpid==0) _exit(0); //kill child
-	Log("[3] Publisher::SendMessager: if Async you dont see me",3);
+	//if(async_ && childpid==0) _exit(0); //kill child
+	//Log("[3] Publisher::SendMessager: if Async you dont see me",3);
 	return 0;
 }
 
 void Publisher::SetPort(int p){
-	Log("[3] Publisher::SetPort",3);
+	Log("[1] Publisher::SetPort",1);
 	char buffer[8];
 	sprintf(buffer,"%d",p);
 	Port=buffer;
@@ -83,20 +83,18 @@ Subscriber::~Subscriber(){
 int  Subscriber::RecvMessage(dataType &mex) // return 0 if yes
 {
 	Log("[3] Subscriber::RecvMessage",3);
-	 zmq::message_t zmq_mex;	
-	 bool status=socket->recv(&zmq_mex,ZMQ_DONTWAIT);
+	zmq::message_t zmq_mex;	
+	bool status=socket->recv(&zmq_mex,ZMQ_DONTWAIT);
 	// bool status=socket->recv(&zmq_mex);
 
-	 if ( !status ){
+       	if ( !status ){
 			Log("[3] Subscriber::RecvMessage Fail Read",3);
 		 	mex.clear();
 			return -1;
-	 		}
+	}
 	Log("[3] Subscriber::RecvMessage ReadSuccess",3);
-	 mex.copy(zmq_mex.data(), zmq_mex.size()) ;
-	 char buf[10]; sprintf(buf,"%lu",zmq_mex.size() ); // DELETEME
-	Log( string("[3] Subscriber::RecvMessage Size=")+buf,3); // DELETEME
-	 return 0;
+	mex.copy(zmq_mex.data(), zmq_mex.size()) ;
+	return 0;
 }
 
 void Subscriber::SetAddress(string ip,int port)
