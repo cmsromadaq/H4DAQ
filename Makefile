@@ -1,6 +1,7 @@
+INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb 
+CXXFLAGS	=-O2 -ggdb  -I$(INC_DIR)
 LDFLAGS		=-lz -lm -lzmq
 SOFLAGS		=-fPIC -shared
 SHELL		=bash
