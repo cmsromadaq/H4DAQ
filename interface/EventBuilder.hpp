@@ -7,6 +7,8 @@ using namespace std;
 #ifndef EVTBLD_H
 #define EVTBLD_H
 
+typedef unsigned int WORD;
+
 class EventParser{
 public:
 	/* this class converts the streams events in ROOT TTree files
@@ -46,6 +48,8 @@ public:
 		}
 	// --- append
 	void append(void* data, int N);
+	// --- append using dataType
+	void append(dataType x){return append( x.data(), int(x.size()) ) ;};
 	// --- remove [A,B)
 	void erase(int A,int B);
 	// --- clear
@@ -54,9 +58,11 @@ public:
 	void copy(void * data, int N);
 	// --- release ownership of data. This will lost control of data and location
 	void release();
+	//--- Operators
+	//dataType& operator+=(dataType &x) { this->append(x); return this;}
 
 };
-
+// --- bool operator -- mv inside the class
 const bool operator==(dataType &x, dataType &y);
 
 class EventBuilder {
@@ -77,6 +83,15 @@ public:
 	const void* GetStream(){ return dataStream_.c_str();}
 	int  GetSize(){return dataStream_.size();}
 
+	// ---  this will be used by hwmanager to convert the output of a board in a stream
+	// ---  appends a header and trailer
+	static dataType WordToStream(WORD x);
+	static dataType BoardHeader(WORD boardId);
+	static dataType BoardTrailer(WORD boardId);
+	static dataType EventHeader();
+	static dataType EventTrailer();
+	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
+	static dataType MergeEventStream(dataType &x,dataType &y){};
 };
 
 #endif
