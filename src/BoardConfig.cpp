@@ -5,4 +5,3 @@ BoardConfig::BoardConfig(){}
 // --- Destructor
 BoardConfig::~BoardConfig(){}
 // --- 
-void BoardConfig::Read(vector<unsigned int> &v) {}

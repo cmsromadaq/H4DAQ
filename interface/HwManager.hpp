@@ -1,17 +1,25 @@
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
 #include "interface/Logger.hpp"
+#include "interface/EventBuilder.hpp"
+
 
 class Board: public Configurable {
+	// this is the BaseClass. Each other class needs to implement this
+	unsigned int id_;
 public:
 	// --- Constructor 
 	Board();
 	// --- Destructor
 	~Board();
+	// -- Get Id
+	unsigned int GetId();//{return id;};
 	// --- Configurable
-	void Init();
-	void Clear();
-	void Config(Configurator&c);
+	virtual void Init();
+	virtual void Clear();
+	virtual void Config(Configurator&c);
+	// --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
+	virtual void Read(vector<WORD> &v);
 
 };
 
@@ -21,8 +29,10 @@ class HwManager: public Configurable, public LogUtility
  * read the boards and send back the results to the 
  * control manager
  */
-private:
-	vector<Board> hw_;
+protected:
+	vector<Board*> hw_;
+	// --- Read Board i
+	void Read(int i,vector<WORD> &v);
 
 public:
 	// --- Constructor
@@ -33,4 +43,6 @@ public:
 	void Init();
 	void Clear();
 	void Config(Configurator&c);
+	// --- Read All the Boards
+	dataType ReadAll();
 };

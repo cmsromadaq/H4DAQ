@@ -13,7 +13,6 @@ public:
 	// --- Destructor
 	~BoardConfig();
 	// 
-	virtual void Read(vector<unsigned int> &v) ;
 
 
 };
