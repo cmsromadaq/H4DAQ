@@ -1,0 +1,13 @@
+<general>
+  <par_1>val1</par_1>
+  <par_2>val2</par_2>
+  <board_1>
+    <par_1>val1</par_1>
+    <par_2>val2</par_2>
+  </board_1>
+  <board_2>
+    <par_1>val1</par_1>
+    <par_2>val2</par_2>
+    <par_3>val2</par_3>
+  </board_2>  
+</general>
