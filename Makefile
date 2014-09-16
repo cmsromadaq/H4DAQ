@@ -6,7 +6,7 @@ LDFLAGS		=-lz -lm -lzmq
 SOFLAGS		=-fPIC -shared
 SHELL		=bash
 
-Packages	=controller testDataTypeServer testDataTypeClient testDataType testUInt
+Packages	=controller testDataTypeServer testDataTypeClient testDataType testXMLLib testUInt
 Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager AsyncUtils BoardConfig
 LibName		=H4DAQ
 
@@ -20,6 +20,10 @@ StatSuf       = a
 ### ----- OPTIONS ABOVE ----- ####
 
 include Makefile.ROOT
+# libs for XML files
+CXXFLAGS	+=`xml2-config --cflags`
+LDFLAGS 	+=`xml2-config --libs`
+
 
 BASEDIR=$(shell pwd)
 BINDIR=$(BASEDIR)/bin
