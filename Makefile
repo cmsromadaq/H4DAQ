@@ -1,7 +1,7 @@
 INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb  -I$(INC_DIR)
+CXXFLAGS	=-O2 -ggdb 
 LDFLAGS		=-lz -lm -lzmq
 SOFLAGS		=-fPIC -shared
 SHELL		=bash
@@ -65,13 +65,13 @@ $(Packages): % : $(BINDIR)/% | $(BINDIR)
 #$(BINDIR)/$(Packages): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 $(addprefix $(BINDIR)/,$(Packages)): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(StatLib) $<
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(StatLib)  -I$(INC_DIR) -I$(HDIR)
 
 #make this function of $(Packages)
 #.PHONY: controller
 #controller: bin/controller
 #bin/controller: test/controller.cpp $(BINOBJ) $(StatLib)
-#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(BINOBJ) $<
+#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(BINOBJ) $< 
 
 
 .PHONY: clean
@@ -93,11 +93,11 @@ InfoLine = compiling $(1)
 #.o
 $(BINDIR)/%.$(ObjSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $(SRCDIR)/$*.$(SrcSuf)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $(SRCDIR)/$*.$(SrcSuf) -I$(INC_DIR) -I$(HDIR)
 
 #.d
 $(BINDIR)/%.$(DepSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -M -o $@ $(SRCDIR)/$*.$(SrcSuf)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -M -o $@ $(SRCDIR)/$*.$(SrcSuf) -I$(INC_DIR) -I$(HDIR)
 
 
