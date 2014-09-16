@@ -6,6 +6,7 @@ using namespace std;
 
 #ifndef EVTBLD_H
 #define EVTBLD_H
+#include "interface/Logger.hpp"
 
 typedef unsigned int WORD;
 
@@ -65,7 +66,7 @@ public:
 // --- bool operator -- mv inside the class
 const bool operator==(dataType &x, dataType &y);
 
-class EventBuilder {
+class EventBuilder : public LogUtility{
 // ---binary stream of the event -- 1char = 1byte
 dataType dataStream_; // dynamic array of char*
 	
@@ -86,12 +87,16 @@ public:
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
 	static dataType WordToStream(WORD x);
+	static vector<WORD> StreamToWord(dataType &x);
 	static dataType BoardHeader(WORD boardId);
 	static dataType BoardTrailer(WORD boardId);
 	static dataType EventHeader();
 	static dataType EventTrailer();
 	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
-	static dataType MergeEventStream(dataType &x,dataType &y){};
+	static dataType MergeEventStream(dataType &x,dataType &y);
+	static WORD 	IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
+	static WORD 	IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
+	static WORD 	IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
 };
 
 #endif

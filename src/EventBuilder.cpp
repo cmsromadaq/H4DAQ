@@ -17,6 +17,13 @@ dataType::dataType(){
 	clear();
 }
 
+dataType::dataType(int N,void*v){
+	// this constructor will not do malloc and take ownership of the stream
+	dataStream_=v;
+	size_=N;
+	reserved_=N;
+}
+
 	// --- Destructor
 dataType::~dataType(){clear();}
 	// --- reserve N bytes in memory
@@ -175,3 +182,65 @@ dataType EventBuilder::EventTrailer()
 	R.append((void*)"EVNT\0\0\0\0\0\0\0\0",WORDSIZE);
 	return R;
 }
+
+dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ //TODO
+	// takes two streams and merge them independently from the content
+}
+
+vector<WORD>	EventBuilder::StreamToWord(dataType &x){
+	vector<WORD> R;
+	for(int n=0; n< x.size() ; n++)
+		{
+		R.push_back( *(WORD*)(  ((char*)x.data()) + n*WORDSIZE) );
+		}
+	// check rounding
+	if( x.size() % WORDSIZE  != 0 ) 
+		{
+		//Log("[2] EventBuilder::StreamToWord: Error in rounding, last bytes ignored",2); -- i'm in a static member function, can't call it
+		}
+
+	return R;
+}
+
+WORD 	EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
+
+	dataType H=BoardHeader(boardId);
+	dataType T=BoardTrailer(boardId);
+	
+	// Look in the Header for the 
+	vector<WORD> myWords = StreamToWord( x );
+	vector<WORD> Header  = StreamToWord( H );
+	vector<WORD> Trailer  = StreamToWord( T );
+	
+	if (myWords[0]  != Header[0] ) return 0;
+
+	if( boardId !=0 )
+	{
+		if ( myWords.size()< 2 || boardId != myWords[1] ) return 0;
+	}
+
+	// the the N of bytes of the stream
+	if (myWords.size() <3) return 0;
+	WORD NBytes = myWords[2];
+	WORD NWords  = NBytes / WORDSIZE;
+
+	// ------------------|TRAILER POS| +1 
+	if (myWords.size() < NWords + 3 + 1 ) return 0;
+
+	if (myWords[NWords+3] != Trailer[0] ) return 0;
+
+	return (NWords+3+1)*WORDSIZE; // interesting size
+
+}
+
+WORD 	EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
+	{
+	// take ownership of myStream (*v)
+	dataType myStream(MaxN,v);
+	WORD R= IsBoardOk(myStream,boardId);
+	// release ownership of myStream
+	myStream.release();
+	return R;
+	}
+
+WORD 	EventBuilder::IsEventOk(dataType &x){} //TODO

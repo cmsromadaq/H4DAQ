@@ -6,7 +6,7 @@ LDFLAGS		=-lz -lm -lzmq
 SOFLAGS		=-fPIC -shared
 SHELL		=bash
 
-Packages	=controller testDataTypeServer testDataTypeClient testDataType
+Packages	=controller testDataTypeServer testDataTypeClient testDataType testUInt
 Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager AsyncUtils BoardConfig
 LibName		=H4DAQ
 
