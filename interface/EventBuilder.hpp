@@ -8,7 +8,8 @@ using namespace std;
 #define EVTBLD_H
 #include "interface/Logger.hpp"
 
-typedef unsigned int WORD;
+//typedef unsigned int WORD;
+typedef uint32_t WORD;
 
 class EventParser{
 public:

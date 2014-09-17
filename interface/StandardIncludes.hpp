@@ -20,6 +20,13 @@ using namespace std;
 #include <unistd.h> //fork exit
 #include <sys/types.h> //pid_t
 
+
+/// XML
+#ifndef NO_XML
+	#include <libxml/parser.h>
+	#include <libxml/tree.h>
+#endif
+
 #ifndef NO_ZMQ
 //ZQM
 	#include <zmq.hpp>

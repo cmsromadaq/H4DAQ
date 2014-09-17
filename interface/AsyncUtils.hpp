@@ -25,7 +25,7 @@ public:
 	// --- call the fork
 	int Fork();
         // --- Set Asyncronous logging                                 
-	void SetAsync(bool async=true) { async_=async;};      
+	void inline SetAsync(bool async=true) { async_=async;};      
 };
 
 #endif
