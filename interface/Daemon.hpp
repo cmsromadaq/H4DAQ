@@ -15,7 +15,7 @@
 #include "interface/HWManager.hpp"
 
 
-enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV};
+enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA};
 /* Command description:
  * NOP : No Operation. Need for dummy messages that goes around
  * WWE : SPS command of Warning Warning Ejection: 1s 
@@ -29,6 +29,7 @@ enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV};
 
 class Command{
 public:
+	Command(){cmd=NOP; data=NULL; N=0;}
 	void *data;
 	int N;
 	CMD_t cmd;

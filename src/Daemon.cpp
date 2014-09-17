@@ -52,10 +52,24 @@ while (true) {
 		// check Connection Manager
 		// if cmds not empty do something
 		if (todo_.empty() ) { usleep(500);continue;}
-		Command myCmd=todo_.front();
+		Command myCmd=todo_.front();	todo_.pop();
 		switch (myCmd.cmd){
 		case NOP: break;
-		case SEND: connectionManager_->Send(); break;
+		case SEND: connectionManager_->Send(); 
+			   break;
+		case RECV: connectionManager_->Recv(); 
+			   break;
+		case DATA: connectionManager_->Recv(); 
+			   //eventBuilder_->...
+			   break;
+		case WWE: break; // ClearAllBuffer ;todo_->push();
+		case WE: break; // Activate triggers
+		case EE: break; // end triggers; start sending datas
+		case WBT: break;
+		case BT: break;
+		case EBT: break;
+		case WBE: break;
+
 		}
 	}
 	catch(std::exception &e){ printf("%s\n",e.what()); }
