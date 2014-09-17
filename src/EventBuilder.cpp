@@ -116,6 +116,11 @@ dataType EventBuilder::WordToStream(WORD x)
 {
 	dataType R; 
 	R.reserve(WORDSIZE);
+	if (sizeof(x) == WORDSIZE)
+	{
+		R.append(&x,WORDSIZE);
+		return R;
+	}	
 	//if( sizeof(x) < 4 ) // this is not C if word is at least int
 	if (sizeof(x) > WORDSIZE)  // take the less 4 bit significant digits
 	{ // hope never arrived here
@@ -132,10 +137,6 @@ dataType EventBuilder::WordToStream(WORD x)
 			R.append(&c,WORDSIZE);
 			}
 	}
-	if (sizeof(x) == WORDSIZE)
-	{
-		R.append(&x,WORDSIZE);
-	}	
 	return R;
 }
 

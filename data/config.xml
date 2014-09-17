@@ -7,12 +7,10 @@
     <board>
       <type>ExampleBoard1</type>
       <ID>0</ID>
-      <NWord>1</NWord>
     </board>
     <board>
       <type>ExampleBoard2</type>
       <ID>1</ID>
-      <NWord>1</NWord>
     </board>
   </Hardware>
   <otherthing>

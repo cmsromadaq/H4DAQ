@@ -8,6 +8,8 @@ class Board  { // don't inheriths from configurable 'cause I use BoardConfig
 protected:
 	// this is the BaseClass. Each other class needs to implement this
 	unsigned int id_;
+	unsigned int uid_; // crate _board _num
+	string type_;
 public:
 	// --- Constructor 
 	Board();
