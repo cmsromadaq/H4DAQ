@@ -2,12 +2,11 @@
 
 
 // --- Board
-Board::Board(){id_=0;};
+Board::Board(){id_=0;bC_=NULL;};
 Board::~Board(){};
-void Board::Init(){};
-void Board::Clear(){};
-void Board::Config(Configurator&c){};
-void Board::Read(vector<WORD> &v){};
+void Board::Config(BoardConfig *bC){
+	bC_=bC;
+};
 unsigned int Board::GetId(){return id_;};
 
 // -------------------  HW Manager ---------------

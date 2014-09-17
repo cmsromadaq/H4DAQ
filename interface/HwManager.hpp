@@ -8,8 +8,8 @@ class Board  { // don't inheriths from configurable 'cause I use BoardConfig
 protected:
 	// this is the BaseClass. Each other class needs to implement this
 	unsigned int id_;
-	unsigned int uid_; // crate _board _num
 	string type_;
+	BoardConfig *bC_; // don't destroy here
 public:
 	// --- Constructor 
 	Board();
@@ -18,11 +18,13 @@ public:
 	// -- Get Id
 	unsigned int GetId();//{return id;};
 	// --- Configurable
-	virtual void Init();
-	virtual void Clear();
-	virtual void Config(Configurator&c);
+	virtual void Init()=0;
+	virtual void Clear()=0;
+	virtual void BufferClear()=0;
+	virtual void Config(BoardConfig *bC);
 	// --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
-	virtual void Read(vector<WORD> &v);
+	virtual void Read(vector<WORD> &v)=0;
+	virtual void SetHandle(WORD x)=0;
 
 };
 
@@ -47,5 +49,6 @@ public:
 	void Clear();
 	void Config(Configurator&c);
 	// --- Read All the Boards
+	inline void BufferClearAll(){};
 	dataType ReadAll();
 };

@@ -22,7 +22,6 @@ public:
 	void inline SetBoardNode(xmlNode *mynode){board_node=mynode;}
 	xmlNode* GetBoardNodePtr(){return board_node;}
 
-
 };
 
 #endif
