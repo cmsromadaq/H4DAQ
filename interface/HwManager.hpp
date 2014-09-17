@@ -18,7 +18,7 @@ public:
 	// -- Get Id
 	unsigned int GetId();//{return id;};
 	// --- Configurable
-	virtual void Init()=0;
+	virtual int  Init()=0;
 	virtual void Clear()=0;
 	virtual void BufferClear()=0;
 	virtual void Config(BoardConfig *bC);
