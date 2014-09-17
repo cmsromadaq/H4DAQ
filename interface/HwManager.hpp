@@ -19,12 +19,12 @@ public:
 	unsigned int GetId();//{return id;};
 	// --- Configurable
 	virtual int  Init()=0;
-	virtual void Clear()=0;
-	virtual void BufferClear()=0;
-	virtual void Config(BoardConfig *bC);
+	virtual int Clear()=0;
+	virtual int BufferClear()=0;
+	virtual int Config(BoardConfig *bC);
 	// --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
-	virtual void Read(vector<WORD> &v)=0;
-	virtual void SetHandle(WORD x)=0;
+	virtual int Read(vector<WORD> &v)=0;
+	virtual int SetHandle(WORD x)=0;
 
 };
 
