@@ -9,6 +9,7 @@ class counter_exception ;
 class no_zlib_exception ;
 class fork_exception ;
 class config_exception ;
+class configfile_exception;
 //std::bad_alloc = almost sure memory is full
 
 
@@ -43,6 +44,13 @@ class config_exception:public exception
  virtual const char*what() const throw()
  {
  	return "No config key";
+ }
+} ;
+class configfile_exception:public exception
+{
+ virtual const char*what() const throw()
+ {
+ 	return "No config file";
  }
 } ;
 

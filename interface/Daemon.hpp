@@ -38,6 +38,7 @@ friend class ControlManager;
 
 private:
 	//private variable each word is capital execpt the first. Underscore at the end
+	// This class should be think as a finite state machine that decides what to do
 EventBuilder 	*eventBuilder_; 
 ControlManager 	*controlManager_;
 Configurator 	*configurator_;

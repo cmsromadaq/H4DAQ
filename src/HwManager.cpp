@@ -19,6 +19,29 @@ HwManager::~HwManager(){}
 // --- Configure the HwManager
 void HwManager::Config(Configurator &c){
 	// take the configurator. Translate it into a Board config. Configure the board
+	xmlNode *hw_node = NULL;	
+	//locate Hardware Node
+	for (hw_node = c.root_element->children; hw_node ; hw_node = hw_node->next)
+	{
+		if (hw_node->type == XML_ELEMENT_NODE &&
+				xmlStrEqual (hw_node->name, xmlCharStrdup ("Hardware"))  )
+			break;
+	}
+	if ( hw_node== NULL ) throw  config_exception();
+
+	// locate each board node and extract info
+	xmlNode *board_node = NULL;	
+	for ( board_node=hw_node->children; board_node ; board_node = board_node->next)
+	{
+		if (  board_node->type == XML_ELEMENT_NODE 	
+				&& xmlStrEqual (hw_node->name, xmlCharStrdup ("board")) )
+		{
+		int ID=Configurator::GetInt(getElementContent(c, "ID" , board_node));
+		//TODO
+		}
+	}
+
+	return;	
 }
 // --- Init
 void HwManager::Init(){

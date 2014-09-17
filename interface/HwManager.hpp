@@ -4,7 +4,8 @@
 #include "interface/EventBuilder.hpp"
 
 
-class Board: public Configurable {
+class Board  { // don't inheriths from configurable 'cause I use BoardConfig
+protected:
 	// this is the BaseClass. Each other class needs to implement this
 	unsigned int id_;
 public:

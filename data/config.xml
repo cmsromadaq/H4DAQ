@@ -1,21 +1,20 @@
 <general>
-  <par_1>val1</par_1>
-  <par_2>val2</par_2>
-  <board>
-    <type>ExampleBoard1</type>
-    <ID>0</ID>
-    <var1>1</var1>
-    <var2>3.14</var2>
-    <var3>testBoard1</var3>
-  </board>
-  <board>
-    <type>ExampleBoard2</type>
-    <ID>1</ID>
-    <variable1>1</variable1>
-    <variable2>3.14</variable2>
-    <variable3>2.1</variable3>
-    <variable4>testBoard2</variable4>
-  </board>
+  <Network>
+    <ListenPort>5555</ListenPort>
+    <ConnectTo>localhost:5555</ConnectTo>
+  </Network>
+  <Hardware>
+    <board>
+      <type>ExampleBoard1</type>
+      <ID>0</ID>
+      <NWord>1</NWord>
+    </board>
+    <board>
+      <type>ExampleBoard2</type>
+      <ID>1</ID>
+      <NWord>1</NWord>
+    </board>
+  </Hardware>
   <otherthing>
     <field1>f1</field1>
   </otherthing>
