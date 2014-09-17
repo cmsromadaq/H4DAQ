@@ -1,5 +1,6 @@
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
+#include "interface/BoardConfig.hpp"
 #include "interface/Logger.hpp"
 #include "interface/EventBuilder.hpp"
 

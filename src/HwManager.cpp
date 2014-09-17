@@ -4,7 +4,7 @@
 // --- Board
 Board::Board(){id_=0;bC_=NULL;};
 Board::~Board(){};
-void Board::Config(BoardConfig *bC){
+int Board::Config(BoardConfig *bC){
 	bC_=bC;
 };
 unsigned int Board::GetId(){return id_;};
