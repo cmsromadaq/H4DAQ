@@ -1,5 +1,6 @@
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
+#include "interface/BoardConfig.hpp"
 #include "interface/Logger.hpp"
 #include "interface/EventBuilder.hpp"
 #include "interface/BoardConfig.hpp"
@@ -21,6 +22,7 @@ public:
 	// --- Configurable
 	virtual int  Init()=0;
 	virtual int Clear()=0;
+	virtual int Print()=0;
 	virtual int BufferClear()=0;
 	virtual int Config(BoardConfig *bC)=0;
 	virtual int Read(vector<WORD> &v)=0;
