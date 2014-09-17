@@ -23,6 +23,23 @@ public:
 };
 
 
+class RequestAndReply: public HasContext,
+			public AsyncUtils{
+protected:
+	zmq::socket_t *req;
+	zmq::socket_t *rep;
+	string LookForAddress;
+	string ListenPort;
+public:
+	RequestAndReply();
+	~RequestAndReply();
+	void Init();
+	void Clear();
+	bool Request();
+	bool Reply();
+};
+
+
 class Publisher: 	public Configurable,
 			public LogUtility,
 			public HasContext {

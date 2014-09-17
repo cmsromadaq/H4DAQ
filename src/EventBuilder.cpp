@@ -187,6 +187,12 @@ dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ //TODO
 	// takes two streams and merge them independently from the content
 }
 
+vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
+	dataType myStream(N,v);
+	vector<WORD> R = StreamToWord( myStream);
+	myStream.release();
+	return R;
+}
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
 	for(int n=0; n< x.size() ; n++)
@@ -202,45 +208,81 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	return R;
 }
 
-WORD 	EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
+long long EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
 
 	dataType H=BoardHeader(boardId);
 	dataType T=BoardTrailer(boardId);
 	
 	// Look in the Header for the 
-	vector<WORD> myWords = StreamToWord( x );
 	vector<WORD> Header  = StreamToWord( H );
-	vector<WORD> Trailer  = StreamToWord( T );
+	vector<WORD> Trailer = StreamToWord( T );
+	if(x.size() < 3*WORDSIZE ) return 0;
+	vector<WORD> myHead  = StreamToWord( x.data(), 3*WORDSIZE ); // read the first three
 	
-	if (myWords[0]  != Header[0] ) return 0;
+	if (myHead[0]  != Header[0] ) return 0;
 
 	if( boardId !=0 )
 	{
-		if ( myWords.size()< 2 || boardId != myWords[1] ) return 0;
+		if ( myHead.size()< 2 || boardId != myHead[1] ) return 0;
 	}
 
 	// the the N of bytes of the stream
-	if (myWords.size() <3) return 0;
-	WORD NBytes = myWords[2];
+	if (myHead.size() <3) return 0;
+	WORD NBytes = myHead[2];
 	WORD NWords  = NBytes / WORDSIZE;
+	if( boardId !=0 )
+	{
+		// TODO Add a check on NWORDS for the specific BoardId
+		// return 0;
+	}
 
+	if ( x.size() < (NWords+3+1)*WORDSIZE )  return 0;
+	vector<WORD> myWords = StreamToWord( x.data(), (NWords+3+1)*WORDSIZE  ); //
 	// ------------------|TRAILER POS| +1 
-	if (myWords.size() < NWords + 3 + 1 ) return 0;
-
+	if (myWords.size() < NWords + 3 + 1 ) return 0; // useless now
+	//check trailer
 	if (myWords[NWords+3] != Trailer[0] ) return 0;
 
 	return (NWords+3+1)*WORDSIZE; // interesting size
 
 }
 
-WORD 	EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
+long long EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
 	{
 	// take ownership of myStream (*v)
 	dataType myStream(MaxN,v);
-	WORD R= IsBoardOk(myStream,boardId);
+	long long R= IsBoardOk(myStream,boardId);
 	// release ownership of myStream
 	myStream.release();
 	return R;
 	}
 
-WORD 	EventBuilder::IsEventOk(dataType &x){} //TODO
+long long EventBuilder::IsEventOk(dataType &x){
+	char *ptr=(char*)x.data();
+	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*2); // read the first two WORDS
+	dataType H=EventHeader();
+	dataType T=EventTrailer();
+	
+	vector<WORD> Header=StreamToWord( H );
+	vector<WORD> Trailer=StreamToWord( T );
+
+	// check header
+	if( myHead.size() <2 ) return 0;
+	if( myHead[0] != Header[0] ) return 0;
+	// header is fine
+	WORD nBoard=myHead[1];
+
+	long long leftsize=x.size() - WORDSIZE*2;
+	ptr += WORDSIZE*2 ;
+	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
+		{
+		long long readByte=IsBoardOk(ptr, leftsize);
+		if (readByte==0) return 0;
+		leftsize -= readByte;
+		ptr += readByte;
+		}
+	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
+	ptr += WORDSIZE;
+	if ( myTrail[0] != Trailer[0] )  return 0;
+	return ptr - (char*)x.data();
+} 

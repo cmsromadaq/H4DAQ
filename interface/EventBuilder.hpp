@@ -88,15 +88,16 @@ public:
 	// ---  appends a header and trailer
 	static dataType WordToStream(WORD x);
 	static vector<WORD> StreamToWord(dataType &x);
+	static vector<WORD> StreamToWord(void*v,int N);
 	static dataType BoardHeader(WORD boardId);
 	static dataType BoardTrailer(WORD boardId);
 	static dataType EventHeader();
 	static dataType EventTrailer();
 	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
 	static dataType MergeEventStream(dataType &x,dataType &y);
-	static WORD 	IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
-	static WORD 	IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
-	static WORD 	IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
+	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
+	static long long IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
+	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
 };
 
 #endif

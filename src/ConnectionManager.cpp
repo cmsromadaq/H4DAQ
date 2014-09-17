@@ -127,6 +127,69 @@ void Subscriber::Config(Configurator &){} //TODO
 //} // 1 context per program
 zmq::context_t* HasContext::context=new zmq::context_t( CONTEXT_THREAD );
 
+
+// RequestAndReply
+// Constructor -- Destructor
+RequestAndReply::RequestAndReply(){
+	req=NULL;
+	rep=NULL;
+	Clear();
+	SetAsync();
+}
+void RequestAndReply::Init(){
+	if( LookForAddress !="") // REQ
+		{
+		req= new zmq::socket_t(*context,ZMQ_REQ);
+		req->connect( ( LookForAddress  ).c_str());
+		}
+	if(ListenPort != "") //REP
+		{
+		rep= new zmq::socket_t(*context,ZMQ_REP);
+		rep->bind( (string("tcp://*:"+ListenPort)  ).c_str());
+		}
+	
+}
+void RequestAndReply::Clear(){
+	if (req!=NULL)	 delete req;
+	req=NULL;
+	if (rep!=NULL)	 delete rep;
+	rep=NULL;
+	LookForAddress="";
+	ListenPort="";
+}
+bool RequestAndReply::Request(){
+	pid_t child=10;
+	if (async_)
+		{
+		child=Fork();
+		if (child>0) return true;
+		}
+	zmq::message_t mex(5);
+	memcpy(mex.data(),"HELLO",5);
+	req->send(mex);
+	req->recv(&mex);
+
+	if (async_ && child==0)
+		{
+		_exit(0);
+		}
+	if (  ((char*)mex.data())[0] == 'W' ) // of WORD
+		return true;
+	return false;
+}
+
+bool RequestAndReply::Reply(){
+	zmq::message_t mex(5);
+	rep->recv(&mex);
+	if (   ((char*)mex.data())[0] == 'H')
+	{
+		memcpy(mex.data(),"WORD",4);
+		rep->send(mex);
+		return true;	
+	}
+	else return false;
+}
+
 // ---------------- CONNECTION MANAGER
 //
 //
