@@ -24,7 +24,7 @@ void HwManager::Config(Configurator &c){
 void HwManager::Init(){
 }
 // --- Clear
-void Clear(){
+void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
 }
 

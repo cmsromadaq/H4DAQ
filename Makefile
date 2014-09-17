@@ -5,11 +5,6 @@ CXXFLAGS	=-O2 -ggdb
 LDFLAGS		=-lz -lm -lzmq
 SOFLAGS		=-fPIC -shared
 SHELL		=bash
-
-Packages	=controller testDataTypeServer testDataTypeClient testDataType testXMLLib
-Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager AsyncUtils BoardConfig
-LibName		=H4DAQ
-
 ###
 SrcSuf        = cpp
 HeadSuf       = hpp
@@ -17,6 +12,18 @@ ObjSuf        = o
 DepSuf        = d
 DllSuf        = so
 StatSuf       = a
+
+## Packages	=controller testDataTypeServer testDataTypeClient testDataType testXMLLib testUInt
+## Objects		=Daemon EventBuilder Handler Logger Profiler  Configurator ControlManager ConnectionManager Utility HwManager AsyncUtils BoardConfig
+
+CppTestFiles=$(wildcard test/*.$(SrcSuf))
+Packages=$(patsubst test/%.$(SrcSuf),%,$(CppTestFiles) )
+
+CppSrcFiles=$(wildcard src/*.$(SrcSuf))
+Objects=$(patsubst src/%.$(SrcSuf),%,$(CppSrcFiles))
+
+LibName		=H4DAQ
+
 ### ----- OPTIONS ABOVE ----- ####
 
 include Makefile.ROOT
