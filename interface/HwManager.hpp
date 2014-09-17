@@ -21,6 +21,7 @@ public:
 	// --- Configurable
 	virtual int  Init()=0;
 	virtual int Clear()=0;
+	virtual int Print()=0;
 	virtual int BufferClear()=0;
 	virtual int Config(BoardConfig *bC);
 	// --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
