@@ -88,6 +88,8 @@ public:
 	void Clear();
 	void Init();
 	void Config(Configurator &);
+	void Send(){}; //TODO
+	void Recv(){};
 
 };
 

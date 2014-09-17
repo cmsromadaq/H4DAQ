@@ -2,6 +2,7 @@
 #include "interface/Configurator.hpp"
 #include "interface/Logger.hpp"
 #include "interface/EventBuilder.hpp"
+#include "interface/BoardConfig.hpp"
 
 
 class Board  { // don't inheriths from configurable 'cause I use BoardConfig
@@ -16,13 +17,12 @@ public:
 	// --- Destructor
 	~Board();
 	// -- Get Id
-	unsigned int GetId();//{return id;};
+	inline unsigned int GetId(){return id_;};
 	// --- Configurable
 	virtual int  Init()=0;
 	virtual int Clear()=0;
 	virtual int BufferClear()=0;
-	virtual int Config(BoardConfig *bC);
-	// --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
+	virtual int Config(BoardConfig *bC)=0;
 	virtual int Read(vector<WORD> &v)=0;
 	virtual int SetHandle(WORD x)=0;
 
