@@ -58,6 +58,7 @@ public:
     int RecordLength;
     unsigned int PostTrigger;
 
+    int NumEvents;
     int InterruptNumEvents; 
     int TestPattern;
     int DesMode;
