@@ -14,9 +14,9 @@
     </board>
   </Hardware>
   <EventBuilder>
-	  <dump>1</dump>
-	  <send>1</send>
-	  <fileName>/tmp/dump.gz</fileName>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpFileName>/tmp/dump.gz</dumpFileName>
+	  <sendEvent>1</sendEvent>
 	  <compress>1</compress>
   </EventBuilder>
   <otherthing>
