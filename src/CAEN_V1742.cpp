@@ -310,7 +310,68 @@ int CAEN_V1742::programDigitizer()
 
 int CAEN_V1742::writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_eventBuffer, CAEN_DGTZ_EventInfo_t* eventInfo, CAEN_DGTZ_X742_EVENT_t* event)
 {
+  int gr,ch;
   
+  //          ====================================================
+  //          |           V1742 Raw Event Data Format            |
+  //          ====================================================
+
+  //                       31  -  28 27  -  16 15   -   0
+  //            Word[0] = [ 1010  ] [Event Tot #Words  ] //Event Header (5 words)
+  //            Word[1] = [     Board Id    ] [ Pattern]  
+  //            Word[2] = [      #channels readout     ]
+  //            Word[3] = [        Event counter       ]
+  //            Word[4] = [      Trigger Time Tag      ]
+  //            Word[5] = [ 1000  ] [    Ch0   #Words  ] // Ch0 Data (2 + #samples words)
+  //            Word[6] = [    Ch0  #Gr    ] [ Ch0 #Ch ] 
+  //            Word[7] = [ Ch0 Corr. samples  (float) ]
+  //                ..  = [ Ch0 Corr. samples  (float) ]
+  // Word[5+Ch0 #Words] = [ 1000  ] [    Ch1   #Words  ] // Ch1 Data (2 + #samples words)
+  // Word[6+Ch0 #Words] = [    Ch1  #Gr    ] [ Ch1 #Ch ]
+  // Word[7+Ch0 #Words] = [ Ch1 Corr. samples  (float) ]
+  //               ...   = [          .....             ]
+
+  //CAEN_V1742_eventBuffer.clear();
+  CAEN_V1742_eventBuffer.resize(5);
+  (CAEN_V1742_eventBuffer)[0]=0xA0000005; 
+  (CAEN_V1742_eventBuffer)[1]=((eventInfo->BoardId)<<26)+eventInfo->Pattern;
+  (CAEN_V1742_eventBuffer)[2]=0;
+  (CAEN_V1742_eventBuffer)[3]=eventInfo->EventCounter;
+  (CAEN_V1742_eventBuffer)[4]=eventInfo->TriggerTimeTag;
+
+  //  printf("EVENT 1742 %d %d\n",eventInfo->EventCounter,eventInfo->TriggerTimeTag);
+  for (gr=0;gr<(digitizerConfiguration_.Nch/8);gr++) {
+    if (event->GrPresent[gr]) {
+      for(ch=0; ch<9; ch++) {
+	int Size = event->DataGroup[gr].ChSize[ch];
+	if (Size <= 0) {
+	  continue;
+	}
+
+	// Channel Header for this event
+ 	uint32_t ChHeader[2];
+	ChHeader[0] = (8<<28) + (2 + Size); //Number of words written for this channel
+	ChHeader[1] = (gr<<16)+ch;
+
+	//Starting pointer
+	int start_ptr=CAEN_V1742_eventBuffer.size();
+
+	//Allocating necessary space for this channel
+	CAEN_V1742_eventBuffer.resize(CAEN_V1742_eventBuffer.size() + 2 + Size);
+	memcpy(&((CAEN_V1742_eventBuffer)[start_ptr]), &ChHeader[0], 2 * sizeof(unsigned int));
+
+	//Beware the datas are float (because they are corrected...) but copying them here bit by bit. Should remember this for reading them out
+	memcpy(&((CAEN_V1742_eventBuffer)[start_ptr+2]), event->DataGroup[gr].DataChannel[ch], Size * sizeof(unsigned int));
+
+	//Update event size and #channels
+	(CAEN_V1742_eventBuffer)[0]+=(Size+2);
+	(CAEN_V1742_eventBuffer)[2]++;
+      }
+    }
+  }
+  
+  return 0;
+
 }
 
 //Fill V1742 config struct from xmlNode
