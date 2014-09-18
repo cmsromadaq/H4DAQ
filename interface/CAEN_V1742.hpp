@@ -35,17 +35,6 @@ class CAEN_V1742: public Board {
 
 public:
 
-  typedef struct CAEN_V1742_Event_t
-  {
-    CAEN_V1742_Event_t(const CAEN_DGTZ_EventInfo_t& ei, const CAEN_DGTZ_X742_EVENT_t& e): 
-      eventInfo(ei), 
-      event(e) 
-    {
-    };
-    CAEN_DGTZ_EventInfo_t eventInfo;
-    CAEN_DGTZ_X742_EVENT_t event;
-  } CAEN_V1742_Event_t;
-
   typedef struct CAEN_V1742_Config_t {
     int LinkType;
     int LinkNum;
@@ -104,7 +93,7 @@ private:
 
   int getMoreBoardInfo();
   int programDigitizer();
-  int writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_eventBuffer, CAEN_DGTZ_EventInfo_t *EventInfo, CAEN_DGTZ_X742_EVENT_t *Event);
+  int writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_rawDataBinaryBuffer, CAEN_DGTZ_EventInfo_t* eventInfo, CAEN_DGTZ_X742_EVENT_t* event);
   int ParseConfiguration();
 					
   uint32_t digitizerHandle_;

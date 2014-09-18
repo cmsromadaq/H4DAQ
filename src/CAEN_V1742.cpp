@@ -107,7 +107,109 @@ int CAEN_V1742::Config(BoardConfig *bC)
   ParseConfiguration();
 };
 
-int CAEN_V1742::Read(vector<WORD> &v){};
+int CAEN_V1742::Read(vector<WORD> &v)
+{
+  CAEN_DGTZ_ErrorCode ret=CAEN_DGTZ_Success;
+  ERROR_CODES ErrCode= ERR_NONE;
+  int i;
+  //, Nb=0, Ne=0;
+  uint32_t BufferSize, NumEvents,Nb=0,Ne=0;
+  CAEN_DGTZ_EventInfo_t       EventInfo;
+
+  char *v1742_buffer;
+  char *v1742_eventPtr;
+  
+  v1742_buffer=NULL;
+
+  uint32_t AllocatedSize;
+
+  CAEN_DGTZ_X742_EVENT_t       *Event742=NULL;  /* custom event struct */
+  
+  ret = CAEN_DGTZ_AllocateEvent(digitizerHandle_, (void**)&Event742);
+  if (ret != CAEN_DGTZ_Success) {
+    ErrCode = ERR_MALLOC;
+    return ErrCode;
+  }
+
+  /* printf("allocated event %d\n",ret); */
+  ret = CAEN_DGTZ_MallocReadoutBuffer(digitizerHandle_, &v1742_buffer, &AllocatedSize); /* WARNING: This malloc must be done after the digitizer programming */
+  /* printf("malloc %d %d\n",AllocatedSize,ret); */
+  if (ret) {
+    ErrCode = ERR_MALLOC;
+    return ErrCode;
+  }
+
+  BufferSize = 0;
+  NumEvents = 0;
+
+  while (NumEvents==0)
+    {
+      ret = CAEN_DGTZ_ReadData(digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, v1742_buffer, &BufferSize);
+      
+      if (ret) {
+	ErrCode = ERR_READOUT;
+	return ErrCode;
+      }
+      
+      if (BufferSize != 0) {
+	ret = CAEN_DGTZ_GetNumEvents(digitizerHandle_, v1742_buffer, BufferSize, &NumEvents);
+	if (ret) {
+	  ErrCode = ERR_READOUT;
+	  return ErrCode;
+	}
+      }
+    }
+  
+  //For the moment empty the buffers one by one
+  if (NumEvents != 1)
+    {
+      ErrCode = ERR_MISMATCH_EVENTS;
+      return ErrCode;
+    }
+  
+  /* Analyze data */
+  for(i = 0; i < (int)NumEvents; i++) {
+    /* Get one event from the readout buffer */
+    ret = CAEN_DGTZ_GetEventInfo(digitizerHandle_, v1742_buffer, BufferSize, i, &EventInfo, &v1742_eventPtr);
+    if (ret) {
+      ErrCode = ERR_EVENT_BUILD;
+      return ErrCode;
+    }
+    ret = CAEN_DGTZ_DecodeEvent(digitizerHandle_, v1742_eventPtr, (void**)&Event742);
+    if (ret) {
+      ErrCode = ERR_EVENT_BUILD;
+      return ErrCode;
+    }    
+    // if(digitizerConfiguration_.useCorrections != -1) { // if manual corrections
+    // 	ApplyDataCorrection( 0, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, &(Event742->DataGroup[0]), &Table_gr0);
+    // 	ApplyDataCorrection( 1, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, &(Event742->DataGroup[1]), &Table_gr1);
+    // 	  }
+    ret = (CAEN_DGTZ_ErrorCode) writeEventToOutputBuffer(v,&EventInfo,Event742);
+    if (ret) {
+      ErrCode = ERR_EVENT_BUILD;
+      return ErrCode;
+    }    
+  }
+    
+
+      //      printf("%d %d\n",Nb,Ne);
+      //      sleep(1);
+  
+  /* //Freeing V1742 memory  after read */
+  free(v1742_buffer);
+  //  free(v1742_eventPtr);
+  delete(Event742);
+
+  // Test what happens when enable this. Do we need to malloc again? To be checked
+  /* ret = CAEN_DGTZ_FreeReadoutBuffer(&v1742_buffer); */
+  /* if (ret) { */
+  /*   ErrCode = ERR_FREE_BUFFER; */
+  /*   return ErrCode; */
+  /* } */
+  
+  return 0;
+
+};
 
 int CAEN_V1742::SetHandle(vector<WORD> &v){};
 
@@ -206,7 +308,10 @@ int CAEN_V1742::programDigitizer()
   return 0;
 };
 
-int CAEN_V1742::writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_eventBuffer, CAEN_DGTZ_EventInfo_t *EventInfo, CAEN_DGTZ_X742_EVENT_t *Event){};
+int CAEN_V1742::writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_eventBuffer, CAEN_DGTZ_EventInfo_t* eventInfo, CAEN_DGTZ_X742_EVENT_t* event)
+{
+  
+}
 
 //Fill V1742 config struct from xmlNode
 int CAEN_V1742::ParseConfiguration()
