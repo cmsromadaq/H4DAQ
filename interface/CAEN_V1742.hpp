@@ -4,38 +4,41 @@
 #include <CAENDigitizer.h>
 #define CAEN_V1742_MAXCH  64          /* max. number of channels */
 #define CAEN_V1742_MAXSET 8           /* max. number of independent settings */
-
 #define CAEN_V1742_MAXGW  1000        /* max. number of generic write commads */
 
-#define VME_INTERRUPT_LEVEL      1
-#define VME_INTERRUPT_STATUS_ID  0xAAAA
-#define INTERRUPT_MODE           CAEN_DGTZ_IRQ_MODE_ROAK
-#define INTERRUPT_TIMEOUT        200  // ms
+#define CAEN_V1742_VME_INTERRUPT_LEVEL      1
+#define CAEN_V1742_VME_INTERRUPT_STATUS_ID  0xAAAA
 
-typedef enum  {
-  ERR_NONE= 0,
-  ERR_CONF_NOT_FOUND= 2,
-  ERR_DGZ_OPEN,
-  ERR_BOARD_INFO_READ,
-  ERR_INVALID_BOARD_TYPE,
-  ERR_DGZ_PROGRAM,
-  ERR_MALLOC,
-  ERR_RESTART,
-  ERR_INTERRUPT,
-  ERR_READOUT,
-  ERR_EVENT_BUILD,
-  ERR_HISTO_MALLOC,
-  ERR_UNHANDLED_BOARD,
-  ERR_MISMATCH_EVENTS,
-  ERR_FREE_BUFFER,
-  ERR_DUMMY_LAST,
-} ERROR_CODES;
+#define CAEN_V1742_INTERRUPT_MODE           CAEN_DGTZ_IRQ_MODE_ROAK
+#define CAEN_V1742_INTERRUPT_TIMEOUT        200  // ms
+
 
 class CAEN_V1742: public Board {
 
 public:
 
+  typedef enum  {
+    ERR_NONE= 0,
+    ERR_CONF_NOT_FOUND= 2,
+    ERR_DGZ_OPEN,
+    ERR_BOARD_INFO_READ,
+    ERR_INVALID_BOARD_TYPE,
+    ERR_DGZ_PROGRAM,
+    ERR_MALLOC,
+    ERR_RESTART,
+    ERR_INTERRUPT,
+    ERR_READOUT,
+    ERR_EVENT_BUILD,
+    ERR_HISTO_MALLOC,
+    ERR_UNHANDLED_BOARD,
+    ERR_MISMATCH_EVENTS,
+    ERR_FREE_BUFFER,
+    ERR_DUMMY_LAST,
+  } ERROR_CODES;
+
+
   typedef struct CAEN_V1742_Config_t {
+    unsigned int baseAddress;
     int LinkType;
     int LinkNum;
     int ConetNode;

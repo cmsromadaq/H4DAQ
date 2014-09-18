@@ -248,8 +248,8 @@ int CAEN_V1742::programDigitizer()
   if( digitizerConfiguration_.InterruptNumEvents > 0) {
       // Interrupt handling
       if( ret |= CAEN_DGTZ_SetInterruptConfig( digitizerHandle_, CAEN_DGTZ_ENABLE,
-                                               VME_INTERRUPT_LEVEL, VME_INTERRUPT_STATUS_ID,
-                                               digitizerConfiguration_.InterruptNumEvents, INTERRUPT_MODE)!= CAEN_DGTZ_Success) {
+                                               CAEN_V1742_VME_INTERRUPT_LEVEL, CAEN_V1742_VME_INTERRUPT_STATUS_ID,
+                                               digitizerConfiguration_.InterruptNumEvents, CAEN_V1742_INTERRUPT_MODE)!= CAEN_DGTZ_Success) {
           printf( "\nError configuring interrupts. Interrupts disabled\n\n");
           digitizerConfiguration_.InterruptNumEvents = 0;
       }
