@@ -14,40 +14,20 @@ int CAEN_VX718::Init()
   status |= CAENVME_SystemReset(handle_);
   if (status)
     return ERR_RESET;
+
   status |= CAENVME_WriteRegister(handle_,cvVMEControlReg,configuration_.controlRegWord);
-  if (status)
-    return ERR_PROGRAM;
   /*  setting the output lines */
   status |= CAENVME_SetOutputConf(handle_,cvOutput0,configuration_.Output0Polarity,configuration_.Output0LedPolarity,configuration_.Output0Source);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetOutputConf(handle_,cvOutput1,configuration_.Output1Polarity,configuration_.Output1LedPolarity,configuration_.Output1Source);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetOutputConf(handle_,cvOutput2,configuration_.Output2Polarity,configuration_.Output2LedPolarity,configuration_.Output2Source);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetOutputConf(handle_,cvOutput3,configuration_.Output3Polarity,configuration_.Output3LedPolarity,configuration_.Output3Source);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetOutputConf(handle_,cvOutput4,configuration_.Output4Polarity,configuration_.Output4LedPolarity,configuration_.Output4Source);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
-
   /* setting which output line must be pulsed  */
   status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
-  if (status)
-    return ERR_PROGRAM;
-
   //setting the input lines
   status |= CAENVME_SetInputConf(handle_,cvInput0,configuration_.Input0Polarity,configuration_.Input0LedPolarity);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetInputConf(handle_,cvInput1,configuration_.Input1Polarity,configuration_.Input1LedPolarity);
-  if (status)
-    return ERR_PROGRAM;
-
   //setting up the pulser
   status |= CAENVME_SetPulserConf(handle_,
 				  cvPulserA,
@@ -58,13 +38,8 @@ int CAEN_VX718::Init()
 				  configuration_.PulserAStartInput,
 				  configuration_.PulserAResetInput
 				  );
-  if (status)
-    return ERR_PROGRAM;
-
   //setting up scaler
   status |= CAENVME_WriteRegister(handle_,cvScaler0,configuration_.scalerConfWord);
-  if (status)
-    return ERR_PROGRAM;
   status |= CAENVME_SetScalerConf(handle_,
 				  configuration_.ScalerLimit,
 				  configuration_.ScalerAutoReset,
@@ -72,9 +47,9 @@ int CAEN_VX718::Init()
 				  configuration_.ScalerGateInput,
 				  configuration_.ScalerResetInput
 				  );
+  status |= CAENVME_EnableScalerGate(handle_); 
   if (status)
     return ERR_PROGRAM;
-  status |= CAENVME_EnableScalerGate(handle_); 
 
   PrintConfiguration();
   std::cout << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++" << std::endl;  
@@ -147,7 +122,9 @@ int CAEN_VX718::TriggerReceived()
 	}
     }
   //send DAQ_TRIG_ACK
-  SendSignal(DAQ_TRIG_ACK);
+  status = SendSignal(DAQ_TRIG_ACK);
+  if (status)
+    return status;
   return 0;
 }
 
