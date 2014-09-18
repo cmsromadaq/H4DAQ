@@ -211,9 +211,86 @@ int CAEN_V1742::Read(vector<WORD> &v)
 
 };
 
-int CAEN_V1742::SetHandle(vector<WORD> &v){};
-
-int CAEN_V1742::getMoreBoardInfo(){};
+int CAEN_V1742::getMoreBoardInfo()
+{
+  CAEN_DGTZ_DRS4Frequency_t freq;
+  int ret;
+  switch(boardInfo_.FamilyCode) {
+  case CAEN_DGTZ_XX724_FAMILY_CODE: digitizerConfiguration_.Nbit = 14; digitizerConfiguration_.Ts = 10.0; break;
+  case CAEN_DGTZ_XX720_FAMILY_CODE: digitizerConfiguration_.Nbit = 12; digitizerConfiguration_.Ts = 4.0;  break;
+  case CAEN_DGTZ_XX721_FAMILY_CODE: digitizerConfiguration_.Nbit =  8; digitizerConfiguration_.Ts = 2.0;  break;
+  case CAEN_DGTZ_XX731_FAMILY_CODE: digitizerConfiguration_.Nbit =  8; digitizerConfiguration_.Ts = 2.0;  break;
+  case CAEN_DGTZ_XX751_FAMILY_CODE: digitizerConfiguration_.Nbit = 10; digitizerConfiguration_.Ts = 1.0;  break;
+  case CAEN_DGTZ_XX761_FAMILY_CODE: digitizerConfiguration_.Nbit = 10; digitizerConfiguration_.Ts = 0.25;  break;
+  case CAEN_DGTZ_XX740_FAMILY_CODE: digitizerConfiguration_.Nbit = 12; digitizerConfiguration_.Ts = 16.0; break;
+  case CAEN_DGTZ_XX742_FAMILY_CODE: 
+    digitizerConfiguration_.Nbit = 12; 
+    if ((ret = CAEN_DGTZ_GetDRS4SamplingFrequency(digitizerHandle_, &freq)) != CAEN_DGTZ_Success) return (int)CAEN_DGTZ_CommError;
+    switch (freq) {
+    case CAEN_DGTZ_DRS4_1GHz:
+      digitizerConfiguration_.Ts = 1.0;
+      break;
+    case CAEN_DGTZ_DRS4_2_5GHz:
+      digitizerConfiguration_.Ts = (float)0.4;
+      break;
+    case CAEN_DGTZ_DRS4_5GHz:
+      digitizerConfiguration_.Ts = (float)0.2;
+      break;
+    }
+    break;
+  default: return -1;
+  }
+  if (((boardInfo_.FamilyCode == CAEN_DGTZ_XX751_FAMILY_CODE) ||
+       (boardInfo_.FamilyCode == CAEN_DGTZ_XX731_FAMILY_CODE) ) && digitizerConfiguration_.DesMode)
+    digitizerConfiguration_.Ts /= 2;
+	
+  switch(boardInfo_.FamilyCode) {
+  case CAEN_DGTZ_XX724_FAMILY_CODE:
+  case CAEN_DGTZ_XX720_FAMILY_CODE:
+  case CAEN_DGTZ_XX721_FAMILY_CODE:
+  case CAEN_DGTZ_XX751_FAMILY_CODE:
+  case CAEN_DGTZ_XX761_FAMILY_CODE:
+  case CAEN_DGTZ_XX731_FAMILY_CODE:
+    switch(boardInfo_.FormFactor) {
+    case CAEN_DGTZ_VME64_FORM_FACTOR:
+    case CAEN_DGTZ_VME64X_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 8;
+      break;
+    case CAEN_DGTZ_DESKTOP_FORM_FACTOR:
+    case CAEN_DGTZ_NIM_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 4;
+      break;
+    }
+    break;
+  case CAEN_DGTZ_XX740_FAMILY_CODE:
+    switch( boardInfo_.FormFactor) {
+    case CAEN_DGTZ_VME64_FORM_FACTOR:
+    case CAEN_DGTZ_VME64X_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 64;
+      break;
+    case CAEN_DGTZ_DESKTOP_FORM_FACTOR:
+    case CAEN_DGTZ_NIM_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 32;
+      break;
+    }
+    break;
+  case CAEN_DGTZ_XX742_FAMILY_CODE:
+    switch( boardInfo_.FormFactor) {
+    case CAEN_DGTZ_VME64_FORM_FACTOR:
+    case CAEN_DGTZ_VME64X_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 36;
+      break;
+    case CAEN_DGTZ_DESKTOP_FORM_FACTOR:
+    case CAEN_DGTZ_NIM_FORM_FACTOR:
+      digitizerConfiguration_.Nch = 16;
+      break;
+    }
+    break;
+  default:
+    return -1;
+  }
+  return 0;
+};
 
 int CAEN_V1742::programDigitizer()
 {
