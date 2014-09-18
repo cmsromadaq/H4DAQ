@@ -39,6 +39,7 @@ public:
 
   typedef struct CAEN_V1742_Config_t {
     unsigned int baseAddress;
+
     int LinkType;
     int LinkNum;
     int ConetNode;
