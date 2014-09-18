@@ -1,4 +1,5 @@
 #include "interface/Utility.hpp"
+#include <sstream>
 
 string Utility::AsciiData(void *data,int N,int M)
 {
@@ -31,4 +32,11 @@ while( !mex1.empty() && !mex2.empty() )
 	mex2.erase(0,pos2+1);
 	}
 return mex;
+}
+
+string Utility::ConvertToString(int N){
+	std::ostringstream ostr; //output string stream
+	ostr << N; //use the string stream just like cout,
+	std::string theNumberString = ostr.str(); //the str() function of the stream 
+	return theNumberString;
 }

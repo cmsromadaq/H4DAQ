@@ -103,9 +103,10 @@ void dataType::release(){
 // ---------- Event Builder
 EventBuilder::EventBuilder()
 {
-	dataStream_.reserve(1024); //reserve 1K for each stream
+	myRun_.reserve(1024); //reserve 1K for each stream
 	dumpEvent_=true;
-	dumpEvent_=false;
+	sendEvent_=false;
+	isRunOpen_=false;
 	// Init dumper
 	dump_=new Logger();
 	dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
@@ -194,6 +195,20 @@ dataType EventBuilder::EventTrailer()
 {
 	dataType R;R.reserve(WORDSIZE);
 	R.append((void*)"EVNT\0\0\0\0\0\0\0\0",WORDSIZE);
+	return R;
+}
+
+dataType EventBuilder::RunHeader()
+{
+	dataType R; R.reserve(WORDSIZE);
+	R.append((void*)"RUNH\0\0\0\0\0\0\0\0",WORDSIZE);
+	return R;
+}
+
+dataType EventBuilder::RunTrailer()
+{
+	dataType R;R.reserve(WORDSIZE);
+	R.append((void*)"RUNT\0\0\0\0\0\0\0\0",WORDSIZE);
 	return R;
 }
 
@@ -329,3 +344,53 @@ void EventBuilder::Clear(){
 	if(dumpEvent_)dump_->Clear();
 }
 //
+// RUN 
+void EventBuilder::OpenRun(WORD runNum)
+{
+	if (isRunOpen_) CloseRun(); 
+	if (dumpEvent_)
+	{ // open dumping file
+		string fileName=dump_->GetFileName();
+		size_t dot= fileName.rfind(".");
+		string newFileName=fileName.substr(0,dot) + "_" + to_string(runNum) + fileName.substr(dot,string::npos); // c++11 to string, othewsie use something like sprintf
+		dump_->SetFileName( newFileName );	
+		dump_->Init();
+	}
+	isRunOpen_=true;
+	dataType runH=RunHeader();
+	myRun_.append(runH);
+	myRun_.append( (void *)&runNum,WORDSIZE);
+	WORD zero=0;
+	myRun_.append( (void*)&zero, WORDSIZE);
+}
+
+void EventBuilder::CloseRun()
+{
+	dataType  runT=RunTrailer();
+	myRun_.append(runT);
+	if( dumpEvent_) 
+	{
+		Dump(myRun_);
+		dump_->Close();
+	}
+	if (sendEvent_) {} //TODO -- also do the merging if recv
+	myRun_.clear();
+	isRunOpen_=false;	
+}
+
+void EventBuilder::AddEventToRun(dataType &event){
+	if (!isRunOpen_) return; // throw exception TODO
+	// find the N.Of.Event in the actual RUn
+	if (myRun_.size() < WORDSIZE*3)  return; //throw exception TODO
+	WORD *nEventsPtr=((WORD*)myRun_.data() +2 );
+	WORD nEvents= *nEventsPtr;
+	nEvents+=1;
+	(*nEventsPtr)=nEvents;
+	myRun_.append(event);
+	return;
+}
+void EventBuilder::MergeRuns(dataType &run2 ){
+	dataType oldRun_(myRun_.size(),myRun_.data());	
+	myRun_.release();myRun_.clear();
+	//TODO
+}

@@ -69,11 +69,12 @@ const bool operator==(dataType &x, dataType &y);
 
 class EventBuilder : public LogUtility, public Configurable{
 // ---binary stream of the event -- 1char = 1byte
-dataType dataStream_; // dynamic array of char*
+dataType myRun_; // dynamic array of char*
 
 bool dumpEvent_; // default true
 bool sendEvent_; // default false
 Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
+bool isRunOpen_;
 
 	
 public:
@@ -87,12 +88,16 @@ public:
 	~EventBuilder();
 	// 
 	void AppendToStream();
-	const void* GetStream(){ return dataStream_.c_str();}
-	int  GetSize(){return dataStream_.size();}
+	const void* GetStream(){ return myRun_.c_str();}
+	int  GetSize(){return myRun_.size();}
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO
 	void Clear(); //TODO
-	inline void Dump(dataType&event) {dump_->Dump(event);};
+	inline void Dump(dataType&run) {dump_->Dump(run);};
+	void OpenRun(WORD runNum);
+	void CloseRun( );
+	void AddEventToRun(dataType &event ); //TODO
+	void MergeRuns(dataType &run2 ); //TODO
 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
@@ -103,6 +108,8 @@ public:
 	static dataType BoardTrailer(WORD boardId);
 	static dataType EventHeader();
 	static dataType EventTrailer();
+	static dataType RunHeader();
+	static dataType RunTrailer();
 	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
 	static dataType MergeEventStream(dataType &x,dataType &y);
 	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
