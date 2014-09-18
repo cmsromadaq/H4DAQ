@@ -94,6 +94,15 @@ int CAEN_VX718::Clear()
 
 int CAEN_VX718::BufferClear()
 {
+  //Reset the scaler counter
+  int status = 0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+  status |= CAENVME_ResetScalerCount(handle_);
+  if (status)
+    return ERR_RESET;
+  return 0;
+
 }
 
 int CAEN_VX718::Config(BoardConfig *bC)
@@ -104,20 +113,61 @@ int CAEN_VX718::Config(BoardConfig *bC)
 
 int CAEN_VX718::Read(vector<WORD> &v)
 {
+  //Nothing to read for VX718
 }
 
 int CAEN_VX718::TriggerReceived()
 {
+  int status = 0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
   //Clear scaler
-  BufferClear();
+  status = BufferClear();
+  if (status)
+    return status;
   //send DAQ_CLEAR_BUSY
+  status = SendSignal(DAQ_CLEAR_BUSY);
+  if  (status)
+    return status;
+  
   //loop until scaler switch to 1
+  bool trigger=false;
+  uint32_t data;
+  while(!trigger) //maybe implement also a trigger timeout later
+    {
+      status |= CAENVME_ReadRegister(handle_, cvScaler1, &data);
+      if (status)
+	return ERR_TRIGGER_READ;
+      if (data)
+	{
+	  trigger=true;
+	  if (data>1)
+	    std::cout << "[VX718]::[WARNING]::SCALER >1" << std::endl;
+	}
+    }
   //send DAQ_TRIG_ACK
-  return 1;
+  SendSignal(DAQ_TRIG_ACK);
+  return 0;
 }
 
-int CAEN_VX718::SendSignal(VX718_DAQ_Signals)
+int CAEN_VX718::SendSignal(VX718_DAQ_Signals sig)
 {
+  int status = 0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  if(sig==DAQ_CLEAR_BUSY)
+    status |= CAENVME_PulseOutputRegister(handle_,configuration_.clearBusyOutputBit);
+  else if(sig==DAQ_TRIG_ACK)
+    status |= CAENVME_PulseOutputRegister(handle_,configuration_.trigAckOutputBit);
+  else
+    return ERR_DAQ_SIGNAL_UNKNOWN;
+
+  if (status)
+    return ERR_DAQ_SIGNAL;
+
+  return 0;
 }
 
 int CAEN_VX718::PrintConfiguration()

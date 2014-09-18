@@ -19,6 +19,8 @@ public:
     ERR_READ,
     ERR_PROGRAM,
     ERR_TRIGGER_READ,
+    ERR_DAQ_SIGNAL,
+    ERR_DAQ_SIGNAL_UNKNOWN,
     ERR_RESET,
     ERR_DUMMY_LAST,
   } ERROR_CODES;
@@ -96,7 +98,7 @@ public:
   virtual int TriggerReceived();
 
 private:
-  int SendSignal(VX718_DAQ_Signals);
+  int SendSignal(VX718_DAQ_Signals sig);
   int PrintConfiguration();
   int ParseConfiguration();
 					
