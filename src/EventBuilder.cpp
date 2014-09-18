@@ -104,6 +104,11 @@ void dataType::release(){
 EventBuilder::EventBuilder()
 {
 	dataStream_.reserve(1024); //reserve 1K for each stream
+	dumpEvent_=true;
+	dump=new Logger();
+	dump->SetFileName("/tmp/dump.gz");
+	dump->SetCompress();
+	dump->SetBinary();
 }
 
 

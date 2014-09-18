@@ -1,9 +1,9 @@
 INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb 
+CXXFLAGS	=-O2 -ggdb -std=gnu++0x 
 LDFLAGS		=-lz -lm -lzmq
-SOFLAGS		=-fPIC -shared
+SOFLAGS		=-fPIC -shared 
 SHELL		=bash
 ###
 SrcSuf        = cpp
@@ -76,7 +76,7 @@ $(Packages): % : $(BINDIR)/% | $(BINDIR)
 #$(BINDIR)/$(Packages): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 $(addprefix $(BINDIR)/,$(Packages)): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(StatLib)  -I$(INC_DIR) -I$(HDIR)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(StatLib) -I$(INC_DIR) -I$(HDIR)
 
 #make this function of $(Packages)
 #.PHONY: controller
