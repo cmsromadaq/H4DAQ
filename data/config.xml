@@ -13,6 +13,12 @@
       <ID>1</ID>
     </board>
   </Hardware>
+  <EventBuilder>
+	  <dump>1</dump>
+	  <send>1</send>
+	  <fileName>/tmp/dump.gz</fileName>
+	  <compress>1</compress>
+  </EventBuilder>
   <otherthing>
     <field1>f1</field1>
   </otherthing>

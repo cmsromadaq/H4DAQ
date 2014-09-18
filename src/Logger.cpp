@@ -12,6 +12,7 @@ Logger::Logger()
 	logNumber_=-1;
 	async_=false;
 	logLevel_=1; // 0 -> no log, 1-> reasonable 3->everything
+	binary_=0;
 }
 // Destructor
 Logger::~Logger(){ 
@@ -58,6 +59,7 @@ void Logger::Release(LogUtility *u) {
 
 void Logger::Init(){
 	string fileName= fileName_;
+	if (maxlines_ >0 && binary_) { maxlines_=-1; } // binary mode don't split. In future may count the bytes written
 	if (maxlines_ >0)
 		{
 		++logNumber_ ;
@@ -67,12 +69,17 @@ void Logger::Init(){
 	
 	if (compress_){
 		#ifndef NO_ZLIB
-			gw_=gzopen(fileName.c_str(),"w");
+			if (binary_)gw_=gzopen(fileName.c_str(),"wb");
+			else gw_=gzopen(fileName.c_str(),"w");
 		#else
 			throw no_zlib_exception();
 		#endif
 		}
-	else {fw_=fopen(fileName.c_str(),"w"); }
+	else {
+		if(binary_)fw_=fopen(fileName.c_str(),"wb"); 
+		else fw_=fopen(fileName.c_str(),"w"); 
+		}
+	return ;
 }
 
 void Logger::SetCompress(bool compress)
@@ -85,6 +92,24 @@ void Logger::SetCompress(bool compress)
 	#endif
 	compress_=compress;
 return;
+}
+
+void Logger::Write(dataType &d, bool dryrun){
+	// implement the low level Dump. intended for binary
+	if (maxlines_>=0) return; // can't count lines
+	if ( compress_)
+		{
+		#ifndef NO_ZLIB
+			gzwrite(gw_,d.data(),d.size());
+			gzflush(gw_,Z_SYNC_FLUSH);
+		#else
+			throw no_zlib_exception();
+		#endif
+		}
+	else    {
+		if(!dryrun)fwrite(d.data(),1,d.size(),fw_);
+		}
+	return;
 }
 
 void Logger::Write(string line, bool dryrun)
@@ -137,6 +162,23 @@ void Logger::Close(){
 	return;
 }
 
+void Logger::Dump(dataType &d)
+{
+	if (async_){
+   	pid_t childpid=Fork(); 
+	if (childpid==0) //child
+		{
+		Write(d);
+		_exit(0);
+		}
+	else if (childpid >0 ) {
+		return; 
+		}
+	else  { Write(d); return; } // async off -- Async utils takes care of limits
+	
+	}
+	else { Write(d) ; return;}
+}
 
 void Logger::Log(string line,short level){
 // implement the high level logging for async operation

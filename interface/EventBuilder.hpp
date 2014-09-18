@@ -70,6 +70,10 @@ const bool operator==(dataType &x, dataType &y);
 class EventBuilder : public LogUtility, public Configurable{
 // ---binary stream of the event -- 1char = 1byte
 dataType dataStream_; // dynamic array of char*
+
+bool dumpEvent_; // default true
+Logger *dump; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
+
 	
 public:
 	/* this class contains the raw event.

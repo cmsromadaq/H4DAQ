@@ -5,11 +5,13 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-
+class dataType;
 class LogUtility;
 
 class Logger: public Configurable, public AsyncUtils{
 friend class LogUtility;
+// this is actually a class that can be used to write on files. 
+// 
 
 // --- fileName where to log to
 string fileName_;
@@ -23,6 +25,7 @@ FILE *fw_;
 #endif
 
 bool compress_;
+bool binary_;
 //bool async_;
 long int counter_;
 long int maxlines_;
@@ -44,20 +47,26 @@ public:
 	void Config(Configurator &){};
 	// --- Init Function
 	void Init();
+	// --- Binary
+	inline void SetBinary(bool binary=true){binary_=binary;}
 	// --- Set Compression of the log
 	void SetCompress(bool compress=true);
 	// --- Set Asyncronous logging
 	//void SetAsync(bool async=true) { async_=async;};
 	// --- Set Max n. of lines in a log file
-	void SetMaxLines(long n) { maxlines_=n;};
+	inline void SetMaxLines(long n) { maxlines_=n;};
 	// --- Set Log Level 0-> quite 1-> normal 3->verbose
-	void SetLogLevel(short l) { logLevel_ = l ;}
+	inline void SetLogLevel(short l) { logLevel_ = l ;}
 	// --- Set FileName 
-	void SetFileName(string name) {fileName_=name;}
-	// --- Write a line to the log file
+	inline void SetFileName(string name) {fileName_=name;}
+	// --- Write a line to the log file -- low level
 	void Write(string line, bool dryrun=false);
+	// --- Write a DataType on file
+	void Write(dataType &d, bool dryrun=false); // this requires Binary moed
 	// --- Log 
 	void Log(string line,short level);
+	// --- High level function for dumping
+	void Dump(dataType &d);
 	// --- Close files
 	void Close();
 	// --- Clear from configurator
@@ -79,5 +88,8 @@ class LogUtility
 	inline void LogClearDirty(){log=NULL;}
 	inline short int GetLogLevel(){ return log->logLevel_ ;}
 };
+
+// put this here in order to define dataType. Cannot put before because in it it requires logger. Therefore we use a fwd declaration of dataType
+#include "interface/EventBuilder.hpp"
 
 #endif
