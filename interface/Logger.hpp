@@ -59,6 +59,8 @@ public:
 	inline void SetLogLevel(short l) { logLevel_ = l ;}
 	// --- Set FileName 
 	inline void SetFileName(string name) {fileName_=name;}
+	// --- Get FileName 
+	inline string GetFileName() {return fileName_;}
 	// --- Write a line to the log file -- low level
 	void Write(string line, bool dryrun=false);
 	// --- Write a DataType on file

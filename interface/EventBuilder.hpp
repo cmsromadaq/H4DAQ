@@ -72,7 +72,8 @@ class EventBuilder : public LogUtility, public Configurable{
 dataType dataStream_; // dynamic array of char*
 
 bool dumpEvent_; // default true
-Logger *dump; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
+bool sendEvent_; // default false
+Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
 
 	
 public:
@@ -88,9 +89,10 @@ public:
 	void AppendToStream();
 	const void* GetStream(){ return dataStream_.c_str();}
 	int  GetSize(){return dataStream_.size();}
-	void Config(Configurator&){};//TODO
-	void Init(){};//TODO
-	void Clear(){}; //TODO
+	void Config(Configurator&); // TODO --check that all is complete
+	void Init();//TODO
+	void Clear(); //TODO
+	inline void Dump(dataType&event) {dump_->Dump(event);};
 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer

@@ -105,10 +105,18 @@ EventBuilder::EventBuilder()
 {
 	dataStream_.reserve(1024); //reserve 1K for each stream
 	dumpEvent_=true;
-	dump=new Logger();
-	dump->SetFileName("/tmp/dump.gz");
-	dump->SetCompress();
-	dump->SetBinary();
+	dumpEvent_=false;
+	// Init dumper
+	dump_=new Logger();
+	dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
+	dump_->SetCompress();
+	dump_->SetBinary();
+	dump_->SetAsync(); // asyncronous dumping
+}
+EventBuilder::~EventBuilder()
+{
+	Clear();
+	delete dump_;
 }
 
 
@@ -292,3 +300,32 @@ long long EventBuilder::IsEventOk(dataType &x){
 	if ( myTrail[0] != Trailer[0] )  return 0;
 	return ptr - (char*)x.data();
 } 
+
+// ---- EVENT BUILDER NON STATIC -----
+void EventBuilder::Config(Configurator &c){
+        xmlNode *eb_node = NULL;
+        //locate EventBuilder Node
+        for (eb_node = c.root_element->children; eb_node ; eb_node = eb_node->next)
+        {
+                if (eb_node->type == XML_ELEMENT_NODE &&
+                                xmlStrEqual (eb_node->name, xmlCharStrdup ("EventBuilder"))  )
+                        break;
+        }
+        if ( eb_node== NULL ) throw  config_exception();
+	dumpEvent_=Configurator::GetInt(getElementContent(c, "dumpEvent" , eb_node) );
+	sendEvent_=Configurator::GetInt(getElementContent(c, "sendEvent" , eb_node) );
+	dump_->SetFileName(getElementContent(c, "dumpFileName" , eb_node) );
+	dump_->SetBinary();
+	if (dump_->GetFileName().find(".gz") != string::npos)
+		{dump_->SetCompress();}
+	else {dump_->SetCompress(false);}
+}
+
+void EventBuilder::Init(){
+	if(dumpEvent_)dump_->Init();
+}
+
+void EventBuilder::Clear(){
+	if(dumpEvent_)dump_->Clear();
+}
+//
