@@ -12,7 +12,7 @@
 #include "interface/ControlManager.hpp"
 #include "interface/ConnectionManager.hpp"
 #include "interface/Configurator.hpp"
-#include "interface/HWManager.hpp"
+#include "interface/HwManager.hpp"
 
 
 enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA};
