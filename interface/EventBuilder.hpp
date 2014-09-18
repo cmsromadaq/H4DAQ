@@ -67,7 +67,7 @@ public:
 // --- bool operator -- mv inside the class
 const bool operator==(dataType &x, dataType &y);
 
-class EventBuilder : public LogUtility{
+class EventBuilder : public LogUtility, public Configurable{
 // ---binary stream of the event -- 1char = 1byte
 dataType dataStream_; // dynamic array of char*
 	
@@ -84,6 +84,9 @@ public:
 	void AppendToStream();
 	const void* GetStream(){ return dataStream_.c_str();}
 	int  GetSize(){return dataStream_.size();}
+	void Config(Configurator&){};//TODO
+	void Init(){};//TODO
+	void Clear(){}; //TODO
 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
