@@ -16,9 +16,10 @@ public:
     ERR_NONE= 0,
     ERR_CONF_NOT_FOUND= 2,
     ERR_OPEN,
+    ERR_READ,
     ERR_PROGRAM,
     ERR_TRIGGER_READ,
-    ERR_RESTART,
+    ERR_RESET,
     ERR_DUMMY_LAST,
   } ERROR_CODES;
   
@@ -31,9 +32,6 @@ public:
 
   typedef struct CAEN_VX718_Config_t {
     CVBoardTypes boardType;
-
-    uint32_t baseAddress;
-
     int32_t LinkType;
     int32_t LinkNum;
 
@@ -80,6 +78,7 @@ public:
 
     CVTimeUnits PulserATimeUnit;
     uint32_t PulserATimeWidth;
+    uint32_t PulserATimePeriod;
     uint32_t PulserATimePulses;
     CVIOSources PulserAStartInput;
     CVIOSources PulserAResetInput;
@@ -93,7 +92,7 @@ public:
   virtual int BufferClear(); //reset the scaler
   virtual int Config(BoardConfig *bC);
   virtual int Read(vector<WORD> &v);
-  virtual int SetHandle(vector<WORD> &v);
+  virtual int SetHandle(uint32_t handle) {handle_=handle;};
   virtual int TriggerReceived();
 
 private:

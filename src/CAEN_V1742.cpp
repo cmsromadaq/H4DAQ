@@ -7,9 +7,7 @@ int CAEN_V1742::Init()
   int ret=CAEN_DGTZ_Success;
   ERROR_CODES ErrCode= ERR_NONE;
   
-  std::cout <<"**************************************************************" << std::endl;
-  std::cout <<"                        Initialise V1742" << std::endl;
-
+  std::cout << "[V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++" << std::endl;
   if (bC_ == NULL ) {
     return ERR_CONF_NOT_FOUND;
   }
@@ -21,15 +19,15 @@ int CAEN_V1742::Init()
     return ErrCode;
   }
 
-  std::cout << "Connected to CAEN Digitizer Model "<< boardInfo_.ModelName << std::endl;
-  std::cout << "ROC FPGA Release is " <<  boardInfo_.ROC_FirmwareRel;
-  std::cout << "AMC FPGA Release is " <<boardInfo_.AMC_FirmwareRel;
+  std::cout << "[V1742]::[INFO]::Connected to CAEN Digitizer Model "<< boardInfo_.ModelName << std::endl;
+  std::cout << "[V1742]::[INFO]::ROC FPGA Release is " <<  boardInfo_.ROC_FirmwareRel;
+  std::cout << "[V1742]::[INFO]::AMC FPGA Release is " <<boardInfo_.AMC_FirmwareRel;
   
   // Check firmware rivision (DPP firmwares cannot be used with WaveDump */
   int MajorNumber;
   sscanf(boardInfo_.AMC_FirmwareRel, "%d", &MajorNumber);
   if (MajorNumber >= 128) {
-    printf("This digitizer has a DPP firmware\n");
+    std::cout << "[V1742]::[ERROR]::This digitizer has a DPP firmware" << std::endl;
     ErrCode = ERR_INVALID_BOARD_TYPE;
     return ErrCode;
   }
@@ -80,6 +78,7 @@ int CAEN_V1742::Init()
   }
   
   CAEN_DGTZ_SWStartAcquisition(digitizerHandle_);
+  std::cout << "[V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++" << std::endl;
   std::cout << "**************************************************************" << std::endl;
 
   return 0;
@@ -92,7 +91,7 @@ int CAEN_V1742::Clear(){
   ret |= CAEN_DGTZ_Reset(digitizerHandle_);
 
   if (ret != 0) {
-    std::cout << "Error: Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" << std::endl;
+    std::cout << "[V1742]::[ERROR]::Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" << std::endl;
     return ERR_RESTART;
   }
 

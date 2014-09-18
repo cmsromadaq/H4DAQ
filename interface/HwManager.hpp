@@ -21,15 +21,15 @@ public:
 	inline unsigned int GetId(){return id_;};
 	// --- GetType
 	inline string GetType() const { return type_;}
-	// --- Configurable
+	// --- Configurable  
 	virtual int  Init()=0;
 	virtual int Clear()=0;
 	virtual int Print()=0;
 	virtual int BufferClear()=0;
 	virtual int Config(BoardConfig *bC)=0;
+        bool IsConfigured() {return bC_!=0;};
 	virtual int Read(vector<WORD> &v)=0;
 	virtual int SetHandle(WORD x)=0;
-
 };
 
 class HwManager: public Configurable, public LogUtility
