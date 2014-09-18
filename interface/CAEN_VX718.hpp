@@ -1,13 +1,17 @@
 #include "interface/HwManager.hpp"
 #include "interface/BoardConfig.hpp"
 
-#include <CAENDigitizer.h>
+#ifdef __linux__
+#define LINUX
+#endif
 
+#include "CAENVMElib.h"
+#include "CAENVMEtypes.h" 
+#include "CAENVMEoslib.h"
 
-class CAEN_V1742: public Board {
-
+class CAEN_VX718: public Board 
+{
 public:
-
   typedef enum  {
     ERR_NONE= 0,
     ERR_CONF_NOT_FOUND= 2,
@@ -18,7 +22,6 @@ public:
     ERR_DUMMY_LAST,
   } ERROR_CODES;
   
-
   typedef enum VX718_DAQ_Signals 
     {
       DAQ_CLEAR_BUSY=0,
@@ -27,14 +30,13 @@ public:
     } VX718_DAQ_Signals;
 
   typedef struct CAEN_VX718_Config_t {
+    CVBoardTypes boardType;
+
     uint32_t baseAddress;
 
     int32_t LinkType;
     int32_t LinkNum;
-    int32_t ConetNode;
-    
-    CVBoardTypes boardType;
-    
+
     CVOutputSelect clearBusyOutputBit;
     CVOutputSelect trigAckOutputBit;
     CVInputSelect  triggerInputBit;
@@ -84,7 +86,7 @@ public:
 
   } CAEN_VX718_Config_t;
 
-  CAEN_VX718();
+  CAEN_VX718(): handle_(-1){};
 
   virtual int Init();
   virtual int Clear();
@@ -95,8 +97,8 @@ public:
   virtual int TriggerReceived();
 
 private:
-  int sendSignal(VX718_DAQ_Signals);
-  int printConfiguration()
+  int SendSignal(VX718_DAQ_Signals);
+  int PrintConfiguration();
   int ParseConfiguration();
 					
   uint32_t handle_;
