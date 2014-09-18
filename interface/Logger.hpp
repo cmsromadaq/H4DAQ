@@ -76,8 +76,8 @@ class LogUtility
 	void LogInit(Logger *l);//{log=l;}
 	// --- Disable logging
 	void LogClear();
-	void LogClearDirty(){log=NULL;}
-	short int GetLogLevel(){ return log->logLevel_ ;}
+	inline void LogClearDirty(){log=NULL;}
+	inline short int GetLogLevel(){ return log->logLevel_ ;}
 };
 
 #endif

@@ -10,6 +10,7 @@ class no_zlib_exception ;
 class fork_exception ;
 class config_exception ;
 class configfile_exception;
+class hw_exception;
 //std::bad_alloc = almost sure memory is full
 
 
@@ -19,6 +20,14 @@ class sigint_exception: public exception
   virtual const char* what() const throw()
   {
     return "Caught signal CTRL+C";
+  }
+} ;
+
+class hw_exception: public exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Hardware Exception";
   }
 } ;
 

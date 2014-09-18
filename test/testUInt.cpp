@@ -36,7 +36,7 @@ int main(){
 	printf("float %lu\n",sizeof(f));
 	printf("double %lu\n",sizeof(d));
 	printf("long double %lu\n",sizeof(ld));
-	printf("*******************\n");
+	printf("********C++11***********\n");
 	printf("max int %lu\n",sizeof(uintmax_t));
 	printf("int8 %lu\n",sizeof(uint8_t));
 	printf("int16 %lu\n",sizeof(uint16_t));

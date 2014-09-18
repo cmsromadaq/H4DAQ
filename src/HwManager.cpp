@@ -6,6 +6,7 @@ Board::Board(){id_=0;bC_=NULL;};
 Board::~Board(){};
 int Board::Config(BoardConfig *bC){
 	bC_=bC;
+	return 0;
 };
 //unsigned int Board::GetId(){return id_;};
 
@@ -33,10 +34,11 @@ void HwManager::Config(Configurator &c){
 	for ( board_node=hw_node->children; board_node ; board_node = board_node->next)
 	{
 		if (  board_node->type == XML_ELEMENT_NODE 	
-				&& xmlStrEqual (hw_node->name, xmlCharStrdup ("board")) )
+				&& xmlStrEqual (board_node->name, xmlCharStrdup ("board")) )
 		{
 		int ID=Configurator::GetInt(getElementContent(c, "ID" , board_node));
-		//TODO
+		Log("[2] Configuring Board ID="+ getElementContent(c, "ID" , board_node)+"type=" + getElementContent(c, "type" , board_node),2);
+		//TODO -- construct the board
 		}
 	}
 
@@ -44,11 +46,28 @@ void HwManager::Config(Configurator &c){
 }
 // --- Init
 void HwManager::Init(){
+	for(unsigned int i=0;i<hw_.size();i++)
+	{
+		int R=hw_[i]->Init();
+		if ( !(R&~1) )  throw hw_exception();
+	}
+
 }
 // --- Clear
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
 }
+
+void HwManager::Print(){
+	Log("[2] Printing configuratio",2);
+	for(vector<Board*>::iterator iBoard=hw_.begin();iBoard!=hw_.end();iBoard++)
+		{
+		int r = (*iBoard)->Print();// 0-1 are ok status
+		if(r)Log( string("[2] Error on Board")+(*iBoard)->GetType(),2);
+		}
+	return ; 
+}
+
 
 void HwManager::Read(int i,vector<WORD> &v)
 {

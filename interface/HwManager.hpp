@@ -19,6 +19,8 @@ public:
 	~Board();
 	// -- Get Id
 	inline unsigned int GetId(){return id_;};
+	// --- GetType
+	inline string GetType() const { return type_;}
 	// --- Configurable
 	virtual int  Init()=0;
 	virtual int Clear()=0;
@@ -53,4 +55,6 @@ public:
 	// --- Read All the Boards
 	inline void BufferClearAll(){};
 	dataType ReadAll();
+	void Print();
+
 };
