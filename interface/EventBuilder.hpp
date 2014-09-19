@@ -73,8 +73,11 @@ dataType myRun_; // dynamic array of char*
 
 bool dumpEvent_; // default true
 bool sendEvent_; // default false
+int recvEvent_; // if set to true will set also dumpEvent
 Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
 bool isRunOpen_;
+
+map<WORD,pair<int,dataType> > runs_; //store incomplete runs if in recv mode. RUNNUM -> NMerged, RunStream
 
 	
 public:
@@ -91,19 +94,23 @@ public:
 	const void* GetStream(){ return myRun_.c_str();}
 	int  GetSize(){return myRun_.size();}
 	void Config(Configurator&); // TODO --check that all is complete
-	void Init();//TODO
-	void Clear(); //TODO
+	void Init();//TODO -- check
+	void Clear(); //TODO -- check
 	inline void Dump(dataType&run) {dump_->Dump(run);};
 	void OpenRun(WORD runNum);
 	void CloseRun( );
 	void AddEventToRun(dataType &event ); //TODO
-	void MergeRuns(dataType &run2 ); //TODO
+	// merge in Run1, Run2. check i runNum is to be dumped
+	void MergeRuns(dataType &run1,dataType &run2 ); //TODO
 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
 	static dataType WordToStream(WORD x);
 	static vector<WORD> StreamToWord(dataType &x);
 	static vector<WORD> StreamToWord(void*v,int N);
+	static WORD 	ReadRunNum(dataType &x);
+	static WORD 	ReadRunNevents(dataType &x);
+	static WORD 	ReadEventNboards(dataType &x);
 	static dataType BoardHeader(WORD boardId);
 	static dataType BoardTrailer(WORD boardId);
 	static dataType EventHeader();
@@ -114,7 +121,8 @@ public:
 	static dataType MergeEventStream(dataType &x,dataType &y);
 	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
 	static long long IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
-	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM
+	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM
+	static inline long long IsEventOk(void *v, int N){ dataType tmp(N,v);long long R= IsEventOk(tmp); tmp.release(); return R;};
 };
 
 #endif

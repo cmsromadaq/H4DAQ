@@ -106,6 +106,7 @@ EventBuilder::EventBuilder()
 	myRun_.reserve(1024); //reserve 1K for each stream
 	dumpEvent_=true;
 	sendEvent_=false;
+	recvEvent_=0;
 	isRunOpen_=false;
 	// Init dumper
 	dump_=new Logger();
@@ -214,7 +215,24 @@ dataType EventBuilder::RunTrailer()
 
 dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ //TODO
 	// takes two streams and merge them independently from the content
+	dataType R;
+	R.append(x);
+
+	WORD nboards1=ReadEventNboards(x);
+	WORD nboards2=ReadEventNboards(y);
+	long size1=IsEventOk(x);
+	long size2=IsEventOk(y);
+	WORD *ptrNboards=(WORD*)R.data() +1;
+	*ptrNboards=nboards1+nboards2;
+	R.reserve(size1+size2); // minus hedrs but it is just a reserve
+	R.erase(size1-WORDSIZE, size1); // delete trailer
+
+	WORD*ptr2= (WORD*)y.data() +2 ; // content
+
+	R.append( (void*)ptr2, size2 -WORDSIZE*2 ) ; // remove H, copy T
+	return R;
 }
+
 
 vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 	dataType myStream(N,v);
@@ -316,6 +334,23 @@ long long EventBuilder::IsEventOk(dataType &x){
 	return ptr - (char*)x.data();
 } 
 
+
+WORD 	EventBuilder::ReadRunNum(dataType &x)
+{
+	WORD *runNumPtr=(WORD*)x.data() + 1;
+	return *runNumPtr;
+}
+WORD 	EventBuilder::ReadEventNboards(dataType &x)
+{
+	WORD *runNumPtr=(WORD*)x.data() + 1;
+	return *runNumPtr;
+}
+WORD 	EventBuilder::ReadRunNevents(dataType &x)
+{
+	WORD *runNeventsPtr=(WORD*)x.data() + 2;
+	return *runNeventsPtr;
+}
+
 // ---- EVENT BUILDER NON STATIC -----
 void EventBuilder::Config(Configurator &c){
         xmlNode *eb_node = NULL;
@@ -329,6 +364,7 @@ void EventBuilder::Config(Configurator &c){
         if ( eb_node== NULL ) throw  config_exception();
 	dumpEvent_=Configurator::GetInt(getElementContent(c, "dumpEvent" , eb_node) );
 	sendEvent_=Configurator::GetInt(getElementContent(c, "sendEvent" , eb_node) );
+	recvEvent_=Configurator::GetInt(getElementContent(c, "recvEvent" , eb_node) );
 	dump_->SetFileName(getElementContent(c, "dumpFileName" , eb_node) );
 	dump_->SetBinary();
 	if (dump_->GetFileName().find(".gz") != string::npos)
@@ -366,6 +402,7 @@ void EventBuilder::OpenRun(WORD runNum)
 
 void EventBuilder::CloseRun()
 {
+	isRunOpen_=false;	
 	dataType  runT=RunTrailer();
 	myRun_.append(runT);
 	if( dumpEvent_) 
@@ -374,8 +411,17 @@ void EventBuilder::CloseRun()
 		dump_->Close();
 	}
 	if (sendEvent_) {} //TODO -- also do the merging if recv
+	if (recvEvent_) { 
+		WORD runNum=ReadRunNum(myRun_);
+		if ( runs_.find(runNum) != runs_.end() ) 
+			{
+			runs_[runNum] = pair<int,dataType>(1,dataType( myRun_.size(),myRun_.data())   );
+			myRun_.release();
+			}
+		else MergeRuns(runs_[runNum].second,myRun_);
+	} 
 	myRun_.clear();
-	isRunOpen_=false;	
+	return;
 }
 
 void EventBuilder::AddEventToRun(dataType &event){
@@ -389,8 +435,50 @@ void EventBuilder::AddEventToRun(dataType &event){
 	myRun_.append(event);
 	return;
 }
-void EventBuilder::MergeRuns(dataType &run2 ){
-	dataType oldRun_(myRun_.size(),myRun_.data());	
-	myRun_.release();myRun_.clear();
-	//TODO
+void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
+	//TODO --- can't merge inplace two events
+	WORD runNum1 = ReadRunNum(run1);
+	WORD runNum2 = ReadRunNum(run2);
+
+	WORD runNevents1 = ReadRunNevents(run1);
+	WORD runNevents2 = ReadRunNevents(run2);
+
+	if (runNum1 != runNum2) return ; // TODO throw exception
+	if (runNevents1 != runNevents2) return ; // TODO throw exception
+
+	dataType oldRun(run1.size(),run1.data());	
+	run1.release();run1.clear();
+
+
+	dataType H=RunHeader();
+	dataType T=RunTrailer();
+	run1.append(H);
+	run1.append((void*)&runNum1,WORDSIZE);
+	run1.append((void*)&runNevents1,WORDSIZE);
+
+	char* ptr1=(char*)oldRun.data();
+	char* ptr2=(char*)run2  .data();
+	long left1=oldRun.size() - WORDSIZE*3;
+	long left2=run2.size() - WORDSIZE*3;
+	ptr1+= WORDSIZE*3;
+	ptr2+= WORDSIZE*3;
+	for(int iEvent=0;iEvent< runNevents1 ;iEvent++)
+	       {
+		long eventSize1= IsEventOk(ptr1,left1);
+		long eventSize2= IsEventOk(ptr2,left2);
+		//---- Unire i due eventi
+		dataType event1(eventSize1,ptr1);
+		dataType event2(eventSize2,ptr2);
+		dataType myEvent=MergeEventStream(event1,event2);
+		event1.release();
+		event2.release();
+		run1.append(myEvent);
+		//----
+		ptr1+= eventSize1;
+		ptr2+= eventSize2;
+		left1-=eventSize1;
+		left2-=eventSize2;
+	       }	
+	
+	run1.append(T);
 }
