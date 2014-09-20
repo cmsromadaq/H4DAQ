@@ -95,7 +95,11 @@ public:
   virtual int Config(BoardConfig *bC);
   virtual int Read(vector<WORD> &v);
   virtual int SetHandle(uint32_t handle) {handle_=handle;};
-  virtual int TriggerReceived();
+
+  //Main functions to handle the event trigger
+  virtual int ClearBusy();
+  virtual bool TriggerReceived();
+  virtual int TriggerAck();
 
 private:
   int SendSignal(VX718_DAQ_Signals sig);
