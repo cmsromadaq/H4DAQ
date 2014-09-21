@@ -30,15 +30,21 @@ enum STATUS_t {WAIT_TRIG=0,OUT_OF_RUN};
  * BT  : SPS command of Burst Test: Train of 10 khz pulses, duration 1s
  * WBT : SPS command of Warning Burst Test
  * EBT : SPS command of End of Burst Test
+ * RECV: Check if mex is received
+ * SEND: send cmd
+ * DATA: send DATA
  */
 
 class Command{
 public:
 	Command(){cmd=NOP; data=NULL; N=0;}
+	~Command(){ if (data != NULL) delete [] (char*)data;}
 	void *data;
 	int N;
 	CMD_t cmd;
+	string name() ;
 };
+
 
 class Daemon 
 {
@@ -71,6 +77,8 @@ public:
 	void Loop();
 	// --- Reset
 	void Clear();
+	// --- this is meant to parse the commands that navigate through the network
+	Command ParseData(dataType mex);
 
 
 };

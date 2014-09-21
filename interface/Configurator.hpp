@@ -14,6 +14,8 @@ public:
 	virtual void Config(Configurator &)=0;
 	static string getElementContent (xmlDocPtr doc, const char * key, const xmlNode * node);
 	static string getElementContent (Configurator&c, const char * key, const xmlNode * node);
+	static vector<string> getElementVector (Configurator&c, const char * key, const xmlNode * node);
+	static vector<string> getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node);
 };
 
 class Configurator

@@ -148,7 +148,28 @@ string Configurable::getElementContent (xmlDocPtr doc, const char * key, const x
     return string (content) ;
   }
 
+vector<string> Configurable::getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node)
+  {
+    vector<string> R;
+    char * content ;
+    xmlNode *cur_node = NULL;
+    for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
+      {
+        if ((!xmlStrcmp (cur_node->name, (const xmlChar *) key)))
+          {
+            content = (char *) xmlNodeListGetString (doc, cur_node->xmlChildrenNode, 1);
+	    R.push_back(content);
+          }
+       }
+    return R ;
+  }
+
 string Configurable::getElementContent(Configurator&c, const char * key, const xmlNode * node)
 {
 	return getElementContent(c.doc, key,node);
+}
+
+vector<string> Configurable::getElementVector(Configurator&c, const char * key, const xmlNode * node)
+{
+	return getElementVector(c.doc, key,node);
 }

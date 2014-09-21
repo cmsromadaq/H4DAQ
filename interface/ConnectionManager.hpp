@@ -53,6 +53,7 @@ public:
 	~Publisher();
 	//void SetAsync(bool async=true){async_=async;} 
 	int  SendMessage(dataType &mex); //  return 0 if correct
+	void SetPort(string p);
 	void SetPort(int p);
 	void Clear();
 	void Init();
@@ -71,6 +72,7 @@ public:
 	~Subscriber();
 	int RecvMessage(dataType &mex); // return 0 if yes - NO STRING!
 	void SetAddress(string ip,int port);
+	void SetAddress(string addr);
 	void Clear();
 	void Init();
 	void Config(Configurator &);
@@ -85,13 +87,13 @@ class ConnectionManager: public Configurable{
 private:
 vector<string> recvAddresses;
 vector<string> sendPorts;
-Publisher *pub;
+vector<Publisher*>  pubs;
 vector<Subscriber*> subs;
 public:
 	void Clear(); // TODO
 	void Init(); // TODO
 	void Config(Configurator &); // TODO
-	void Send(){}; //TODO
+	inline void Send(dataType &mex,int i=0){pubs[i]->SendMessage(mex);}; 
 	// --- check subscribers to see if one have received a mex
 	bool Recv(dataType &mex);
 

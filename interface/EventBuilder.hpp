@@ -76,9 +76,11 @@ bool sendEvent_; // default false
 int recvEvent_; // if set to true will set also dumpEvent
 Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
 bool isRunOpen_;
+WORD lastRun_;
 
 map<WORD,pair<int,dataType> > runs_; //store incomplete runs if in recv mode. RUNNUM -> NMerged, RunStream
 
+	void MergeRuns(dataType &run1,dataType &run2 ); //TODO
 	
 public:
 	/* this class contains the raw event.
@@ -98,10 +100,11 @@ public:
 	void Clear(); //TODO -- check
 	inline void Dump(dataType&run) {dump_->Dump(run);};
 	void OpenRun(WORD runNum);
+	inline void OpenRun() { OpenRun( lastRun_ + 1 ) ; }; 
 	void CloseRun( );
-	void AddEventToRun(dataType &event ); //TODO
+	void AddEventToRun(dataType &event ); 
 	// merge in Run1, Run2. check i runNum is to be dumped
-	void MergeRuns(dataType &run1,dataType &run2 ); //TODO
+	void MergeRuns(dataType &run2 ) ;//{WORD runNum=ReadRunNum(run2); MergeRuns(runs_[runNum].second,run2); runs_[runNum].first++; return;} ;
 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer

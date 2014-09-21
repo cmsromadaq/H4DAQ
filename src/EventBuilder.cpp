@@ -108,6 +108,7 @@ EventBuilder::EventBuilder()
 	sendEvent_=false;
 	recvEvent_=0;
 	isRunOpen_=false;
+	lastRun_=100;
 	// Init dumper
 	dump_=new Logger();
 	dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
@@ -384,7 +385,7 @@ void EventBuilder::Clear(){
 void EventBuilder::OpenRun(WORD runNum)
 {
 	if (isRunOpen_) CloseRun(); 
-	if (dumpEvent_)
+	if (dumpEvent_ && !recvEvent_) // TODO: what happen if I open a run without other runs to be close
 	{ // open dumping file
 		string fileName=dump_->GetFileName();
 		size_t dot= fileName.rfind(".");
@@ -393,6 +394,7 @@ void EventBuilder::OpenRun(WORD runNum)
 		dump_->Init();
 	}
 	isRunOpen_=true;
+	lastRun_= runNum;
 	dataType runH=RunHeader();
 	myRun_.append(runH);
 	myRun_.append( (void *)&runNum,WORDSIZE);
@@ -405,7 +407,7 @@ void EventBuilder::CloseRun()
 	isRunOpen_=false;	
 	dataType  runT=RunTrailer();
 	myRun_.append(runT);
-	if( dumpEvent_) 
+	if( dumpEvent_ && !recvEvent_) 
 	{
 		Dump(myRun_);
 		dump_->Close();
@@ -480,5 +482,25 @@ void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
 		left2-=eventSize2;
 	       }	
 	
-	run1.append(T);
+	run1.append(T); 
 }
+
+void EventBuilder::MergeRuns(dataType &run2 ) {
+	WORD runNum=ReadRunNum(run2); 
+	MergeRuns(runs_[runNum].second,run2); 
+	runs_[runNum].first++; 
+	if (!recvEvent_ ) return ;
+
+	if ( runs_[runNum].first > recvEvent_)  // dump for recvEvent
+		{
+		string fileName=dump_->GetFileName();
+		size_t dot= fileName.rfind(".");
+		string newFileName=fileName.substr(0,dot) + "_" + to_string(runNum) + fileName.substr(dot,string::npos); // c++11 to string, othewsie use something like sprintf
+		dump_->SetFileName( newFileName );	
+		dump_->Init();
+		Dump(runs_[runNum].second);
+		dump_->Close();
+		runs_.erase(runNum);
+		}
+	return;
+} 

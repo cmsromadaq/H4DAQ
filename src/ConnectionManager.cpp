@@ -68,6 +68,11 @@ void Publisher::SetPort(int p){
 	Log("[3] Publisher::SetPort Port=" + Port,3);
 	return;
 }
+void Publisher::SetPort(string p){
+	Log("[1] Publisher::SetPort"+Port,1);
+	Port=p;
+	return;
+}
 void Publisher::Config(Configurator &){}; //TODO
 
 // ---------------- SUBSCRIBER ------------------
@@ -106,6 +111,11 @@ void Subscriber::SetAddress(string ip,int port)
 	Log("[3] Subscriber::SetAddress "+Address,3);
 	return;
 
+}
+void Subscriber::SetAddress(string addr)
+{
+	Address= "tcp://" + addr;
+	return;
 }
 
 void Subscriber::Clear(){
@@ -200,9 +210,50 @@ bool ConnectionManager::Recv(dataType &mex){
 	return 1;
 }
 
-void ConnectionManager::Clear(){}
-void ConnectionManager::Init(){}
-void ConnectionManager::Config(Configurator &){}
+void ConnectionManager::Clear(){
+	for(int i=0;i<pubs.size();i++)
+		{
+		pubs[i]->Clear();
+		delete pubs[i];
+		}
+	for(int i=0;i<subs.size();i++)
+		{
+		subs[i]->Clear();
+		delete subs[i];
+		}
+	subs.clear();
+	pubs.clear();
+}
+
+void ConnectionManager::Init(){
+	Clear();
+	for(int i=0;i<sendPorts.size();i++)
+		{
+		pubs.push_back(new Publisher() );
+		pubs[i]->SetPort(sendPorts[i]); // move in config ? 
+		pubs[i]->Init();
+		}
+	for(int i=0;i<recvAddresses.size();i++)
+		{
+		subs.push_back(new Subscriber() ) ;
+		subs[i]->SetAddress(recvAddresses[i]);
+		subs[i]->Init();
+		}
+}
+
+void ConnectionManager::Config(Configurator &c){
+	xmlNode *net_node = NULL; 		
+        for (net_node = c.root_element->children; net_node ; net_node = net_node->next)
+        {
+                if (net_node->type == XML_ELEMENT_NODE &&
+                                xmlStrEqual (net_node->name, xmlCharStrdup ("Network"))  )
+                        break;
+        }
+        if ( net_node== NULL ) throw  config_exception();
+
+	sendPorts=getElementVector(c, "ListenPort" , net_node) ;
+	recvAddresses=getElementVector(c, "ConnectTo" , net_node) ;
+}
 
 
 
