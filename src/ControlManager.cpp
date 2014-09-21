@@ -4,6 +4,9 @@
 ControlManager::ControlManager(){
 	Clear();
 }
+ControlManager::~ControlManager(){
+	Clear();
+}
 
 void ControlManager::Init( )
 	{

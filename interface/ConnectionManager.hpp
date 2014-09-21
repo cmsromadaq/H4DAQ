@@ -79,17 +79,21 @@ public:
 };
 
 class ConnectionManager: public Configurable{
-	/*this class implements the actual connections at low level
+	/*
+	 * this class implements the actual connections at low level
 	 */
 private:
 vector<string> recvAddresses;
 vector<string> sendPorts;
+Publisher *pub;
+vector<Subscriber*> subs;
 public:
-	void Clear();
-	void Init();
-	void Config(Configurator &);
+	void Clear(); // TODO
+	void Init(); // TODO
+	void Config(Configurator &); // TODO
 	void Send(){}; //TODO
-	void Recv(){};
+	// --- check subscribers to see if one have received a mex
+	bool Recv(dataType &mex);
 
 };
 

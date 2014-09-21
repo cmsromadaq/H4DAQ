@@ -56,6 +56,9 @@ void HwManager::Init(){
 // --- Clear
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
+	for(int i=0;i<hw_.size();i++)
+		hw_[i]->Clear();
+	return;
 }
 
 void HwManager::Print(){
@@ -89,4 +92,24 @@ dataType HwManager::ReadAll(){
 	}
 	R.append(EventBuilder::EventTrailer());
 	return R;
+}
+
+void  HwManager::BufferClearAll(){
+	for(int i=0;i< hw_.size();i++)
+		hw_[i]->BufferClear();
+	return;
+}
+
+
+void HwManager::ClearBusy(){
+	hw_[trigBoard_]->ClearBusy();
+	return;
+}
+
+bool HwManager::TriggerReceived(){
+	return hw_[trigBoard_]->TriggerReceived();
+}
+
+int HwManager::TriggerAck(){
+	return hw_[trigBoard_]->TriggerAck();
 }

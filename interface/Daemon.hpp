@@ -9,13 +9,18 @@
 //class Configurator;
 
 #include "interface/EventBuilder.hpp"
-#include "interface/ControlManager.hpp"
+//#include "interface/ControlManager.hpp"
+#include "interface/HwManager.hpp"
 #include "interface/ConnectionManager.hpp"
 #include "interface/Configurator.hpp"
 #include "interface/HwManager.hpp"
 
 
+// this are the cmd that the finate state machine can receive
 enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA};
+// this are the status of the finate state machines
+enum STATUS_t {WAIT_TRIG=0,OUT_OF_RUN};
+
 /* Command description:
  * NOP : No Operation. Need for dummy messages that goes around
  * WWE : SPS command of Warning Warning Ejection: 1s 
@@ -43,7 +48,7 @@ private:
 	//private variable each word is capital execpt the first. Underscore at the end
 	// This class should be think as a finite state machine that decides what to do
 EventBuilder 		*eventBuilder_	; 
-ControlManager 		*controlManager_;
+HwManager 		*hwManager_;
 Configurator 		*configurator_	;
 ConnectionManager 	*connectionManager_;
 
@@ -51,6 +56,7 @@ pid_t pid_;
 
 // by default uses deque, it can also use list in case
 queue< Command > todo_; // front/pop/push/empty/size
+STATUS_t myStatus_;
 
 public:
 	// --- Constructor

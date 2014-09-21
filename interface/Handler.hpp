@@ -17,6 +17,7 @@ class hw_exception;
 //define here all type of execptions that can go across the all program
 class sigint_exception: public exception
 {
+public:
   virtual const char* what() const throw()
   {
     return "Caught signal CTRL+C";
@@ -25,6 +26,7 @@ class sigint_exception: public exception
 
 class hw_exception: public exception
 {
+public:
   virtual const char* what() const throw()
   {
     return "Hardware Exception";
@@ -34,6 +36,7 @@ class hw_exception: public exception
 
 class counter_exception:public exception
 {
+public:
  virtual const char*what() const throw()
  {
  	return "Counters Errors";
@@ -42,6 +45,7 @@ class counter_exception:public exception
 
 class fork_exception:public exception
 {
+public:
  virtual const char*what() const throw()
  {
  	return "Unable to run asyncronous process";
@@ -50,6 +54,7 @@ class fork_exception:public exception
 
 class config_exception:public exception
 {
+public:
  virtual const char*what() const throw()
  {
  	return "No config key";
@@ -57,6 +62,7 @@ class config_exception:public exception
 } ;
 class configfile_exception:public exception
 {
+public:
  virtual const char*what() const throw()
  {
  	return "No config file";
@@ -65,6 +71,7 @@ class configfile_exception:public exception
 
 class no_zlib_exception : public exception
 {
+public:
  virtual const char*what() const throw()
  {
  	return "ZLib Support not included";

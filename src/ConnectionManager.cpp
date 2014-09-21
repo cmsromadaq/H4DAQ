@@ -194,6 +194,15 @@ bool RequestAndReply::Reply(){
 //
 //
 
+bool ConnectionManager::Recv(dataType &mex){
+	for( int i=0;i< subs.size() ;i++)
+		if( subs[i]->RecvMessage(mex) == 0 ) return 0;
+	return 1;
+}
+
 void ConnectionManager::Clear(){}
 void ConnectionManager::Init(){}
 void ConnectionManager::Config(Configurator &){}
+
+
+
