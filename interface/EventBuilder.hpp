@@ -12,6 +12,7 @@ class Command; // fwd decl
 
 //typedef unsigned int WORD;
 typedef uint32_t WORD;
+#define WORDSIZE 4
 
 class EventParser{
 public:
@@ -71,18 +72,20 @@ const bool operator==(dataType &x, dataType &y);
 
 class EventBuilder : public LogUtility, public Configurable{
 // ---binary stream of the event -- 1char = 1byte
-dataType myRun_; // dynamic array of char*
+dataType mySpill_; // dynamic array of char*
 
 bool dumpEvent_; // default true
 bool sendEvent_; // default false
 int recvEvent_; // if set to true will set also dumpEvent
 Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
-bool isRunOpen_;
-WORD lastRun_;
+string dirName_;
+bool isSpillOpen_;
+WORD lastSpill_;
+WORD runNum_;
 
-map<WORD,pair<int,dataType> > runs_; //store incomplete runs if in recv mode. RUNNUM -> NMerged, RunStream
+map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 
-	void MergeRuns(dataType &run1,dataType &run2 ); //TODO
+	void MergeSpills(dataType &spill1,dataType &spill2 ); //TODO
 	
 public:
 	/* this class contains the raw event.
@@ -95,34 +98,37 @@ public:
 	~EventBuilder();
 	// 
 	void AppendToStream();
-	const void* GetStream(){ return myRun_.c_str();}
-	int  GetSize(){return myRun_.size();}
+	const void* GetStream(){ return mySpill_.c_str();}
+	int  GetSize(){return mySpill_.size();}
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check
 	void Clear(); //TODO -- check
-	inline void Dump(dataType&run) {dump_->Dump(run);};
-	void OpenRun(WORD runNum);
-	inline void OpenRun() { OpenRun( lastRun_ + 1 ) ; }; 
-	// -- close the run. Return the command to be parsed by the daemon
-	Command CloseRun( );
-	void AddEventToRun(dataType &event ); 
-	// merge in Run1, Run2. check i runNum is to be dumped
-	void MergeRuns(dataType &run2 ) ;//{WORD runNum=ReadRunNum(run2); MergeRuns(runs_[runNum].second,run2); runs_[runNum].first++; return;} ;
-
+	inline void Dump(dataType&spill) {dump_->Dump(spill);};
+	void OpenSpill(WORD spillNum);
+	inline void OpenSpill() { OpenSpill( lastSpill_ + 1 ) ; }; 
+	inline void ResetSpillNumber(){lastSpill_=100;}
+	// -- close the spill. Return the command to be parsed by the daemon
+	Command CloseSpill( );
+	void AddEventToSpill(dataType &event ); 
+	// merge in Spill1, Spill2. check i spillNum is to be dumped
+	void MergeSpills(dataType &spill2 ) ;//{WORD spillNum=ReadSpillNum(spill2); MergeSpills(spills_[spillNum].second,spill2); spills_[spillNum].first++; return;} ;
+	//
+	void SetRunNum(WORD x);//{ runNum_=x;}
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
 	static dataType WordToStream(WORD x);
 	static vector<WORD> StreamToWord(dataType &x);
 	static vector<WORD> StreamToWord(void*v,int N);
-	static WORD 	ReadRunNum(dataType &x);
-	static WORD 	ReadRunNevents(dataType &x);
+	static WORD 	ReadSpillNum(dataType &x);
+	static WORD 	ReadRunNumFromSpill(dataType &x);
+	static WORD 	ReadSpillNevents(dataType &x);
 	static WORD 	ReadEventNboards(dataType &x);
 	static dataType BoardHeader(WORD boardId);
 	static dataType BoardTrailer(WORD boardId);
 	static dataType EventHeader();
 	static dataType EventTrailer();
-	static dataType RunHeader();
-	static dataType RunTrailer();
+	static dataType SpillHeader();
+	static dataType SpillTrailer();
 	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
 	static dataType MergeEventStream(dataType &x,dataType &y);
 	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 

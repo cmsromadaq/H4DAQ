@@ -15,7 +15,8 @@
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
-	  <dumpFileName>/tmp/dump.gz</dumpFileName>
+	  <dumpDirName>/tmp/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>1</dumpCompress>
 	  <sendEvent>1</sendEvent>
 	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
 	  <compress>1</compress>

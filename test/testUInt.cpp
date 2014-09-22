@@ -46,9 +46,12 @@ int main(){
 	i=1;
 	char *c2=(char*)&i;
 	if( *c2 ) 
-		printf("Little Endian\n");
+		sprintf(buf,"Little Endian == SAME ");
+		//printf("Little Endian == SAME\n");
 	else
-		printf("Big Endian\n");
+		sprintf(buf,"Big Endian == SAME ");
+		//printf("Big Endian == SAME\n");
+	DrawBox(buf);
 	printf("*******************\n");
 
 }

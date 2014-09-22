@@ -5,6 +5,7 @@
 
 class Daemon;
 #include "interface/Daemon.hpp"
+#include "interface/FSM.hpp"
 #include "interface/Handler.hpp"
 #include "interface/EventBuilder.hpp"
 
@@ -18,7 +19,8 @@ int main(int argc, char**argv)
 // define Handlers for sigint
 define_handlers();
 //
-Daemon *d=new Daemon();
+//Daemon *d=new Daemon();
+DataReadoutFSM *d=new DataReadoutFSM();
 d->Init("data/config.xml");
 try{
 	d->Loop();

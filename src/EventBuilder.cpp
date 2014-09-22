@@ -103,12 +103,13 @@ void dataType::release(){
 // ---------- Event Builder
 EventBuilder::EventBuilder()
 {
-	myRun_.reserve(1024); //reserve 1K for each stream
+	mySpill_.reserve(1024); //reserve 1K for each stream
 	dumpEvent_=true;
 	sendEvent_=false;
 	recvEvent_=0;
-	isRunOpen_=false;
-	lastRun_=100;
+	isSpillOpen_=false;
+	//lastSpill_=100;
+	ResetSpillNumber();
 	// Init dumper
 	dump_=new Logger();
 	dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
@@ -126,7 +127,6 @@ EventBuilder::~EventBuilder()
 // ---- STATIC EVENT BUILDER
 //
 
-#define WORDSIZE 4
 
 dataType EventBuilder::WordToStream(WORD x)
 {
@@ -200,17 +200,17 @@ dataType EventBuilder::EventTrailer()
 	return R;
 }
 
-dataType EventBuilder::RunHeader()
+dataType EventBuilder::SpillHeader()
 {
 	dataType R; R.reserve(WORDSIZE);
-	R.append((void*)"RUNH\0\0\0\0\0\0\0\0",WORDSIZE);
+	R.append((void*)"SPLH\0\0\0\0\0\0\0\0",WORDSIZE);
 	return R;
 }
 
-dataType EventBuilder::RunTrailer()
+dataType EventBuilder::SpillTrailer()
 {
 	dataType R;R.reserve(WORDSIZE);
-	R.append((void*)"RUNT\0\0\0\0\0\0\0\0",WORDSIZE);
+	R.append((void*)"SPLT\0\0\0\0\0\0\0\0",WORDSIZE);
 	return R;
 }
 
@@ -335,21 +335,26 @@ long long EventBuilder::IsEventOk(dataType &x){
 	return ptr - (char*)x.data();
 } 
 
-
-WORD 	EventBuilder::ReadRunNum(dataType &x)
+WORD 	EventBuilder::ReadRunNumFromSpill(dataType &x)
 {
-	WORD *runNumPtr=(WORD*)x.data() + 1;
-	return *runNumPtr;
+	WORD *spillNumPtr=(WORD*)x.data() + 1;
+	return *spillNumPtr;
+}
+
+WORD 	EventBuilder::ReadSpillNum(dataType &x)
+{
+	WORD *spillNumPtr=(WORD*)x.data() + 2;
+	return *spillNumPtr;
 }
 WORD 	EventBuilder::ReadEventNboards(dataType &x)
 {
-	WORD *runNumPtr=(WORD*)x.data() + 1;
-	return *runNumPtr;
+	WORD *spillNumPtr=(WORD*)x.data() + 1;
+	return *spillNumPtr;
 }
-WORD 	EventBuilder::ReadRunNevents(dataType &x)
+WORD 	EventBuilder::ReadSpillNevents(dataType &x)
 {
-	WORD *runNeventsPtr=(WORD*)x.data() + 2;
-	return *runNeventsPtr;
+	WORD *spillNeventsPtr=(WORD*)x.data() + 2;
+	return *spillNeventsPtr;
 }
 
 // ---- EVENT BUILDER NON STATIC -----
@@ -366,11 +371,11 @@ void EventBuilder::Config(Configurator &c){
 	dumpEvent_=Configurator::GetInt(getElementContent(c, "dumpEvent" , eb_node) );
 	sendEvent_=Configurator::GetInt(getElementContent(c, "sendEvent" , eb_node) );
 	recvEvent_=Configurator::GetInt(getElementContent(c, "recvEvent" , eb_node) );
-	dump_->SetFileName(getElementContent(c, "dumpFileName" , eb_node) );
+	//dump_->SetFileName(getElementContent(c, "dumpFileName" , eb_node) );
+	dirName_=getElementContent(c, "dumpDirName" , eb_node) ;
+	bool dumpCompress=Configurator::GetInt(getElementContent(c, "dumpCompress" , eb_node) );
+	dump_->SetCompress(dumpCompress);
 	dump_->SetBinary();
-	if (dump_->GetFileName().find(".gz") != string::npos)
-		{dump_->SetCompress();}
-	else {dump_->SetCompress(false);}
 }
 
 void EventBuilder::Init(){
@@ -381,100 +386,106 @@ void EventBuilder::Clear(){
 	if(dumpEvent_)dump_->Clear();
 }
 //
-// RUN 
-void EventBuilder::OpenRun(WORD runNum)
+// SPILL 
+void EventBuilder::OpenSpill(WORD spillNum)
 {
-	if (isRunOpen_) CloseRun(); 
-	if (dumpEvent_ && !recvEvent_) // TODO: what happen if I open a run without other runs to be close
+	if (isSpillOpen_) CloseSpill(); 
+	if (dumpEvent_ && !recvEvent_) 
 	{ // open dumping file
-		string fileName=dump_->GetFileName();
-		size_t dot= fileName.rfind(".");
-		string newFileName=fileName.substr(0,dot) + "_" + to_string(runNum) + fileName.substr(dot,string::npos); // c++11 to string, othewsie use something like sprintf
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) runNum_) + "/" + to_string((unsigned long long)spillNum);
+		if (dump_->GetCompress() )  newFileName += ".gz";
+		else newFileName +=".txt";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
 	}
-	isRunOpen_=true;
-	lastRun_= runNum;
-	dataType runH=RunHeader();
-	myRun_.append(runH);
-	myRun_.append( (void *)&runNum,WORDSIZE);
+	isSpillOpen_=true;
+	lastSpill_= spillNum;
+	dataType spillH=SpillHeader();
+	mySpill_.append(spillH);
+	mySpill_.append( (void *)&runNum_,WORDSIZE);
+	mySpill_.append( (void *)&spillNum,WORDSIZE);
 	WORD zero=0;
-	myRun_.append( (void*)&zero, WORDSIZE);
+	mySpill_.append( (void*)&zero, WORDSIZE);
 }
 
-Command EventBuilder::CloseRun()
+Command EventBuilder::CloseSpill()
 {
 	Command myCmd; myCmd.cmd=NOP;
-	isRunOpen_=false;	
-	dataType  runT=RunTrailer();
-	myRun_.append(runT);
+	isSpillOpen_=false;	
+	dataType  spillT=SpillTrailer();
+	mySpill_.append(spillT);
 	if( dumpEvent_ && !recvEvent_) 
 	{
-		Dump(myRun_);
+		Dump(mySpill_);
 		dump_->Close();
 	}
 	if (recvEvent_) { 
-		WORD runNum=ReadRunNum(myRun_);
-		if ( runs_.find(runNum) != runs_.end() ) 
+		WORD spillNum=ReadSpillNum(mySpill_);
+		if ( spills_.find(spillNum) != spills_.end() ) 
 			{
-			runs_[runNum] = pair<int,dataType>(1,dataType( myRun_.size(),myRun_.data())   );
-			myRun_.release();
+			spills_[spillNum] = pair<int,dataType>(1,dataType( mySpill_.size(),mySpill_.data())   );
+			mySpill_.release();
 			}
-		else MergeRuns(runs_[runNum].second,myRun_);
+		else MergeSpills(spills_[spillNum].second,mySpill_);
 	} 
 	if (sendEvent_) {//TODO -- also do the merging if recv
 		// --- Instruct Daemon to send them through the connection manager
 		myCmd.cmd=SEND;
 		dataType myMex;
 		myMex.append((void*)"DATA\0",5);
-		myMex.append(myRun_);
+		myMex.append(mySpill_);
 		myCmd.data=myMex.data();
 		myCmd.N=myMex.size();
 		myMex.release();
 		} 
-	myRun_.clear();
+	mySpill_.clear();
 	return myCmd;
 }
 
-void EventBuilder::AddEventToRun(dataType &event){
-	if (!isRunOpen_) return; // throw exception TODO
+void EventBuilder::AddEventToSpill(dataType &event){
+	if (!isSpillOpen_) return; // throw exception TODO
 	// find the N.Of.Event in the actual RUn
-	if (myRun_.size() < WORDSIZE*3)  return; //throw exception TODO
-	WORD *nEventsPtr=((WORD*)myRun_.data() +2 );
+	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
+	WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
 	WORD nEvents= *nEventsPtr;
 	nEvents+=1;
 	(*nEventsPtr)=nEvents;
-	myRun_.append(event);
+	mySpill_.append(event);
 	return;
 }
-void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
+void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	// --- can't merge inplace two events
-	WORD runNum1 = ReadRunNum(run1);
-	WORD runNum2 = ReadRunNum(run2);
+	WORD runNum1 = ReadRunNumFromSpill(spill1);
+	WORD runNum2 = ReadRunNumFromSpill(spill2);
 
-	WORD runNevents1 = ReadRunNevents(run1);
-	WORD runNevents2 = ReadRunNevents(run2);
+	WORD spillNum1 = ReadSpillNum(spill1);
+	WORD spillNum2 = ReadSpillNum(spill2);
+
+	WORD spillNevents1 = ReadSpillNevents(spill1);
+	WORD spillNevents2 = ReadSpillNevents(spill2);
 
 	if (runNum1 != runNum2) return ; // TODO throw exception
-	if (runNevents1 != runNevents2) return ; // TODO throw exception
+	if (spillNum1 != spillNum2) return ; // TODO throw exception
+	if (spillNevents1 != spillNevents2) return ; // TODO throw exception
 
-	dataType oldRun(run1.size(),run1.data());	
-	run1.release();run1.clear();
+	dataType oldSpill(spill1.size(),spill1.data());	
+	spill1.release();spill1.clear();
 
 
-	dataType H=RunHeader();
-	dataType T=RunTrailer();
-	run1.append(H);
-	run1.append((void*)&runNum1,WORDSIZE);
-	run1.append((void*)&runNevents1,WORDSIZE);
+	dataType H=SpillHeader();
+	dataType T=SpillTrailer();
+	spill1.append(H);
+	spill1.append((void*)&runNum1,WORDSIZE); // TODO new runN- spillN
+	spill1.append((void*)&spillNum1,WORDSIZE); // TODO new runN- spillN
+	spill1.append((void*)&spillNevents1,WORDSIZE);
 
-	char* ptr1=(char*)oldRun.data();
-	char* ptr2=(char*)run2  .data();
-	long left1=oldRun.size() - WORDSIZE*3;
-	long left2=run2.size() - WORDSIZE*3;
-	ptr1+= WORDSIZE*3;
-	ptr2+= WORDSIZE*3;
-	for(int iEvent=0;iEvent< runNevents1 ;iEvent++)
+	char* ptr1=(char*)oldSpill.data();
+	char* ptr2=(char*)spill2  .data();
+	long left1=oldSpill.size() - WORDSIZE*4;
+	long left2=spill2.size() - WORDSIZE*4;
+	ptr1+= WORDSIZE*4;
+	ptr2+= WORDSIZE*4;
+	for(int iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
 		long eventSize1= IsEventOk(ptr1,left1);
 		long eventSize2= IsEventOk(ptr2,left2);
@@ -484,7 +495,7 @@ void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
 		dataType myEvent=MergeEventStream(event1,event2);
 		event1.release();
 		event2.release();
-		run1.append(myEvent);
+		spill1.append(myEvent);
 		//----
 		ptr1+= eventSize1;
 		ptr2+= eventSize2;
@@ -492,25 +503,35 @@ void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
 		left2-=eventSize2;
 	       }	
 	
-	run1.append(T); 
+	spill1.append(T); 
 }
 
-void EventBuilder::MergeRuns(dataType &run2 ) {
-	WORD runNum=ReadRunNum(run2); 
-	MergeRuns(runs_[runNum].second,run2); 
-	runs_[runNum].first++; 
+void EventBuilder::MergeSpills(dataType &spill2 ) {
+	WORD spillNum=ReadSpillNum(spill2); 
+	MergeSpills(spills_[spillNum].second,spill2); 
+	spills_[spillNum].first++; 
 	if (!recvEvent_ ) return ;
 
-	if ( runs_[runNum].first > recvEvent_)  // dump for recvEvent
+	if ( spills_[spillNum].first > recvEvent_)  // dump for recvEvent
 		{
-		string fileName=dump_->GetFileName();
-		size_t dot= fileName.rfind(".");
-		string newFileName=fileName.substr(0,dot) + "_" + to_string(runNum) + fileName.substr(dot,string::npos); // c++11 to string, othewsie use something like sprintf
+		WORD myRunNum=ReadRunNumFromSpill(spill2);
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
+		if (dump_->GetCompress() )  newFileName += ".gz";
+		else newFileName +=".txt";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
-		Dump(runs_[runNum].second);
+		Dump(spills_[spillNum].second);
 		dump_->Close();
-		runs_.erase(runNum);
+		spills_.erase(spillNum);
 		}
 	return;
 } 
+
+void EventBuilder::SetRunNum(WORD x)
+{
+runNum_=x;
+if (dumpEvent_ || recvEvent_)  // POSIX
+	system(  ("mkdir -p "+dirName_+ to_string(runNum_) ).c_str() );
+}
+
+

@@ -16,9 +16,9 @@ class dataType;
 
 
 // this are the cmd that the finate state machine can receive
-enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA,READ};
+enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,STARTRUN,SEND,RECV,DATA,STATUS,SPILLCOMPL,ENDRUN,DIE};
 // this are the status of the finate state machines
-enum STATUS_t {WAIT_TRIG=0,OUT_OF_RUN};
+enum STATUS_t { START=0, INIT, INITIALIZED , CLEARED, BEGINSPILL, WAITTRIG, READ, ENDSPILL, SENTBUFFER,BYE };
 
 /* Command description:
  * NOP : No Operation. Need for dummy messages that goes around
@@ -48,9 +48,7 @@ public:
 
 class Daemon 
 {
-friend class ControlManager;
-
-private:
+protected:
 	//private variable each word is capital execpt the first. Underscore at the end
 	// This class should be think as a finite state machine that decides what to do
 EventBuilder 		*eventBuilder_	; 
@@ -71,16 +69,16 @@ public:
 	~Daemon();
 	// --- Initialization
 		//  Init itself and all the othe process
-	int Init(string configFileName="data/config.xml"); 
+	virtual int Init(string configFileName="data/config.xml"); 
 	// --- Loop
 	//     Will loop on the things to do, and handle exceptions
-	void Loop();
+	virtual void Loop()=0;
 	// --- Reset
-	void Clear();
+	virtual void Clear();
 	// --- this is meant to parse the commands that navigate through the network
 	Command ParseData(dataType mex);
-
-
+	// ---
+	void MoveToStatus(STATUS_t newStatus);
 };
 
 

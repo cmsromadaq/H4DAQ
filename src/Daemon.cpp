@@ -64,6 +64,7 @@ void Daemon::Clear()
 }
 
 
+/*
 void Daemon::Loop(){
 while (true) {
 	try{
@@ -71,7 +72,7 @@ while (true) {
 		// check Connection Manager
 		// if cmds not empty do something
 	switch (myStatus_ ) {
-	case OUT_OF_RUN: 
+	case OUT_OF_SPILL: 
 		{
 			if (todo_.empty() ) { 
 				Command myCmd; 
@@ -100,7 +101,7 @@ while (true) {
 					   connectionManager_->Recv(myMex);  // parse mex to generate cmds
 					   Command myNewCmd=ParseData(myMex);
 
-					   // don't push for the machine which is also RUN CONTROL
+					   // don't push for the machine which is also SPILL CONTROL
 					   if ( hwManager_->IsRunControl()  && 
 							   ( myNewCmd.cmd == WWE || myNewCmd.cmd == WE  || myNewCmd.cmd == EE ||
 							     myNewCmd.cmd == WBE || myNewCmd.cmd == BT  || myNewCmd.cmd == WBT || 
@@ -113,7 +114,7 @@ while (true) {
 					  {
 					   dataType myMex;
 					   myMex.append(myCmd.data,myCmd.N);
-					   eventBuilder_->MergeRuns(myMex);
+					   eventBuilder_->MergeSpills(myMex);
 					   break;
 					  }
 				case WWE: {
@@ -131,12 +132,12 @@ while (true) {
 					  	dataType myMex; myMex.append((void*)"WE\0",3);
 					   	connectionManager_->Send(myMex); 
 					  	}
-					  eventBuilder_->OpenRun();
+					  eventBuilder_->OpenSpill();
 					  myStatus_=WAIT_TRIG;
 					  break;
 					  }
 				case EE:  {// this command is useless in this status (Out-of-run)
-				          // if control manager, send to all EE
+				          // if control manager, send to all EE - in the WAIT_FOR_TRIGGER, the SPILLCONTROL LOAD this cmd
 					  if ( !hwManager_->IsRunControl()) break;
 					  Command myNewCmd;
 					  myNewCmd.cmd=SEND;
@@ -177,6 +178,7 @@ while (true) {
 					  }
 				case READ: { // TODO
 					   // Ask HwManager to read Boards with SPS Status.
+					   if ( !hwManager_->IsRunControl()  ) break;
 					   // Generate ad hoc commands
 					   dataType myMex;
 					   //---- .... ----
@@ -192,8 +194,8 @@ while (true) {
 
 			}
 			break;
-		} // OUT_OF RUN
-	//eventBuilder->myRun is open
+		} // OUT_OF SPILL
+	//eventBuilder->mySpill is open
 	default:
 	case WAIT_TRIG:
 		{
@@ -201,7 +203,7 @@ while (true) {
 		if( hwManager_->TriggerReceived() ){
 			//read everything 	
 			dataType event=hwManager_->ReadAll();
-			eventBuilder_->AddEventToRun(event);
+			eventBuilder_->AddEventToSpill(event);
 			hwManager_->BufferClearAll();
 			}
 		// read if I have something on the network
@@ -212,14 +214,14 @@ while (true) {
 			Command myNewCmd = ParseData( myMex);
 			if (myNewCmd.cmd == EE ) 
 				{ // EE
-				myStatus_=OUT_OF_RUN;
+				myStatus_=OUT_OF_SPILL;
 				//case EE: break; // end triggers; close runs;start sending data
-				Command closeRunCmd=eventBuilder_->CloseRun(); // this will send the run or dump it
+				Command closeSpillCmd=eventBuilder_->CloseSpill(); // this will send the run or dump it
 				if (hwManager_->IsRunControl() ){ // append the EE to the list of commands
 					todo_.push(myNewCmd);
 					}
-				if (closeRunCmd.cmd == SEND)
-					todo_.push(closeRunCmd);
+				if (closeSpillCmd.cmd == SEND) // this will send the DATA oft the run
+					todo_.push(closeSpillCmd);
 				}
 			else // other mex ??
 				{ 
@@ -235,6 +237,7 @@ while (true) {
 } // while-true
 return;
 }
+*/
 
 
 
@@ -286,5 +289,38 @@ Command Daemon::ParseData(dataType mex)
 		myCmd.cmd=WBE;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "EBT")  )
 		myCmd.cmd=EBT;
+	else if (N >=7  and !strcmp( (char*) mex.data(), "STATUS")  )
+		{
+		mex.erase(0,7);
+		myCmd.cmd=STATUS;
+		myCmd.data = mex.data();
+		myCmd.N    = mex.size();
+		mex.release();
+		}
+	else if (N >=9  and !strcmp( (char*) mex.data(), "STARTRUN")  )
+		{
+		mex.erase(0,9);
+		myCmd.cmd=STARTRUN;
+		myCmd.data = mex.data();
+		myCmd.N    = mex.size();
+		mex.release();
+		}
+	else if (N >=11  and !strcmp( (char*) mex.data(), "SPILLCOMPL")  )
+		myCmd.cmd=SPILLCOMPL;
+	else if (N >=7  and !strcmp( (char*) mex.data(), "ENDRUN")  )
+		myCmd.cmd=ENDRUN;
+	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
+		myCmd.cmd=DIE;
 	return myCmd;
+}
+
+
+
+void Daemon::MoveToStatus(STATUS_t newStatus){
+	dataType myMex;
+	myMex.append((void*)"STATUS\0",7);
+	WORD myStatus=(WORD)newStatus;
+	myMex.append((void*)&myStatus,WORDSIZE);
+	connectionManager_->Send(myMex);
+	myStatus_=newStatus;
 }

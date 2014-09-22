@@ -51,6 +51,8 @@ public:
 	inline void SetBinary(bool binary=true){binary_=binary;}
 	// --- Set Compression of the log
 	void SetCompress(bool compress=true);
+	// --- Get Compression of the log
+	inline bool GetCompress()const { return compress_;}
 	// --- Set Asyncronous logging
 	//void SetAsync(bool async=true) { async_=async;};
 	// --- Set Max n. of lines in a log file
