@@ -93,7 +93,7 @@ public:
 	void Clear(); // TODO
 	void Init(); // TODO
 	void Config(Configurator &); // TODO
-	inline void Send(dataType &mex,int i=0){pubs[i]->SendMessage(mex);}; 
+	inline void Send(dataType &mex,int i=0){ pubs[i]->SendMessage(mex);}; 
 	// --- check subscribers to see if one have received a mex
 	bool Recv(dataType &mex);
 

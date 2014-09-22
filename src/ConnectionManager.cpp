@@ -34,8 +34,8 @@ void Publisher::Clear(){
 int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 {
 	Log("[3] Publisher::SendMessage",3);
-	pid_t childpid;
-	char buffer[16];
+	//pid_t childpid;
+	//char buffer[16];
 	//if (async_){  ZMQ is already async
 	//	childpid=fork();
 	//	sprintf(buffer,"%d",childpid);
@@ -49,6 +49,7 @@ int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 	//create the message and put it in the send
 	//zmq::message_t message( mex.data() ,mex.size() ,myzmq_nofree) ;
 	zmq::message_t message( mex.data() ,mex.size() , NULL ) ;
+	//mex.release(); // ???
 	//   void*myMsg=mex.data();
 	//   int mySize=mex.size();
 	//   mex.release();

@@ -14,6 +14,9 @@ const bool operator==(dataType &x, dataType &y)
 	
 	// --- Constructor
 dataType::dataType(){
+	dataStream_=NULL;
+	size_=0;
+	reserved_=0;
 	clear();
 }
 
@@ -81,10 +84,12 @@ void dataType::erase(int A,int B){
 	}
 	// --- clear
 void dataType::clear(){ 
+	//printf("Clearing dataType\n"); //DEBUG
 	size_=0;
 	reserved_=0; 
 	if(dataStream_!=NULL)delete [] (char*)dataStream_; 
 	dataStream_=NULL;
+	//printf("Clearing dataType:DONE\n"); //DEBUG
 	}
 
 void dataType::copy(void* data,int N){

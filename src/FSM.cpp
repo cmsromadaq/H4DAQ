@@ -168,13 +168,20 @@ while (true) {
 		    {
 		    // start RUN
 			    printf ("waiting for RunNum\n:");
-			    WORD runNum;scanf("%u",&runNum);
-			    printf("Starting Run %u",runNum);
+			    WORD runNum;
+			    scanf("%u",&runNum);
+			    printf("Starting Run %u\n",runNum);
 			    dataType myMex;
+			    printf("myMex.size()=%d\n",myMex.size() );
 			    myMex.append((void*)"STARTRUN\0",9);
+			    printf("myMex.size()=%d\n",myMex.size() );
 			    myMex.append((void*)&runNum,WORDSIZE);
-			    connectionManager_->Send(myMex);
+			    printf("myMex.size()=%d\n",myMex.size() );
+			    printf("Sending Mex\n"); //DEBUG
+			    //connectionManager_->Send(myMex);
+			    printf("MexSent\n"); // DEBUG
 			    MoveToStatus(READ);
+			    printf("myMex.size()=%d\n",myMex.size() );
 			    break;
 		    }
 	case BEGINSPILL:
@@ -237,21 +244,21 @@ while (true) {
 		    {
 			int cmd;
 			printf("waiting for command:\n ");
-			printf("\t%d->WWE\n",WWE);
-			printf("\t%d->WE\n",WE);
-			printf("\t%d->EE\n",EE);
-			printf("\t%d->STATUS\n",STATUS);
-			printf("\t%d->ENDRUN\n",ENDRUN);
-			printf("\t%d->DIE\n",DIE);
+			printf("\t0->WWE\n",WWE);
+			printf("\t1->WE\n",WE);
+			printf("\t2->EE\n",EE);
+			printf("\t3->STATUS\n",STATUS);
+			printf("\t4->ENDRUN\n",ENDRUN);
+			printf("\t5->DIE\n",DIE);
 			printf("\n: ");
 			scanf("%d",&cmd);
-			switch ( (CMD_t)cmd ){
-				case  WWE: 	{MoveToStatus(BEGINSPILL); break;}
-				case  WE : 	{MoveToStatus(CLEARED);break;}
-				case  STATUS: 	{MoveToStatus(WAITTRIG); break;}
-				case  EE:  	{MoveToStatus(ENDSPILL); break;}
-				case  ENDRUN: 	{MoveToStatus(SENTBUFFER); break;}
-				case  DIE: 	{MoveToStatus(BYE);break;}
+			switch ( cmd ){
+				case  0: 	{MoveToStatus(BEGINSPILL); break;}
+				case  1 : 	{MoveToStatus(CLEARED);break;}
+				case  2:  	{MoveToStatus(ENDSPILL); break;}
+				case  3: 	{MoveToStatus(WAITTRIG); break;}
+				case  4: 	{MoveToStatus(SENTBUFFER); break;}
+				case  5: 	{MoveToStatus(BYE);break;}
 				default: break;
 			}
 

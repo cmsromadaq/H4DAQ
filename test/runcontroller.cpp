@@ -17,16 +17,21 @@ int main(int argc, char**argv)
  *  this is the main loop of the controller.
  */
 // define Handlers for sigint
+printf("HANDLERS\n");
 define_handlers();
 //
 //Daemon *d=new Daemon();
+printf("RC\n");
 RunControllerFSM *d=new RunControllerFSM();
+printf("INIT\n");
 d->Init("data/config.xml");
 try{
+	printf("LOOP\n");
 	d->Loop();
    }
    catch (sigint_exception &e) { printf("%s\n",e.what());}
 
+printf("CLEAR\n");
 d->Clear();
 return 0;
 }
