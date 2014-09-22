@@ -8,6 +8,8 @@ using namespace std;
 #define EVTBLD_H
 #include "interface/Logger.hpp"
 
+class Command; // fwd decl
+
 //typedef unsigned int WORD;
 typedef uint32_t WORD;
 
@@ -101,7 +103,8 @@ public:
 	inline void Dump(dataType&run) {dump_->Dump(run);};
 	void OpenRun(WORD runNum);
 	inline void OpenRun() { OpenRun( lastRun_ + 1 ) ; }; 
-	void CloseRun( );
+	// -- close the run. Return the command to be parsed by the daemon
+	Command CloseRun( );
 	void AddEventToRun(dataType &event ); 
 	// merge in Run1, Run2. check i runNum is to be dumped
 	void MergeRuns(dataType &run2 ) ;//{WORD runNum=ReadRunNum(run2); MergeRuns(runs_[runNum].second,run2); runs_[runNum].first++; return;} ;
@@ -127,5 +130,7 @@ public:
 	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM
 	static inline long long IsEventOk(void *v, int N){ dataType tmp(N,v);long long R= IsEventOk(tmp); tmp.release(); return R;};
 };
+
+#include "interface/Daemon.hpp" // Command -- fwd decl
 
 #endif

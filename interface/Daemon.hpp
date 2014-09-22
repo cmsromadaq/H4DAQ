@@ -3,17 +3,16 @@
 #ifndef DAEMON_H
 #define DAEMON_H
 
-//class ControlManager;
-//class Daemon;
-//class EventBuilder;
-//class Configurator;
 
-#include "interface/EventBuilder.hpp"
-//#include "interface/ControlManager.hpp"
-#include "interface/HwManager.hpp"
-#include "interface/ConnectionManager.hpp"
-#include "interface/Configurator.hpp"
-#include "interface/HwManager.hpp"
+// fwd decl -- avoid loop
+//class ControlManager;
+class ConnectionManager;
+class Daemon;
+class EventBuilder;
+class Configurator;
+class HwManager;
+class dataType;
+
 
 
 // this are the cmd that the finate state machine can receive
@@ -83,5 +82,12 @@ public:
 
 };
 
+
+// fwd decl
+#include "interface/EventBuilder.hpp"
+//#include "interface/ControlManager.hpp"
+#include "interface/HwManager.hpp"
+#include "interface/ConnectionManager.hpp"
+#include "interface/Configurator.hpp"
 
 #endif

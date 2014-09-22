@@ -137,7 +137,9 @@ while (true) {
 				{ // EE
 				myStatus_=OUT_OF_RUN;
 				//case EE: break; // end triggers; close runs;start sending data
-				eventBuilder_->CloseRun(); // this will send the run or dump it
+				Command closeRunCmd=eventBuilder_->CloseRun(); // this will send the run or dump it
+				if (closeRunCmd.cmd == DATA)
+					todo_.push(closeRunCmd);
 				}
 			else // other mex ??
 				{ 

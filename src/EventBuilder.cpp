@@ -214,7 +214,7 @@ dataType EventBuilder::RunTrailer()
 	return R;
 }
 
-dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ //TODO
+dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ 
 	// takes two streams and merge them independently from the content
 	dataType R;
 	R.append(x);
@@ -402,8 +402,9 @@ void EventBuilder::OpenRun(WORD runNum)
 	myRun_.append( (void*)&zero, WORDSIZE);
 }
 
-void EventBuilder::CloseRun()
+Command EventBuilder::CloseRun()
 {
+	Command myCmd; myCmd.cmd=NOP;
 	isRunOpen_=false;	
 	dataType  runT=RunTrailer();
 	myRun_.append(runT);
@@ -412,7 +413,6 @@ void EventBuilder::CloseRun()
 		Dump(myRun_);
 		dump_->Close();
 	}
-	if (sendEvent_) {} //TODO -- also do the merging if recv
 	if (recvEvent_) { 
 		WORD runNum=ReadRunNum(myRun_);
 		if ( runs_.find(runNum) != runs_.end() ) 
@@ -422,8 +422,15 @@ void EventBuilder::CloseRun()
 			}
 		else MergeRuns(runs_[runNum].second,myRun_);
 	} 
+	if (sendEvent_) {//TODO -- also do the merging if recv
+		// --- Instruct Daemon to send them through the connection manager
+		myCmd.cmd=DATA;
+		myCmd.data=myRun_.data();
+		myCmd.N=myRun_.size();
+		myRun_.release();
+		} 
 	myRun_.clear();
-	return;
+	return myCmd;
 }
 
 void EventBuilder::AddEventToRun(dataType &event){
@@ -438,7 +445,7 @@ void EventBuilder::AddEventToRun(dataType &event){
 	return;
 }
 void EventBuilder::MergeRuns(dataType &run1,dataType &run2 ){
-	//TODO --- can't merge inplace two events
+	// --- can't merge inplace two events
 	WORD runNum1 = ReadRunNum(run1);
 	WORD runNum2 = ReadRunNum(run2);
 
