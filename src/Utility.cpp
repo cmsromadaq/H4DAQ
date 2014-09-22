@@ -7,7 +7,7 @@ string mex="";
 char buf[4];
 for(int i=0;i<N ;i++)
 	{
-	sprintf(buf,"%02X",((char*)data)[i] );
+	sprintf(buf,"%02X",((unsigned char*)data)[i] );
 	mex += buf;
 	if ((i%M)==M-1) mex += "\n";
 	else mex += " ";

@@ -79,6 +79,8 @@ public:
 	Command ParseData(dataType mex);
 	// ---
 	void MoveToStatus(STATUS_t newStatus);
+	// -- check if configuration is consistent with the subclasses
+	virtual bool IsOk();//{return true;};
 };
 
 

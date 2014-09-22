@@ -15,7 +15,7 @@ int Board::Config(BoardConfig *bC){
 // --- Constructor
 HwManager::HwManager(){
 	trigBoard_=-1;
-	runControl_=false;
+	//runControl_=false;
 }
 // --- Destructor
 HwManager::~HwManager(){}
@@ -60,7 +60,7 @@ void HwManager::Init(){
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
 	trigBoard_=-1;
-	runControl_=false;
+	//runControl_=false;
 	for(int i=0;i<hw_.size();i++)
 		hw_[i]->Clear();
 	return;

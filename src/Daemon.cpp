@@ -324,3 +324,5 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	connectionManager_->Send(myMex);
 	myStatus_=newStatus;
 }
+
+bool Daemon::IsOk(){return true;}

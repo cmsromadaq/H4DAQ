@@ -71,12 +71,14 @@ public:
 const bool operator==(dataType &x, dataType &y);
 
 class EventBuilder : public LogUtility, public Configurable{
+
+friend class Daemon;
 // ---binary stream of the event -- 1char = 1byte
 dataType mySpill_; // dynamic array of char*
 
 bool dumpEvent_; // default true
 bool sendEvent_; // default false
-int recvEvent_; // if set to true will set also dumpEvent
+int recvEvent_; //  wait for other classes. Change behaviour of dumpEvent
 Logger *dump_; // this is not the Logger. This will be used to dump the event, and will be set in binary mode.
 string dirName_;
 bool isSpillOpen_;
@@ -85,7 +87,7 @@ WORD runNum_;
 
 map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 
-	void MergeSpills(dataType &spill1,dataType &spill2 ); //TODO
+	void MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
 public:
 	/* this class contains the raw event.
@@ -96,10 +98,14 @@ public:
 	EventBuilder();
 	// --- Destructor
 	~EventBuilder();
-	// 
-	void AppendToStream();
-	const void* GetStream(){ return mySpill_.c_str();}
-	int  GetSize(){return mySpill_.size();}
+	// --- Get Info
+	inline bool GetDumpEvent(){return dumpEvent_;};
+	inline bool GetSendEvent(){return sendEvent_;};
+	inline int GetRecvEvent() { return recvEvent_;};
+	//void AppendToStream();
+	const void* GetStream(){ return mySpill_.c_str();};
+	int  GetSize(){return mySpill_.size();};
+	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check
 	void Clear(); //TODO -- check

@@ -1,11 +1,19 @@
 #include "interface/Daemon.hpp"
 #include "interface/FSM.hpp"
+#include "interface/Utility.hpp"
 
+// --- Constructor: C++11 inherits automatically. C++03 no
+DataReadoutFSM::DataReadoutFSM(): Daemon() {}
 
+bool DataReadoutFSM::IsOk(){
+	if ( eventBuilder_->GetSendEvent() != true ) return false;
+	return true;
+}
 
 void DataReadoutFSM::Loop(){
+// not constructed in the constructor -- should take this from the configuration
 
-hwManager_->SetRunControl(false);
+if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
@@ -148,8 +156,18 @@ return;
 } // end Loop
 
 // ------------------------- RUN CONTROLLER
+// --- Constructor
+RunControllerFSM::RunControllerFSM() : Daemon() {};
+
+bool RunControllerFSM::IsOk(){
+	//if( hwManager_->GetRunControl() != true) return false;
+	return true;
+}
+
 void RunControllerFSM::Loop(){
-hwManager_->SetRunControl(true);
+
+if ( !IsOk() ) throw config_exception();
+
 while (true) {
 	try{
 		// check source that can populate the commands -- Connection and HW
@@ -172,16 +190,15 @@ while (true) {
 			    scanf("%u",&runNum);
 			    printf("Starting Run %u\n",runNum);
 			    dataType myMex;
-			    printf("myMex.size()=%d\n",myMex.size() );
 			    myMex.append((void*)"STARTRUN\0",9);
-			    printf("myMex.size()=%d\n",myMex.size() );
 			    myMex.append((void*)&runNum,WORDSIZE);
-			    printf("myMex.size()=%d\n",myMex.size() );
-			    printf("Sending Mex\n"); //DEBUG
-			    //connectionManager_->Send(myMex);
-			    printf("MexSent\n"); // DEBUG
+			    printf("RUN MEX: %d\n",myMex.size());
+				printf("------------------\n");
+				//fwrite(myMex.data(),1,myMex.size(),stdout);
+				printf("%s",Utility::AsciiData(myMex.data(),myMex.size()).c_str() );
+				printf("------------------\n");
+			    connectionManager_->Send(myMex);
 			    MoveToStatus(READ);
-			    printf("myMex.size()=%d\n",myMex.size() );
 			    break;
 		    }
 	case BEGINSPILL:
@@ -213,8 +230,11 @@ while (true) {
 			    {
 				printf("Reiceved Message:\n");
 				printf("------------------\n");
-				fwrite(myMex.data(),1,myMex.size(),stdout);
+				printf("size = %d\n",myMex.size() ) ;
 				printf("------------------\n");
+				//fwrite(myMex.data(),1,myMex.size(),stdout);
+				printf("%s",Utility::AsciiData(myMex.data(),myMex.size()).c_str()  );
+				printf("\n------------------\n");
 			    }
 			    MoveToStatus(READ);
 			    break;
@@ -280,3 +300,14 @@ while (true) {
 }//end while
 return;
 }//end LOOP
+
+// ------------------- EVENT BUILDER
+bool EventBuilderFSM::IsOk(){
+	if( eventBuilder_->GetRecvEvent() != true) return false;
+	return true;
+}
+
+void EventBuilderFSM::Loop(){
+
+if ( !IsOk() ) throw config_exception();
+}
