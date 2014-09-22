@@ -79,8 +79,9 @@ while (true) {
 				case NOP: break;
 				case SEND: 
 					  {
-					   dataType myMex;
-					   myMex.append( (void*)"SEND\0" , 5 );
+					   dataType myMex; 
+					   // the command is already formatted
+					   //myMex.append( (void*)"SEND\0" , 5 );
 					   myMex.append( myCmd.data , myCmd.N );
 					   connectionManager_->Send(myMex); 
 					   break;
@@ -138,7 +139,7 @@ while (true) {
 				myStatus_=OUT_OF_RUN;
 				//case EE: break; // end triggers; close runs;start sending data
 				Command closeRunCmd=eventBuilder_->CloseRun(); // this will send the run or dump it
-				if (closeRunCmd.cmd == DATA)
+				if (closeRunCmd.cmd == SEND)
 					todo_.push(closeRunCmd);
 				}
 			else // other mex ??

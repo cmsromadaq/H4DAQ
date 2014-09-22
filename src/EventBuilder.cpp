@@ -424,10 +424,13 @@ Command EventBuilder::CloseRun()
 	} 
 	if (sendEvent_) {//TODO -- also do the merging if recv
 		// --- Instruct Daemon to send them through the connection manager
-		myCmd.cmd=DATA;
-		myCmd.data=myRun_.data();
-		myCmd.N=myRun_.size();
-		myRun_.release();
+		myCmd.cmd=SEND;
+		dataType myMex;
+		myMex.append((void*)"DATA\0",5);
+		myMex.append(myRun_);
+		myCmd.data=myMex.data();
+		myCmd.N=myMex.size();
+		myMex.release();
 		} 
 	myRun_.clear();
 	return myCmd;
