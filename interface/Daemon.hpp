@@ -16,7 +16,7 @@ class dataType;
 
 
 // this are the cmd that the finate state machine can receive
-enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA};
+enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,SEND,RECV,DATA,READ};
 // this are the status of the finate state machines
 enum STATUS_t {WAIT_TRIG=0,OUT_OF_RUN};
 
@@ -31,7 +31,8 @@ enum STATUS_t {WAIT_TRIG=0,OUT_OF_RUN};
  * EBT : SPS command of End of Burst Test
  * RECV: Check if mex is received
  * SEND: send cmd
- * DATA: send DATA
+ * DATA: received data
+ * READ: check if board with sps status generated something
  */
 
 class Command{

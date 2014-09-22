@@ -73,7 +73,15 @@ while (true) {
 	switch (myStatus_ ) {
 	case OUT_OF_RUN: 
 		{
-			if (todo_.empty() ) { Command myCmd; myCmd.cmd=RECV; todo_.push(myCmd);  usleep(500);continue;}
+			if (todo_.empty() ) { 
+				Command myCmd; 
+				myCmd.cmd=RECV; 
+				todo_.push(myCmd);  
+				myCmd.cmd=READ;
+				todo_.push(myCmd);  
+				usleep(50); // avoid ultra-fast loop. Maybe remove it
+				continue;
+			}
 			Command myCmd=todo_.front();	todo_.pop();
 			switch (myCmd.cmd){
 				case NOP: break;
@@ -91,6 +99,13 @@ while (true) {
 					   dataType myMex;
 					   connectionManager_->Recv(myMex);  // parse mex to generate cmds
 					   Command myNewCmd=ParseData(myMex);
+
+					   // don't push for the machine which is also RUN CONTROL
+					   if ( hwManager_->IsRunControl()  && 
+							   ( myNewCmd.cmd == WWE || myNewCmd.cmd == WE  || myNewCmd.cmd == EE ||
+							     myNewCmd.cmd == WBE || myNewCmd.cmd == BT  || myNewCmd.cmd == WBT || 
+							     myNewCmd.cmd == EBT ) 
+					      ) break;
 					   todo_.push(myNewCmd);
 					   break;
 					  }
@@ -101,18 +116,79 @@ while (true) {
 					   eventBuilder_->MergeRuns(myMex);
 					   break;
 					  }
-				case WWE: break; // ClearAllBuffer ;todo_->push(); ENTER WAITING FOR TRIGGER
+				case WWE: {
+					// send WWE
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"WWE\0",4);
+					   	connectionManager_->Send(myMex); 
+					  	}
+					   hwManager_->BufferClearAll(); 
+					    break; // ClearAllBuffer ;todo_->push(); 
+					  }
 				case WE:  // Activate triggers - start run
 					  {
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"WE\0",3);
+					   	connectionManager_->Send(myMex); 
+					  	}
 					  eventBuilder_->OpenRun();
 					  myStatus_=WAIT_TRIG;
 					  break;
 					  }
-				case EE: break; // end triggers; start sending datas
-				case WBT: break;
-				case BT: break;
-				case EBT: break;
-				case WBE: break;
+				case EE:  {// this command is useless in this status (Out-of-run)
+				          // if control manager, send to all EE
+					  if ( !hwManager_->IsRunControl()) break;
+					  Command myNewCmd;
+					  myNewCmd.cmd=SEND;
+					  dataType myMex; myMex.append((void*)"EE\0",3);
+					  myNewCmd.data= myMex.data();
+					  myNewCmd.N=myMex.size();
+					  myMex.release();
+					  todo_.push(myNewCmd); 
+					  break; // end triggers; start sending data; t 
+					  }
+				case WBT: {
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"WBT\0",4);
+					   	connectionManager_->Send(myMex); 
+					  	}
+					  break;
+					  }
+				case BT: {
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"BT\0",3);
+					   	connectionManager_->Send(myMex); 
+					  	}
+					  break;
+					 }
+				case EBT: {
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"EBT\0",4);
+					   	connectionManager_->Send(myMex); 
+					  	}
+						  break;
+					  }
+				case WBE: {
+				          if (hwManager_->IsRunControl()){ // SEND NOW, 'cause otherwise may not process until EE
+					  	dataType myMex; myMex.append((void*)"WBT\0",4);
+					   	connectionManager_->Send(myMex); 
+					  	}
+						  break;
+					  }
+				case READ: { // TODO
+					   // Ask HwManager to read Boards with SPS Status.
+					   // Generate ad hoc commands
+					   dataType myMex;
+					   //---- .... ----
+					   myMex.append((void*)"WWE\0",4);
+					   Command myReadedCmd;
+					   myReadedCmd.cmd=SEND;
+					   myReadedCmd.data=myMex.data();
+					   myReadedCmd.N=myMex.size();
+
+					   myMex.release();
+					   break;
+					   }
 
 			}
 			break;
@@ -139,6 +215,9 @@ while (true) {
 				myStatus_=OUT_OF_RUN;
 				//case EE: break; // end triggers; close runs;start sending data
 				Command closeRunCmd=eventBuilder_->CloseRun(); // this will send the run or dump it
+				if (hwManager_->IsRunControl() ){ // append the EE to the list of commands
+					todo_.push(myNewCmd);
+					}
 				if (closeRunCmd.cmd == SEND)
 					todo_.push(closeRunCmd);
 				}

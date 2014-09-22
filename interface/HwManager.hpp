@@ -51,6 +51,8 @@ protected:
 	void Read(int i,vector<WORD> &v);
 	// -- Board associated to trigger
 	int trigBoard_;
+	// -- Flag to set if it has the SPS Boards or not
+	bool runControl_;
 
 public:
 	// --- Constructor
@@ -70,6 +72,9 @@ public:
 	void ClearBusy();
 	bool TriggerReceived();
 	int TriggerAck();
+	// --- Promote To Run Control
+	inline void SetRunControl(bool rc=true){ runControl_=rc;}
+	inline bool IsRunControl() const {return runControl_;}
 
 };
 

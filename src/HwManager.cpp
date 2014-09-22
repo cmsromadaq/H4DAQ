@@ -13,7 +13,10 @@ int Board::Config(BoardConfig *bC){
 // -------------------  HW Manager ---------------
 //
 // --- Constructor
-HwManager::HwManager(){}
+HwManager::HwManager(){
+	trigBoard_=-1;
+	runControl_=false;
+}
 // --- Destructor
 HwManager::~HwManager(){}
 // --- Configure the HwManager
@@ -56,6 +59,8 @@ void HwManager::Init(){
 // --- Clear
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
+	trigBoard_=-1;
+	runControl_=false;
 	for(int i=0;i<hw_.size();i++)
 		hw_[i]->Clear();
 	return;
@@ -102,14 +107,17 @@ void  HwManager::BufferClearAll(){
 
 
 void HwManager::ClearBusy(){
+	if (trigBoard_<0 ) return;
 	hw_[trigBoard_]->ClearBusy();
 	return;
 }
 
 bool HwManager::TriggerReceived(){
+	if (trigBoard_<0 ) return false;
 	return hw_[trigBoard_]->TriggerReceived();
 }
 
 int HwManager::TriggerAck(){
+	if (trigBoard_<0) return -1;
 	return hw_[trigBoard_]->TriggerAck();
 }
