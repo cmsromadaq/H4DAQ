@@ -47,11 +47,12 @@ int CAEN_VX718::Init()
    				  configuration_.ScalerGateInput,
    				  configuration_.ScalerResetInput
    				  );
+  PrintConfiguration();
+
   status |= CAENVME_EnableScalerGate(handle_); 
   if (status)
     return ERR_PROGRAM;
 
-  PrintConfiguration();
   std::cout << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++" << std::endl;  
   return 0;
 }
@@ -221,8 +222,8 @@ int CAEN_VX718::PrintConfiguration()
   mainRegisters["PulserATime"]=cvPulserA0;
   mainRegisters["PulserAPulses"]=cvPulserA1;
   mainRegisters["PulserBTime"]=cvPulserB0;
-  mainRegisters["Scaler0Conf"]=cvScaler0;
-  mainRegisters["Scaler1Conf"]=cvScaler1;
+  mainRegisters["Scaler0"]=cvScaler0;
+  mainRegisters["Scaler1"]=cvScaler1;
   
   for (std::map<std::string,CVRegisters>::const_iterator myReg=mainRegisters.begin();myReg!=mainRegisters.end();++myReg)
     {

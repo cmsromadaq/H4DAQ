@@ -86,7 +86,7 @@ public:
 	// --- Trigger Utility
 	void ClearBusy();
 	bool TriggerReceived();
-	int TriggerAck();
+	void TriggerAck();
 	// --- Promote To Run Control
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}

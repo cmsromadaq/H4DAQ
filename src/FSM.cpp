@@ -38,12 +38,15 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  STARTRUN ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 eventBuilder_->ResetSpillNumber();
-					 WORD myRunNum=*(WORD*)myCmd.data;
-					 // init RunNum in eventBuilder
-					 eventBuilder_->SetRunNum(myRunNum);
-					 MoveToStatus(BEGINSPILL);
+				   hwManager_->BufferClearAll();
+				   eventBuilder_->ResetSpillNumber();
+				   WORD myRunNum=*(WORD*)myCmd.data;
+				   ostringstream s;
+				   s << "[DataReadoutFSM]::[INFO]::Starting a new run " <<  myRunNum;
+				   Log(s.str(),1);
+				   // init RunNum in eventBuilder
+				   eventBuilder_->SetRunNum(myRunNum);
+				   MoveToStatus(BEGINSPILL);
 				 }
 			    }
 		    break;

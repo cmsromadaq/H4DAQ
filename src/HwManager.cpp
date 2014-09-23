@@ -134,11 +134,13 @@ int HwManager::CrateInit()
       if (status)
 	{
 	  ostringstream s;
-	  s<<"[HwManager]::[ERROR]::VME Crate Init ERROR. BT "<<controllerConfig->boardType<<" LT "<<controllerConfig->LinkType<<" LN "<<controllerConfig->LinkNum;
+	  s << "[HwManager]::[ERROR]::VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum << " cannot be initialized"  ;
 	  Log(s.str(),1);
 	  throw config_exception();
 	}
-      Log("[HwManager]::[INFO]::VME Crate Initialized",1);
+      ostringstream s;
+      s << "[HwManager]::[INFO]::VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum << " initialized"  ;
+      Log(s.str(),1);
     }
   else
     {
@@ -223,17 +225,49 @@ void  HwManager::BufferClearAll(){
 
 
 void HwManager::ClearBusy(){
-	if (trigBoard_.boardIndex_<0 ) return;
-	hw_[trigBoard_.boardIndex_]->ClearBusy();
-	return;
+	if (trigBoard_.boardIndex_<0 ) 
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Trigger Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+	
+	if (!hw_[trigBoard_.boardIndex_]->ClearBusy())
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::ClearBusy failed";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
 }
 
 bool HwManager::TriggerReceived(){
-	if (trigBoard_.boardIndex_<0 ) return false;
+	if (trigBoard_.boardIndex_<0 ) 
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Trigger Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+
 	return hw_[trigBoard_.boardIndex_]->TriggerReceived();
 }
 
-int HwManager::TriggerAck(){
-	if (trigBoard_.boardIndex_<0) return -1;
-	return hw_[trigBoard_.boardIndex_]->TriggerAck();
+void HwManager::TriggerAck(){
+	if (trigBoard_.boardIndex_<0 ) 
+	  {	    
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Trigger Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+
+	if (!hw_[trigBoard_.boardIndex_]->TriggerAck())
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::TriggerAck failed";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
 }
