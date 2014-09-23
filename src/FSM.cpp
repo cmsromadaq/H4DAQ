@@ -106,9 +106,13 @@ while (true) {
 		    }
 	case READ:
 		    {
-                        dataType event;hwManager_->ReadAll(event);                                 
+                        dataType event;
+			cout<<"READ"<<endl;
+			hwManager_->ReadAll(event);                                 
+			cout<<"EVT READ "<<event.size()<<endl;
                         eventBuilder_->AddEventToSpill(event);                                
-                        hwManager_->BufferClearAll();                                         
+			cout<<"ADDED TO SPILL"<<event.size()<<endl;
+			cout<<"DONE"<<event.size()<<endl;
 			MoveToStatus(CLEARBUSY);
 		    break;
 		    }

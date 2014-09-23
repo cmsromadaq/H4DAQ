@@ -133,30 +133,9 @@ EventBuilder::~EventBuilder()
 //
 
 
-void EventBuilder::WordToStream(dataType&R,WORD x)
+void EventBuilder::WordToStream(dataType&R, WORD x)
 {
-	//R.reserve(WORDSIZE);
-	if (sizeof(x) == WORDSIZE)
-	{
-		R.append(&x,WORDSIZE);
-		return ;
-	}	
-	//if( sizeof(x) < 4 ) // this is not C if word is at least int
-	if (sizeof(x) > WORDSIZE)  // take the less 4 bit significant digits
-	{ // hope never arrived here
-		unsigned int i=1;
-		char *c=(char*)&i;
-		if(*c)// little endian
-			{ // we don't want to reverse the content probably the number is already a cast to something
-			R.append(&x,WORDSIZE);
-			}
-		else// big endian
-			{
-			c=(char*)&x;
-			c+=sizeof(x)-WORDSIZE;
-			R.append(&c,WORDSIZE);
-			}
-	}
+	R.append( (void*)&x,WORDSIZE);
 	return ;
 }
 
