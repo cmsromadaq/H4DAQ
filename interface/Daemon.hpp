@@ -1,4 +1,5 @@
 #include "interface/StandardIncludes.hpp"
+#include "interface/Logger.hpp"
 
 #ifndef DAEMON_H
 #define DAEMON_H
@@ -18,7 +19,7 @@ class dataType;
 // this are the cmd that the finate state machine can receive
 enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,STARTRUN,SEND,RECV,DATA,STATUS,SPILLCOMPL,ENDRUN,DIE};
 // this are the status of the finate state machines
-enum STATUS_t { START=0, INIT, INITIALIZED , CLEARED, BEGINSPILL, WAITTRIG, READ, ENDSPILL, SENTBUFFER,BYE };
+enum STATUS_t { START=0, INIT, INITIALIZED ,  BEGINSPILL, CLEARED,CLEARBUSY,WAITTRIG, READ, ENDSPILL, SENTBUFFER,BYE };
 
 /* Command description:
  * NOP : No Operation. Need for dummy messages that goes around
@@ -46,7 +47,7 @@ public:
 };
 
 
-class Daemon 
+class Daemon : public LogUtility
 {
 protected:
 	//private variable each word is capital execpt the first. Underscore at the end
@@ -81,6 +82,9 @@ public:
 	void MoveToStatus(STATUS_t newStatus);
 	// -- check if configuration is consistent with the subclasses
 	virtual bool IsOk();//{return true;};
+	//
+	void LogInit(Logger*l);
+			
 };
 
 

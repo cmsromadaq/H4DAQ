@@ -80,7 +80,7 @@ public:
 
 };
 
-class ConnectionManager: public Configurable{
+class ConnectionManager: public Configurable, public LogUtility{
 	/*
 	 * this class implements the actual connections at low level
 	 */
@@ -96,6 +96,7 @@ public:
 	inline void Send(dataType &mex,int i=0){ pubs[i]->SendMessage(mex);}; 
 	// --- check subscribers to see if one have received a mex
 	bool Recv(dataType &mex);
+	// Reimplement LogInit TODO
 
 };
 

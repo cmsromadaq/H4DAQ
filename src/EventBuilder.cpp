@@ -133,14 +133,13 @@ EventBuilder::~EventBuilder()
 //
 
 
-dataType EventBuilder::WordToStream(WORD x)
+void EventBuilder::WordToStream(dataType&R,WORD x)
 {
-	dataType R; 
-	R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	if (sizeof(x) == WORDSIZE)
 	{
 		R.append(&x,WORDSIZE);
-		return R;
+		return ;
 	}	
 	//if( sizeof(x) < 4 ) // this is not C if word is at least int
 	if (sizeof(x) > WORDSIZE)  // take the less 4 bit significant digits
@@ -158,70 +157,72 @@ dataType EventBuilder::WordToStream(WORD x)
 			R.append(&c,WORDSIZE);
 			}
 	}
-	return R;
+	return ;
 }
 
-dataType EventBuilder::BoardHeader(WORD boardId)
+void EventBuilder::BoardHeader(dataType &R,WORD boardId)
 {
-	dataType R; R.reserve(2*WORDSIZE);
+	//R.reserve(2*WORDSIZE);
 	R.append((void*)"BRDH\0\0\0\0\0\0\0\0",WORDSIZE); //WORDSIZE<12
-	R.append(WordToStream(boardId) ); 
-	return R;
+	//dataType 
+	//R.append(WordToStream(boardId) ); 
+	WordToStream(R,boardId);	
+	return ;
 }
 
-dataType EventBuilder::BoardTrailer(WORD boardId)
+void EventBuilder::BoardTrailer(dataType&R,WORD boardId)
 {
-	dataType R;R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	R.append((void*)"BRDT\0\0\0\0\0\0\0\0",WORDSIZE); // WORDSIZE<12
-	return R;
+	return ;
 }
 
 
 // [HEAD][Nbytes][ ----- ][TRAILER]
 // [HEAD]="BRDH"+"BRDID" - WORD-WORD
-dataType EventBuilder::BoardToStream(WORD boardId,vector<WORD> &v)
+void EventBuilder::BoardToStream(dataType &R ,WORD boardId,vector<WORD> &v)
 {
-	dataType R; R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations
-	R.append( BoardHeader(boardId)   );
+	//R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations
+	BoardHeader(R,boardId   );
 	WORD N= v.size()*WORDSIZE;
-	R.append( WordToStream(N)  ); 
-	for(int i=0;i<v.size();i++) R.append( WordToStream(v[i])  );
-	R.append( BoardTrailer(boardId)   );
+	WordToStream(R,N)  ; 
+	for(int i=0;i<v.size();i++) WordToStream(R,v[i])  ;
+	BoardTrailer(R,boardId) ;
 
-	return R;
+	return ;
 }
 
-dataType EventBuilder::EventHeader()
+void EventBuilder::EventHeader( dataType &R)
 {
-	dataType R; R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	R.append((void*)"EVTH\0\0\0\0\0\0\0\0",WORDSIZE);
-	return R;
+	return ;
 }
 
-dataType EventBuilder::EventTrailer()
+void EventBuilder::EventTrailer(dataType &R)
 {
-	dataType R;R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	R.append((void*)"EVNT\0\0\0\0\0\0\0\0",WORDSIZE);
-	return R;
+	return ;
 }
 
-dataType EventBuilder::SpillHeader()
+void EventBuilder::SpillHeader(dataType &R)
 {
-	dataType R; R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	R.append((void*)"SPLH\0\0\0\0\0\0\0\0",WORDSIZE);
-	return R;
+	return ;
 }
 
-dataType EventBuilder::SpillTrailer()
+void EventBuilder::SpillTrailer(dataType &R)
 {
-	dataType R;R.reserve(WORDSIZE);
+	//R.reserve(WORDSIZE);
 	R.append((void*)"SPLT\0\0\0\0\0\0\0\0",WORDSIZE);
-	return R;
+	return ;
 }
 
-dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){ 
+void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){ 
 	// takes two streams and merge them independently from the content
-	dataType R;
+	//dataType R;
 	R.append(x);
 
 	WORD nboards1=ReadEventNboards(x);
@@ -236,7 +237,7 @@ dataType EventBuilder::MergeEventStream(dataType &x,dataType &y){
 	WORD*ptr2= (WORD*)y.data() +2 ; // content
 
 	R.append( (void*)ptr2, size2 -WORDSIZE*2 ) ; // remove H, copy T
-	return R;
+	return ;
 }
 
 
@@ -263,8 +264,8 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 
 long long EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
 
-	dataType H=BoardHeader(boardId);
-	dataType T=BoardTrailer(boardId);
+	dataType H;BoardHeader(H,boardId);
+	dataType T;BoardTrailer(T,boardId);
 	
 	// Look in the Header for the 
 	vector<WORD> Header  = StreamToWord( H );
@@ -313,8 +314,8 @@ long long EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
 long long EventBuilder::IsEventOk(dataType &x){
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*2); // read the first two WORDS
-	dataType H=EventHeader();
-	dataType T=EventTrailer();
+	dataType H;EventHeader(H);
+	dataType T;EventTrailer(T);
 	
 	vector<WORD> Header=StreamToWord( H );
 	vector<WORD> Trailer=StreamToWord( T );
@@ -397,6 +398,7 @@ void EventBuilder::OpenSpill(WORD spillNum)
 	if (isSpillOpen_) CloseSpill(); 
 	if (dumpEvent_ && !recvEvent_) 
 	{ // open dumping file
+		dump_->Close();
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) runNum_) + "/" + to_string((unsigned long long)spillNum);
 		if (dump_->GetCompress() )  newFileName += ".gz";
 		else newFileName +=".txt";
@@ -405,19 +407,19 @@ void EventBuilder::OpenSpill(WORD spillNum)
 	}
 	isSpillOpen_=true;
 	lastSpill_= spillNum;
-	dataType spillH=SpillHeader();
-	mySpill_.append(spillH);
+	SpillHeader(mySpill_);
 	mySpill_.append( (void *)&runNum_,WORDSIZE);
 	mySpill_.append( (void *)&spillNum,WORDSIZE);
 	WORD zero=0;
 	mySpill_.append( (void*)&zero, WORDSIZE);
+	
 }
 
 Command EventBuilder::CloseSpill()
 {
 	Command myCmd; myCmd.cmd=NOP;
 	isSpillOpen_=false;	
-	dataType  spillT=SpillTrailer();
+	dataType  spillT;SpillTrailer(spillT);
 	mySpill_.append(spillT);
 	if( dumpEvent_ && !recvEvent_) 
 	{
@@ -477,8 +479,8 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	spill1.release();spill1.clear();
 
 
-	dataType H=SpillHeader();
-	dataType T=SpillTrailer();
+	dataType H;SpillHeader(H);
+	dataType T;SpillTrailer(T);
 	spill1.append(H);
 	spill1.append((void*)&runNum1,WORDSIZE); // TODO new runN- spillN
 	spill1.append((void*)&spillNum1,WORDSIZE); // TODO new runN- spillN
@@ -497,7 +499,7 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 		//---- Unire i due eventi
 		dataType event1(eventSize1,ptr1);
 		dataType event2(eventSize2,ptr2);
-		dataType myEvent=MergeEventStream(event1,event2);
+		dataType myEvent;MergeEventStream(myEvent,event1,event2);
 		event1.release();
 		event2.release();
 		spill1.append(myEvent);

@@ -22,7 +22,7 @@ public:
 
   typedef enum  {
     ERR_NONE= 0,
-    ERR_CONF_NOT_FOUND= 2,
+    ERR_CONF_NOT_FOUND,
     ERR_DGZ_OPEN,
     ERR_BOARD_INFO_READ,
     ERR_INVALID_BOARD_TYPE,
@@ -94,7 +94,7 @@ public:
   virtual int Config(BoardConfig *bC);
   // --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
   virtual int Read(vector<WORD> &v);
-  virtual int SetHandle(uint32_t digitizerHandle) { digitizerHandle_ = digitizerHandle; };
+  virtual int SetHandle(int digitizerHandle) { digitizerHandle_ = digitizerHandle; };
 
   inline CAEN_V1742_Config_t* GetConfiguration() { return &digitizerConfiguration_; };
 private:

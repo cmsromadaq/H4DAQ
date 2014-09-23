@@ -24,7 +24,8 @@ define_handlers();
 printf("RC\n");
 RunControllerFSM *d=new RunControllerFSM();
 printf("INIT\n");
-d->Init("data/config.xml");
+//d->Init("data/configRC.xml");
+d->Init(argv[1]);
 try{
 	printf("LOOP\n");
 	d->Loop();

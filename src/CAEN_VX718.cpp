@@ -41,12 +41,12 @@ int CAEN_VX718::Init()
   //setting up scaler
   status |= CAENVME_WriteRegister(handle_,cvScaler0,configuration_.scalerConfWord);
   status |= CAENVME_SetScalerConf(handle_,
-				  configuration_.ScalerLimit,
-				  configuration_.ScalerAutoReset,
-				  configuration_.ScalerSignalInput,
-				  configuration_.ScalerGateInput,
-				  configuration_.ScalerResetInput
-				  );
+   				  configuration_.ScalerLimit,
+   				  configuration_.ScalerAutoReset,
+   				  configuration_.ScalerSignalInput,
+   				  configuration_.ScalerGateInput,
+   				  configuration_.ScalerResetInput
+   				  );
   status |= CAENVME_EnableScalerGate(handle_); 
   if (status)
     return ERR_PROGRAM;
@@ -83,7 +83,48 @@ int CAEN_VX718::BufferClear()
 int CAEN_VX718::Config(BoardConfig *bC)
 {
   Board::Config(bC);
-  ParseConfiguration();
+  //GetConfiguration()->AAA  =Configurator::GetInt( bC->getElementContent("AAA"));  // prototype
+  // fix cast
+  GetConfiguration()->boardType= static_cast<CVBoardTypes> (Configurator::GetInt( bC->getElementContent("boardType")) );  
+  GetConfiguration()->LinkType =Configurator::GetInt( bC->getElementContent("LinkType")); 
+  GetConfiguration()->LinkNum  =Configurator::GetInt( bC->getElementContent("LinkNum")); 
+  GetConfiguration()->clearBusyOutputBit= static_cast<CVOutputSelect>(Configurator::GetInt( bC->getElementContent("clearBusyOutputBit")) ); 
+  GetConfiguration()->trigAckOutputBit  = static_cast<CVOutputSelect>(Configurator::GetInt( bC->getElementContent("trigAckOutputBit")) ); 
+  GetConfiguration()->triggerInputBit   = static_cast<CVInputSelect> (Configurator::GetInt( bC->getElementContent("triggerInputBit")) ); 
+      GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
+      GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
+      GetConfiguration()->scalerConfWord 		= Configurator::GetInt(bC->getElementContent("scalerConfWord"));	// uint32_t--> 
+      GetConfiguration()->controlRegWord 		= Configurator::GetInt(bC->getElementContent("controlRegWord"));	// uint32_t-->
+      GetConfiguration()->Output0Polarity 	= static_cast<CVIOPolarity>(Configurator::GetInt(bC->getElementContent("Output0Polarity")) );	// CVIOPolarity-->
+      GetConfiguration()->Output0LedPolarity 	= static_cast<CVLEDPolarity>(Configurator::GetInt(bC->getElementContent("Output0LedPolarity")) );	// CVLEDPolarity-->
+      GetConfiguration()->Output0Source 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("Output0Source")));	// CVIOSources-->
+      GetConfiguration()->Output1Polarity 	= static_cast<CVIOPolarity> (Configurator::GetInt(bC->getElementContent("Output1Polarity")) );	// CVIOPolarity-->
+      GetConfiguration()->Output1LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Output1LedPolarity")));	// CVLEDPolarity-->
+      GetConfiguration()->Output1Source 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("Output1Source")));	// CVIOSources-->
+      GetConfiguration()->Output2Polarity 	= static_cast<CVIOPolarity> (Configurator::GetInt(bC->getElementContent("Output2Polarity")) );	// CVIOPolarity-->
+      GetConfiguration()->Output2LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Output2LedPolarity")) );	// CVLEDPolarity-->
+      GetConfiguration()->Output2Source 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("Output2Source"))  );	// CVIOSources-->
+      GetConfiguration()->Output3Polarity 	= static_cast<CVIOPolarity> (Configurator::GetInt(bC->getElementContent("Output3Polarity")) );	// CVIOPolarity-->
+      GetConfiguration()->Output3LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Output3LedPolarity")) );	// CVLEDPolarity-->
+      GetConfiguration()->Output3Source 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("Output3Source")) );	// CVIOSources-->
+      GetConfiguration()->Output4Polarity 	= static_cast<CVIOPolarity> (Configurator::GetInt(bC->getElementContent("Output4Polarity")));	// CVIOPolarity-->
+      GetConfiguration()->Output4LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Output4LedPolarity")) );	// CVLEDPolarity-->
+      GetConfiguration()->Output4Source 	= static_cast<CVIOSources> ( Configurator::GetInt(bC->getElementContent("Output4Source")) );	// CVIOSources-->
+      GetConfiguration()->Input0Polarity 	= static_cast<CVIOPolarity> ( Configurator::GetInt(bC->getElementContent("Input0Polarity"))  );	// CVIOPolarity-->
+      GetConfiguration()->Input0LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Input0LedPolarity")) );	// CVLEDPolarity-->
+      GetConfiguration()->Input1Polarity 	= static_cast<CVIOPolarity> (Configurator::GetInt(bC->getElementContent("Input1Polarity")));	// CVIOPolarity-->
+      GetConfiguration()->Input1LedPolarity 	= static_cast<CVLEDPolarity> (Configurator::GetInt(bC->getElementContent("Input1LedPolarity") ));	// CVLEDPolarity-->
+      GetConfiguration()->ScalerLimit 		= Configurator::GetInt(bC->getElementContent("ScalerLimit"));	// uint32_t-->
+      GetConfiguration()->ScalerAutoReset 	= Configurator::GetInt(bC->getElementContent("ScalerAutoReset"));	// uint32_t-->
+      GetConfiguration()->ScalerSignalInput 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("ScalerSignalInput")));	// CVIOSources-->
+      GetConfiguration()->ScalerGateInput 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("ScalerGateInput")));	// CVIOSources-->
+      GetConfiguration()->ScalerResetInput 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("ScalerResetInput")));	// CVIOSources-->
+      GetConfiguration()->PulserATimeUnit 	= static_cast<CVTimeUnits> (Configurator::GetInt(bC->getElementContent("PulserATimeUnit")));	// CVTimeUnits-->
+      GetConfiguration()->PulserATimeWidth 	= Configurator::GetInt(bC->getElementContent("PulserATimeWidth"));	// uint32_t-->
+      GetConfiguration()->PulserATimePeriod 	= Configurator::GetInt(bC->getElementContent("PulserATimePeriod"));	// uint32_t-->
+      GetConfiguration()->PulserATimePulses 	= Configurator::GetInt(bC->getElementContent("PulserATimePulses"));	// uint32_t-->
+      GetConfiguration()->PulserAStartInput 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("PulserAStartInput")));	// CVIOSources-->
+      GetConfiguration()->PulserAResetInput 	= static_cast<CVIOSources> (Configurator::GetInt(bC->getElementContent("PulserAResetInput")));	// CVIOSources-->
 }
 
 int CAEN_VX718::Read(vector<WORD> &v)

@@ -22,17 +22,17 @@ switch (cmd) {
 Daemon::Daemon(){
 	// get the pid of the current process
 	pid_=getpid();
+	//  Construct objects
+	configurator_=new Configurator();
+	eventBuilder_=new EventBuilder();
+	hwManager_=new HwManager();
+	connectionManager_=new ConnectionManager();
+	myStatus_=START;
 }
 
 
 int Daemon::Init(string configFileName){
 	try{
-		//  Construct objects
-		configurator_=new Configurator();
-		eventBuilder_=new EventBuilder();
-		hwManager_=new HwManager();
-		connectionManager_=new ConnectionManager();
-		
 		// Set Configurator ; and Init it
 		configurator_->xmlFileName=configFileName;
 		configurator_->Init();
@@ -311,18 +311,30 @@ Command Daemon::ParseData(dataType mex)
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
+
+	mex.release();
 	return myCmd;
 }
 
 
 
 void Daemon::MoveToStatus(STATUS_t newStatus){
-	dataType myMex;
-	myMex.append((void*)"STATUS\0",7);
-	WORD myStatus=(WORD)newStatus;
-	myMex.append((void*)&myStatus,WORDSIZE);
-	connectionManager_->Send(myMex);
+	//dataType myMex;
+	//myMex.append((void*)"STATUS\0",7);
+	//WORD myStatus=(WORD)newStatus;
+	//myMex.append((void*)&myStatus,WORDSIZE);
+	ostringstream s;
+	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
+	Log(s.str(),3);
+	std::cout << s.str() << std::endl;
+	//connectionManager_->Send(myMex);
 	myStatus_=newStatus;
 }
 
 bool Daemon::IsOk(){return true;}
+void Daemon::LogInit(Logger*l){
+				eventBuilder_->LogInit(l);
+				hwManager_->LogInit(l);
+				connectionManager_->LogInit(l);
+				//configurator_->LogInit(l);
+				};

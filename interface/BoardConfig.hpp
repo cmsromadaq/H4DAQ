@@ -21,6 +21,8 @@ public:
 	// 
 	void inline SetBoardNode(xmlNode *mynode){board_node=mynode;}
 	xmlNode* GetBoardNodePtr(){return board_node;}
+	// overload of operator
+	string inline getElementContent(const char*key){return Configurable::getElementContent(*this,key,board_node) ;};
 
 };
 

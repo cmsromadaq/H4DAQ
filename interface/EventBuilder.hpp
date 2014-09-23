@@ -122,21 +122,21 @@ public:
 	void SetRunNum(WORD x);//{ runNum_=x;}
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
-	static dataType WordToStream(WORD x);
+	static void WordToStream(dataType&R,WORD x);
 	static vector<WORD> StreamToWord(dataType &x);
 	static vector<WORD> StreamToWord(void*v,int N);
 	static WORD 	ReadSpillNum(dataType &x);
 	static WORD 	ReadRunNumFromSpill(dataType &x);
 	static WORD 	ReadSpillNevents(dataType &x);
 	static WORD 	ReadEventNboards(dataType &x);
-	static dataType BoardHeader(WORD boardId);
-	static dataType BoardTrailer(WORD boardId);
-	static dataType EventHeader();
-	static dataType EventTrailer();
-	static dataType SpillHeader();
-	static dataType SpillTrailer();
-	static dataType BoardToStream(WORD boardId,vector<WORD> &v);
-	static dataType MergeEventStream(dataType &x,dataType &y);
+	static void BoardHeader(dataType &R,WORD boardId);
+	static void BoardTrailer(dataType &R,WORD boardId);
+	static void EventHeader(dataType&R);
+	static void EventTrailer(dataType&R);
+	static void SpillHeader(dataType&R);
+	static void SpillTrailer(dataType&);
+	static void BoardToStream(dataType &R,WORD boardId,vector<WORD> &v);
+	static void MergeEventStream(dataType&R,dataType &x,dataType &y);
 	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
 	static long long IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
 	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM

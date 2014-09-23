@@ -33,7 +33,7 @@ while (true) {
 		    {
 		    // wait for start run
 		    dataType myMex;
-			    while (connectionManager_->Recv(myMex) !=0 )
+		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  STARTRUN ) 
@@ -44,9 +44,7 @@ while (true) {
 					 // init RunNum in eventBuilder
 					 eventBuilder_->SetRunNum(myRunNum);
 					 MoveToStatus(BEGINSPILL);
-					 break; //while
 				 }
-			    usleep(10); // nothing on the net
 			    }
 		    break;
 		    }
@@ -54,7 +52,7 @@ while (true) {
 		    {
 		    // wait for wwe
 		    dataType myMex;
-			    while (connectionManager_->Recv(myMex) !=0 )
+		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
@@ -62,9 +60,7 @@ while (true) {
 					 hwManager_->BufferClearAll();
 					 eventBuilder_->OpenSpill();
 					 MoveToStatus(CLEARED);
-					 break; //while
 				 }
-			    usleep(10); // nothing on the net
 			    }
 		    break;
 		    }
@@ -72,25 +68,23 @@ while (true) {
 		    {
 		    // wait for we
 		    dataType myMex;
-			    while (connectionManager_->Recv(myMex) !=0 )
+		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WE ) 
 			   	 {
 					 hwManager_->BufferClearAll();
-					 MoveToStatus(WAITTRIG);
-					 break; //while
+					 MoveToStatus(CLEARBUSY);
 				 }
-			    usleep(2); // nothing on the net
 			    }
 		    break;
 		    }
+	case CLEARBUSY: {
+		        hwManager_->ClearBusy();
+			MoveToStatus(WAITTRIG);
+			}
 	case WAITTRIG:
 		    {
-		     /// check trigger
-		    if( hwManager_->TriggerReceived() ){ 
-			MoveToStatus(READ);
-                        }  
 		     // check network
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
@@ -98,17 +92,24 @@ while (true) {
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
 				    MoveToStatus(ENDSPILL);
+				    break;
 			    }
 		    }
+		     /// check trigger
+		    if( hwManager_->TriggerReceived() ){ 
+			cout<<"TRIGGER RECEIVED"<<endl;
+			hwManager_->TriggerAck();
+			MoveToStatus(READ);
+                        }  
 
 		    break;
 		    }
 	case READ:
 		    {
-                        dataType event=hwManager_->ReadAll();                                 
+                        dataType event;hwManager_->ReadAll(event);                                 
                         eventBuilder_->AddEventToSpill(event);                                
                         hwManager_->BufferClearAll();                                         
-			MoveToStatus(WAITTRIG);
+			MoveToStatus(CLEARBUSY);
 		    break;
 		    }
 	case ENDSPILL:
@@ -189,6 +190,9 @@ while (true) {
 			    WORD runNum;
 			    scanf("%u",&runNum);
 			    printf("Starting Run %u\n",runNum);
+			    dataType myFufMex;
+			    myFufMex.append((void*)"NOP\0",4);
+			    connectionManager_->Send(myFufMex);
 			    dataType myMex;
 			    myMex.append((void*)"STARTRUN\0",9);
 			    myMex.append((void*)&runNum,WORDSIZE);
@@ -234,6 +238,8 @@ while (true) {
 				printf("------------------\n");
 				//fwrite(myMex.data(),1,myMex.size(),stdout);
 				printf("%s",Utility::AsciiData(myMex.data(),myMex.size()).c_str()  );
+				printf("\n------------------\n");
+				printf("\n%s\n",(char*)myMex.data());
 				printf("\n------------------\n");
 			    }
 			    MoveToStatus(READ);

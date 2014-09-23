@@ -32,7 +32,7 @@ public:
 	virtual int Config(BoardConfig *bC)=0;
         inline bool IsConfigured() const {return bC_!=0;};
 	virtual int Read(vector<WORD> &v)=0;
-	virtual int SetHandle(WORD x)=0;
+	virtual int SetHandle(int)=0;
 	// --- this are meaningful only for trigger boards
 	virtual inline int ClearBusy(){return 0;};
 	virtual inline bool TriggerReceived(){return false;};
@@ -81,7 +81,7 @@ public:
 	// --- Read All the Boards
 	void BufferClearAll();
 	// Return Event
-	dataType ReadAll();
+	void ReadAll(dataType &);
 	void Print();
 	// --- Trigger Utility
 	void ClearBusy();

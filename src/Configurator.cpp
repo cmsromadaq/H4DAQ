@@ -173,3 +173,12 @@ vector<string> Configurable::getElementVector(Configurator&c, const char * key, 
 {
 	return getElementVector(c.doc, key,node);
 }
+int    Configurator::GetInt   (string value) {// { return atoi(value.c_str());}
+	if ( value.find("0x") != string::npos ) {
+	int mynum;
+	sscanf(value.c_str(),"%x",&mynum);
+	return mynum;
+	}
+	else return atoi(value.c_str());
+
+}

@@ -102,7 +102,7 @@ int CAEN_V1742::BufferClear(){};
 
 int CAEN_V1742::Config(BoardConfig *bC)
 {
-  Board::Config(bC);
+  Board::Config(bC); // configure common element from the Board
   ParseConfiguration();
 };
 

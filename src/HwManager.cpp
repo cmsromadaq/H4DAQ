@@ -1,5 +1,6 @@
 #include "interface/HwManager.hpp"
 #include "interface/CAEN_VX718.hpp"
+#include "interface/BoardConfig.hpp"
 
 // --- Board
 Board::Board(){id_=0;bC_=NULL;};
@@ -39,7 +40,10 @@ void HwManager::Config(Configurator &c){
 				xmlStrEqual (hw_node->name, xmlCharStrdup ("Hardware"))  )
 			break;
 	}
-	if ( hw_node== NULL ) throw  config_exception();
+	if ( hw_node== NULL ) {
+		printf("Hardware not found in configuration\n");
+		throw  config_exception();
+		}
 
 	// locate each board node and extract info
 	xmlNode *board_node = NULL;	
@@ -50,7 +54,20 @@ void HwManager::Config(Configurator &c){
 		{
 		int ID=Configurator::GetInt(getElementContent(c, "ID" , board_node));
 		Log("[2] Configuring Board ID="+ getElementContent(c, "ID" , board_node)+"type=" + getElementContent(c, "type" , board_node),2);
-		//TODO -- construct the board
+		//TODO -- construct the board -- if elif ... else throw exception 
+		if ( getElementContent(c,"type",board_node) == "CAEN_VX718" )
+			{
+				// keep the index where I'm constructing stuff
+				int bIdx=hw_.size();
+				// construct a CAEN_VX718 Board, and push it back
+				hw_.push_back( new CAEN_VX718() );
+				// construct a board configurator and ask the board to configure itself
+				BoardConfig bC;
+				bC.Init(c);
+				bC.SetBoardNode(board_node);
+				hw_[bIdx]->Config(&bC);
+			}
+		// else if ( ... ==... ) ... TODO
 		}
 	}
 
@@ -59,13 +76,24 @@ void HwManager::Config(Configurator &c){
 // --- Init
 void HwManager::Init(){
   //Crate init
-  CrateInit();
-	for(unsigned int i=0;i<hw_.size();i++)
+  if (hw_.size()>0 )
+  	CrateInit();
+  trigBoard_.boardIndex_=controllerBoard_.boardIndex_;
+  for(unsigned int i=0;i<hw_.size();i++)
 	{
+	  if (hw_[i]->GetType() != "CAEN_V1742" )
+	    hw_[i]->SetHandle(controllerBoard_.boardHandle_);
+	  else
+	    hw_[i]->SetHandle(digiBoard_.boardHandle_);
 		int R=hw_[i]->Init();
-		if ( !(R&~1) )  throw hw_exception();
+		if ( R )  
+		  {
+		    ostringstream s;
+		    s << "[HwManager]::[ERROR]::Error configuring board " << hw_[i]->GetType() << " exit code " << R;
+		    Log(s.str(),1);
+		    throw hw_exception();
+		  }
 	}
-
 }
 
 // --- Crate Init
@@ -105,7 +133,9 @@ int HwManager::CrateInit()
 
       if (status)
 	{
-	  Log("[HwManager]::[ERROR]::VME Crate Init ERROR",1);
+	  ostringstream s;
+	  s<<"[HwManager]::[ERROR]::VME Crate Init ERROR. BT "<<controllerConfig->boardType<<" LT "<<controllerConfig->LinkType<<" LN "<<controllerConfig->LinkNum;
+	  Log(s.str(),1);
 	  throw config_exception();
 	}
       Log("[HwManager]::[INFO]::VME Crate Initialized",1);
@@ -162,19 +192,18 @@ void HwManager::Read(int i,vector<WORD> &v)
 	return;
 }
 
-dataType HwManager::ReadAll(){
-	dataType R;
-	R.append(EventBuilder::EventHeader());
+void HwManager::ReadAll(dataType&R){
+	EventBuilder::EventHeader(R);
 	WORD M=hw_.size();
-	R.append(EventBuilder::WordToStream(M));
+	EventBuilder::WordToStream(R,M);
 	vector<WORD> v; 
 	for(int i=0;i< hw_.size();i++)
 	{
 		hw_[i]->Read(v);
-		R.append(EventBuilder::BoardToStream( hw_[i]->GetId(), v ) ) ;
+		EventBuilder::BoardToStream( R, hw_[i]->GetId(), v )  ;
 	}
-	R.append(EventBuilder::EventTrailer());
-	return R;
+	EventBuilder::EventTrailer(R);
+	return ;
 }
 
 void  HwManager::BufferClearAll(){

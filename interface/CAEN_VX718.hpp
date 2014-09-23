@@ -17,7 +17,7 @@ class CAEN_VX718: public Board
 public:
   typedef enum  {
     ERR_NONE= 0,
-    ERR_CONF_NOT_FOUND= 2,
+    ERR_CONF_NOT_FOUND,
     ERR_OPEN,
     ERR_READ,
     ERR_PROGRAM,
@@ -94,10 +94,11 @@ public:
 
   virtual int Init();
   virtual int Clear();
+  inline int Print(){return PrintConfiguration();};
   virtual int BufferClear(); //reset the scaler
   virtual int Config(BoardConfig *bC);
   virtual int Read(vector<WORD> &v);
-  virtual int SetHandle(uint32_t handle) {handle_=handle;};
+  virtual int SetHandle(int handle) {handle_=handle;};
 
   //Main functions to handle the event trigger
   virtual int ClearBusy();

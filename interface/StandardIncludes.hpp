@@ -3,6 +3,7 @@
 
 // STL
 #include <string>
+#include <sstream>
 #include <vector> //LIFO -> use stack
 #include <queue> //FIFO
 #include <map>

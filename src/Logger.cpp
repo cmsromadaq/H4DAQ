@@ -147,6 +147,7 @@ void Logger::Write(string line, bool dryrun)
 void Logger::Close(){
 	if(compress_)
 		{
+		if (gw_ == NULL ) return;
 		#ifndef NO_ZLIB
 			gzclose(gw_);
 			gw_=NULL;
@@ -156,6 +157,7 @@ void Logger::Close(){
 		}
 	else 
 		{
+		if(fw_==NULL) return;
 		fclose(fw_);
 		fw_=NULL;
 		}

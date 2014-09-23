@@ -57,7 +57,7 @@ int main(int argc,char**argv)
 
  printf("-> Recv Dummy\n");
  	int rc=1;
-	while (rc) { rc=sub.RecvMessage(mexRecv); printf("Cycle\n"); sleep(1);}
+	while (rc) { rc=sub.RecvMessage(mexRecv); printf("Cycle Dummy\n"); sleep(1);}
 
  printf("-> Recv\n");
  	rc=1;

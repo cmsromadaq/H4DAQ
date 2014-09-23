@@ -49,7 +49,7 @@ int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 	//create the message and put it in the send
 	//zmq::message_t message( mex.data() ,mex.size() ,myzmq_nofree) ;
 	zmq::message_t message( mex.data() ,mex.size() , NULL ) ;
-	//mex.release(); // ???
+	mex.release(); // ???
 	//   void*myMsg=mex.data();
 	//   int mySize=mex.size();
 	//   mex.release();

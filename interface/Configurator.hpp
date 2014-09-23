@@ -18,7 +18,7 @@ public:
 	static vector<string> getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node);
 };
 
-class Configurator
+class Configurator 
 {
 //friend class Configurable;
 private:
@@ -53,7 +53,7 @@ public:
 	//			return config[key]; 
 	//			}
 	static inline double GetDouble(string value) { return atof(value.c_str());}
-	static inline int    GetInt   (string value) { return atoi(value.c_str());}
+	static int    GetInt   (string value);// { return atoi(value.c_str());}
 	static inline long   GetLong  (string value) { return atol(value.c_str());}
 	static void  GetVecInt(string value,vector<int> &v) ;
 	

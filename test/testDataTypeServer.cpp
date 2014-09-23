@@ -50,6 +50,7 @@ int main(int argc,char**argv)
 
  printf("-> Sleep\n");
  sleep(10);
+ system("sleep 10");
  //Init Mex
  printf("-> Init Mex\n");
 	 dataType mexSend, mexRecv;
