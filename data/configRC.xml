@@ -1,0 +1,19 @@
+<general>
+  <Network>
+    <ListenPort>5555</ListenPort>
+    <ConnectTo>localhost:5556</ConnectTo>
+  </Network>
+  <Hardware>
+  </Hardware>
+  <EventBuilder>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpDirName>/tmp/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>1</dumpCompress>
+	  <sendEvent>0</sendEvent>
+	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
+	  <compress>1</compress>
+  </EventBuilder>
+  <otherthing>
+    <field1>f1</field1>
+  </otherthing>
+</general>
