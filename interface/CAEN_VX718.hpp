@@ -1,3 +1,6 @@
+#ifndef CAEN_VX718_H
+#define CAEN_VX718_H
+
 #include "interface/HwManager.hpp"
 #include "interface/BoardConfig.hpp"
 
@@ -87,7 +90,7 @@ public:
 
   } CAEN_VX718_Config_t;
 
-  CAEN_VX718(): handle_(-1){};
+  CAEN_VX718(): handle_(-1) { type_="CAEN_VX718"; };
 
   virtual int Init();
   virtual int Clear();
@@ -101,6 +104,8 @@ public:
   virtual bool TriggerReceived();
   virtual int TriggerAck();
 
+  inline CAEN_VX718_Config_t* GetConfiguration() { return &configuration_; };
+
 private:
   int SendSignal(VX718_DAQ_Signals sig);
   int PrintConfiguration();
@@ -109,3 +114,5 @@ private:
   uint32_t handle_;
   CAEN_VX718_Config_t configuration_;
 };
+
+#endif

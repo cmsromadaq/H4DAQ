@@ -1,5 +1,5 @@
 #include "interface/HwManager.hpp"
-
+#include "interface/CAEN_VX718.hpp"
 
 // --- Board
 Board::Board(){id_=0;bC_=NULL;};
@@ -14,8 +14,17 @@ int Board::Config(BoardConfig *bC){
 //
 // --- Constructor
 HwManager::HwManager(){
-	trigBoard_=-1;
-	//runControl_=false;
+
+  trigBoard_.boardIndex_=-1;
+  trigBoard_.boardHandle_=-1;
+
+  controllerBoard_.boardIndex_=-1;
+  controllerBoard_.boardHandle_=-1;
+
+  digiBoard_.boardIndex_=-1;
+  digiBoard_.boardHandle_=-1;
+
+  //runControl_=false;
 }
 // --- Destructor
 HwManager::~HwManager(){}
@@ -49,6 +58,8 @@ void HwManager::Config(Configurator &c){
 }
 // --- Init
 void HwManager::Init(){
+  //Crate init
+  CrateInit();
 	for(unsigned int i=0;i<hw_.size();i++)
 	{
 		int R=hw_[i]->Init();
@@ -56,10 +67,77 @@ void HwManager::Init(){
 	}
 
 }
+
+// --- Crate Init
+int HwManager::CrateInit()
+{
+  int status =0;
+
+  for(unsigned int i=0;i<hw_.size();i++)
+    {
+      if ( hw_[i]->GetType() == "CAEN_V1742" )
+	{
+	  digiBoard_.boardIndex_=i;
+	  break; //do not support >1 digitizer board for the moment...
+	}
+    }
+
+  for(unsigned int i=0;i<hw_.size();i++)
+    {
+      if ( hw_[i]->GetType() == "CAEN_VX718" )
+	{
+	  controllerBoard_.boardIndex_=i;
+	  break; //do not support >1 digitizer board for the moment...
+	}
+    }
+ 
+  if (controllerBoard_.boardIndex_<0)
+    {
+      Log("[HwManager]::[ERROR]::Cannot find controller board",1);
+      throw config_exception();
+    }
+  
+  if (digiBoard_.boardIndex_<0)
+    {
+      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
+
+      status |= CAENVME_Init(controllerConfig->boardType, controllerConfig->LinkType, controllerConfig->LinkNum, &controllerBoard_.boardHandle_);
+
+      if (status)
+	{
+	  Log("[HwManager]::[ERROR]::VME Crate Init ERROR",1);
+	  throw config_exception();
+	}
+      Log("[HwManager]::[INFO]::VME Crate Initialized",1);
+    }
+  else
+    {
+      //have digitizer
+      // TODO
+    }
+
+  if (controllerBoard_.boardHandle_<0)
+    {
+      Log("[HwManager]::[ERROR]::VME Crate Controller Handle is wrong",1);
+      throw config_exception();
+    }
+
+  status |= CAENVME_SystemReset(controllerBoard_.boardHandle_);
+  if (status)
+    {
+      Log("[HwManager]::[ERROR]::VME Crate RESET ERROR",1);
+      throw config_exception();
+    }
+
+  usleep(10000); 
+
+  return 0;
+
+}
+
 // --- Clear
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
-	trigBoard_=-1;
 	//runControl_=false;
 	for(int i=0;i<hw_.size();i++)
 		hw_[i]->Clear();
@@ -107,17 +185,17 @@ void  HwManager::BufferClearAll(){
 
 
 void HwManager::ClearBusy(){
-	if (trigBoard_<0 ) return;
-	hw_[trigBoard_]->ClearBusy();
+	if (trigBoard_.boardIndex_<0 ) return;
+	hw_[trigBoard_.boardIndex_]->ClearBusy();
 	return;
 }
 
 bool HwManager::TriggerReceived(){
-	if (trigBoard_<0 ) return false;
-	return hw_[trigBoard_]->TriggerReceived();
+	if (trigBoard_.boardIndex_<0 ) return false;
+	return hw_[trigBoard_.boardIndex_]->TriggerReceived();
 }
 
 int HwManager::TriggerAck(){
-	if (trigBoard_<0) return -1;
-	return hw_[trigBoard_]->TriggerAck();
+	if (trigBoard_.boardIndex_<0) return -1;
+	return hw_[trigBoard_.boardIndex_]->TriggerAck();
 }

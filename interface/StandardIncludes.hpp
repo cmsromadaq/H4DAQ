@@ -20,6 +20,15 @@ using namespace std;
 #include <unistd.h> //fork exit
 #include <sys/types.h> //pid_t
 
+#ifdef __linux__
+#define LINUX
+#endif
+
+#include "CAENVMElib.h"
+#include "CAENVMEtypes.h" 
+#include "CAENVMEoslib.h"
+
+#include <CAENDigitizer.h>
 
 /// XML
 #ifndef NO_XML

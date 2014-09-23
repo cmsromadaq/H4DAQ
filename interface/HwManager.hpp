@@ -46,12 +46,27 @@ class HwManager: public Configurable, public LogUtility
  * control manager
  */
 protected:
+  typedef struct 
+  {
+    // index in the hw_ array
+    int boardIndex_;
+    // handle (in case it applies)
+    int boardHandle_;
+  } boardPtr;
+
 	vector<Board*> hw_;
 	// --- Read Board i
 	void Read(int i,vector<WORD> &v);
+
+  // ----- Special functions boards -----
 	// -- Board associated to trigger
-	int trigBoard_;
-	// -- Flag to set if it has the SPS Boards or not
+	boardPtr trigBoard_;
+	// -- Controller Board
+	boardPtr controllerBoard_;
+	// -- Digitizer Board
+	boardPtr digiBoard_;
+  // ------------------------------------
+ 	// -- Flag to set if it has the SPS Boards or not
 	//bool runControl_;
 
 public:
@@ -76,6 +91,9 @@ public:
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}
 
+private:
+  //Initialize VME crate
+  int CrateInit();
 };
 
 #endif

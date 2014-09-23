@@ -1,3 +1,6 @@
+#ifndef CAEN_V1742_H
+#define CAEN_V1742_H
+
 #include "interface/HwManager.hpp"
 #include "interface/BoardConfig.hpp"
 
@@ -83,7 +86,7 @@ public:
     
   } CAEN_V1742_Config_t;
 
-  CAEN_V1742():digitizerHandle_(-1) {};
+  CAEN_V1742():digitizerHandle_(-1) { type_="CAEN_V1742"; };
 
   virtual int Init();
   virtual int Clear();
@@ -93,6 +96,7 @@ public:
   virtual int Read(vector<WORD> &v);
   virtual int SetHandle(uint32_t digitizerHandle) { digitizerHandle_ = digitizerHandle; };
 
+  inline CAEN_V1742_Config_t* GetConfiguration() { return &digitizerConfiguration_; };
 private:
 
   int getMoreBoardInfo();
@@ -105,3 +109,5 @@ private:
   CAEN_DGTZ_BoardInfo_t boardInfo_;  
   
 };
+
+#endif

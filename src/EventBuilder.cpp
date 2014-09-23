@@ -536,7 +536,7 @@ void EventBuilder::SetRunNum(WORD x)
 {
 runNum_=x;
 if (dumpEvent_ || recvEvent_)  // POSIX
-	system(  ("mkdir -p "+dirName_+ to_string(runNum_) ).c_str() );
+  system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)runNum_) ).c_str() );
 }
 
 
