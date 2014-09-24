@@ -33,28 +33,22 @@ dataType::~dataType(){clear();}
 	// --- reserve N bytes in memory
 void dataType::reserve(dataTypeSize_t N)
 	{
-	if (N>500 ) cout<<"BEGIN RESERVE "<<N<<endl; //DEBUG LINE
 	if (reserved_ >= N) return; // nothing to be done
 	// allocate new space of size N
-	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL MALLOC"<<N<<endl; //DEBUG LINE
 	void *newStream=new char[N];
 	//void *newStream=malloc(N);
-	if (N>500 ) cout<<"BEGIN RESERVE  CALLED MALLOC"<<N<<endl; //DEBUG LINE
 	if(newStream == NULL ) {
 		cout <<" BAD ALLOC !!! "<<endl;
 		throw std::bad_alloc(); //mem fail
 		}
 	//copy content to new residence
-	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL MEMCPY"<<N<<endl; //DEBUG LINE
 	memcpy(newStream,dataStream_,size_);
 	// release old memory
-	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL FREE"<<N<<endl; //DEBUG LINE
 	//free (dataStream_);
 	delete [] (char*)dataStream_;
 	//update pointers
 	dataStream_=newStream;
 	reserved_=N;
-	if (N>500 ) cout<<"BEGIN RESERVE  END"<<reserved_<<endl; //DEBUG LINE
 	return;
 	}
 void dataType::shrink(dataTypeSize_t N){
@@ -451,20 +445,15 @@ Command EventBuilder::CloseSpill()
 void EventBuilder::AddEventToSpill(dataType &event){
 	if (!isSpillOpen_) return; // throw exception TODO
 	// find the N.Of.Event in the actual RUn
-	cout<<"1 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
-	// ---   WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
-	// ---   WORD nEvents= *nEventsPtr;
-	// ---   cout<<"2 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
-	// ---   cout<<"2.5 nEvents"<<nEvents<<endl;
-	// ---   nEvents+=1;
-	// ---   (*nEventsPtr)=nEvents;
-	//
+	WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
+	WORD nEvents= *nEventsPtr;
+	nEvents+=1;
+	(*nEventsPtr)=nEvents;
+	
 	//cout<<" ------SPILL------ "<<std::dec<< mySpill_.size() <<endl<<Utility::AsciiDataReadable(mySpill_.data(),mySpill_.size())<<endl<<"-----------"<<endl;
 	//cout<<" ------EVENT------ "<< std::dec<< event.size()<<endl<<Utility::AsciiDataReadable(event.data(),event.size())<<endl<<"-----------"<<endl;
-	mySpill_.append( (void*)"soueantnaeohuaoehunsoaheusntsaoehunsheoasnuthoasentuhsneoathusnoeathuntoehunah",WORDSIZE*3);
-	//mySpill_.append(event);
-	cout<<"3 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
+	mySpill_.append(event);
 	return;
 }
 void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){

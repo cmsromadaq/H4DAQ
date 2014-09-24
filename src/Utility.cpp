@@ -59,3 +59,19 @@ string Utility::ConvertToString(int N){
 	std::string theNumberString = ostr.str(); //the str() function of the stream 
 	return theNumberString;
 }
+
+long Utility::timevaldiff(struct timeval *starttime, struct timeval *finishtime)
+{
+  long usec;
+  usec=(finishtime->tv_sec-starttime->tv_sec)*1000000;
+  usec+=(finishtime->tv_usec-starttime->tv_usec);
+  return usec;
+}
+
+long Utility::timestamp(struct timeval *time, time_t *ref){
+		
+  long time_msec;
+  time_msec=(time->tv_sec-*ref)*1000;
+  time_msec+=time->tv_usec/1000;
+  return time_msec;
+}

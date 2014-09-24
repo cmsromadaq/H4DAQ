@@ -19,7 +19,7 @@ class dataType;
 // this are the cmd that the finate state machine can receive
 enum CMD_t {NOP=0,WWE,WE,EE,WBE,BT,WBT,EBT,STARTRUN,SEND,RECV,DATA,STATUS,SPILLCOMPL,ENDRUN,DIE};
 // this are the status of the finate state machines
-enum STATUS_t { START=0, INIT, INITIALIZED ,  BEGINSPILL, CLEARED,CLEARBUSY,WAITTRIG, READ, ENDSPILL, SENTBUFFER,BYE };
+enum STATUS_t { START=0, INIT, INITIALIZED ,  BEGINSPILL, CLEARED,CLEARBUSY,WAITTRIG, READ, ENDSPILL, SENTBUFFER,SPILLCOMPLETED,BYE  };
 
 /* Command description:
  * NOP : No Operation. Need for dummy messages that goes around
@@ -62,6 +62,10 @@ pid_t pid_;
 // by default uses deque, it can also use list in case
 queue< Command > todo_; // front/pop/push/empty/size
 STATUS_t myStatus_;
+
+timeval start_time;
+timeval stopwatch_start_time;
+timeval stopwatch_stop_time;
 
 public:
 	// --- Constructor

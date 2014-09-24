@@ -1,5 +1,6 @@
 #include "interface/HwManager.hpp"
 #include "interface/CAEN_VX718.hpp"
+#include "interface/TimeBoard.hpp"
 #include "interface/BoardConfig.hpp"
 
 // --- Board
@@ -62,6 +63,15 @@ void HwManager::Config(Configurator &c){
 				// construct a CAEN_VX718 Board, and push it back
 				hw_.push_back( new CAEN_VX718() );
 				// construct a board configurator and ask the board to configure itself
+				BoardConfig bC;
+				bC.Init(c);
+				bC.SetBoardNode(board_node);
+				hw_[bIdx]->Config(&bC);
+			}
+		else if( getElementContent(c,"type",board_node) == "TIME")
+			{
+				int bIdx=hw_.size();
+				hw_.push_back( new TimeBoard() );
 				BoardConfig bC;
 				bC.Init(c);
 				bC.SetBoardNode(board_node);

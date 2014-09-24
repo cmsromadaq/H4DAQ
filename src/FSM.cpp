@@ -3,7 +3,9 @@
 #include "interface/Utility.hpp"
 
 // --- Constructor: C++11 inherits automatically. C++03 no
-DataReadoutFSM::DataReadoutFSM(): Daemon() {}
+DataReadoutFSM::DataReadoutFSM(): Daemon() {
+
+}
 
 bool DataReadoutFSM::IsOk(){
 	if ( eventBuilder_->GetSendEvent() != true ) return false;
@@ -69,7 +71,6 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
-		    cout<<"ENTER CLEARED"<<endl;
 		    // wait for we
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -111,13 +112,22 @@ while (true) {
 	case READ:
 		    {
 			static int READED=0;
-			cout<<"Counter "<<READED++<<endl;
+			cout<<"Counter "<<std::dec<<++READED<<endl;
+			static int Counter=0; 
+			if (Counter==0 )  gettimeofday(&stopwatch_start_time,NULL);
+			++Counter;
+			if (Counter >= 500) {
+				gettimeofday(&stopwatch_stop_time,NULL);
+				long elapsed=  Utility::timevaldiff(&stopwatch_start_time,&stopwatch_stop_time);
+				ostringstream s; s <<"[DataReadOutFSM]::[READ] "<<"Triggers in spill "<< READED<<" Rate "<< double(Counter)/elapsed* 1e6 <<" Hz";
+				cout <<s.str()<<endl;
+				Log(s.str(),1);
+				Counter=0;
+			}
+			//-----
                         dataType event;
-			cout<<"READ"<<endl;
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
-			cout<<"EVT READ "<<event.size()<<endl;
                         eventBuilder_->AddEventToSpill(event);                                
-			cout<<"ADDED TO SPILL EB"<<std::dec<<eventBuilder_->GetSize()<<" EVT"<<event.size()<<endl;
 			MoveToStatus(CLEARBUSY);
 		    break;
 		    }
@@ -284,7 +294,8 @@ while (true) {
 			printf("\t2->EE\n",EE);
 			printf("\t3->STATUS\n",STATUS);
 			printf("\t4->ENDRUN\n",ENDRUN);
-			printf("\t5->DIE\n",DIE);
+			printf("\t5->SPILLCOMPL\n",DIE);
+			printf("\t6->DIE\n",DIE);
 			printf("\n: ");
 			scanf("%d",&cmd);
 			switch ( cmd ){
@@ -293,12 +304,21 @@ while (true) {
 				case  2:  	{MoveToStatus(ENDSPILL); break;}
 				case  3: 	{MoveToStatus(WAITTRIG); break;}
 				case  4: 	{MoveToStatus(SENTBUFFER); break;}
-				case  5: 	{MoveToStatus(BYE);break;}
+				case  5: 	{MoveToStatus(SPILLCOMPLETED);break;}
+				case  6: 	{MoveToStatus(BYE);break;}
 				default: break;
 			}
 
 		    break;
 		    }
+	case SPILLCOMPLETED: {
+			    printf("SPILLCOMPL!\n");
+			    dataType myMex;
+			    myMex.append((void*)"SPILLCOMPL\0",11);
+			    connectionManager_->Send(myMex);
+			    MoveToStatus(READ);
+			break;
+			}
 	case BYE:
 		    {
 			    printf("BYE BYE DAQ!\n");

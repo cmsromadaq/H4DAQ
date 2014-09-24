@@ -5,6 +5,10 @@
   </Network>
   <Hardware>
     <board>
+      <ID>1</ID>
+      <type>TIME</type>
+    </board>
+    <board>
       <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <ID>123</ID>
       <boardType>1</boardType> <!-- ??? -->
