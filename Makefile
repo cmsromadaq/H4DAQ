@@ -1,7 +1,7 @@
 INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb -std=gnu++0x 
+CXXFLAGS	=-O2 -ggdb -std=gnu++0x -Wall
 LDFLAGS		=-lz -lm -lzmq -lCAENComm -lCAENDigitizer -lCAENVME
 SOFLAGS		=-fPIC -shared 
 SHELL		=bash

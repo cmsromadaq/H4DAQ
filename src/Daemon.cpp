@@ -241,7 +241,7 @@ return;
 
 
 
-Command Daemon::ParseData(dataType mex)
+Command Daemon::ParseData(dataType &mex)
 {
 	Command myCmd;
 	int N=mex.size();
@@ -253,6 +253,7 @@ Command Daemon::ParseData(dataType mex)
 		//	((char*)mex.data() ) [3]== 'D' and
 		//	((char*)mex.data() ) [4]== '\0'  
 		{
+		//mex.erase(dataTypeSize_t(0),dataTypeSize_t(5));
 		mex.erase(0,5);
 		myCmd.cmd=SEND;
 		myCmd.data = mex.data();

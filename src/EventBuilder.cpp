@@ -1,10 +1,11 @@
 #include "interface/EventBuilder.hpp"
+#include "interface/Utility.hpp"
 
 // --- Implemantation of class dataType: a stream of data of size N
 const bool operator==(dataType &x, dataType &y)
 	{
 	if (x.size() != y.size() ) return false;
-	for(int i=0;i<x.size();i++)
+	for(dataTypeSize_t i=0;i<x.size();i++)
 		{
 		if ( ((char*)x.data())[i] != ((char*)y.data())[i] ) return false;
 		}
@@ -20,7 +21,7 @@ dataType::dataType(){
 	clear();
 }
 
-dataType::dataType(int N,void*v){
+dataType::dataType(dataTypeSize_t N,void*v){
 	// this constructor will not do malloc and take ownership of the stream
 	dataStream_=v;
 	size_=N;
@@ -30,51 +31,65 @@ dataType::dataType(int N,void*v){
 	// --- Destructor
 dataType::~dataType(){clear();}
 	// --- reserve N bytes in memory
-void dataType::reserve(int N)
+void dataType::reserve(dataTypeSize_t N)
 	{
+	if (N>500 ) cout<<"BEGIN RESERVE "<<N<<endl; //DEBUG LINE
 	if (reserved_ >= N) return; // nothing to be done
 	// allocate new space of size N
+	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL MALLOC"<<N<<endl; //DEBUG LINE
 	void *newStream=new char[N];
-	if(newStream == NULL ) throw std::bad_alloc(); //mem fail
+	//void *newStream=malloc(N);
+	if (N>500 ) cout<<"BEGIN RESERVE  CALLED MALLOC"<<N<<endl; //DEBUG LINE
+	if(newStream == NULL ) {
+		cout <<" BAD ALLOC !!! "<<endl;
+		throw std::bad_alloc(); //mem fail
+		}
 	//copy content to new residence
+	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL MEMCPY"<<N<<endl; //DEBUG LINE
 	memcpy(newStream,dataStream_,size_);
 	// release old memory
+	if (N>500 ) cout<<"BEGIN RESERVE  GOING TO CALL FREE"<<N<<endl; //DEBUG LINE
+	//free (dataStream_);
 	delete [] (char*)dataStream_;
 	//update pointers
 	dataStream_=newStream;
 	reserved_=N;
+	if (N>500 ) cout<<"BEGIN RESERVE  END"<<reserved_<<endl; //DEBUG LINE
 	return;
 	}
-void dataType::shrink(int N){
+void dataType::shrink(dataTypeSize_t N){
 	if(size_>=N) return; // bad call
 	if(reserved_<=N) return; //nothing to be done
 	void *newStream=new char[N];
+	//void*newStream=malloc(N);
 	if(newStream == NULL ) throw std::bad_alloc(); //mem fail
 	memcpy(newStream,dataStream_,size_);
 	delete [] (char*)dataStream_;
+	//free(dataStream_);
 	//update pointers
 	dataStream_=newStream;
 	reserved_=N;
 	return;
 	}
 // --- append
-void dataType::append(void* data, int N){
-	int tot=N+size_;
+void dataType::append(void* data, dataTypeSize_t N){
+	dataTypeSize_t tot=N+size_;
 	if(tot>0 && reserved_==0) reserve(tot);
+	if(tot == 0 ) cout<<"TOT IS 0 "<<endl; // TODO something
 	while (reserved_<tot){
 		reserve(2*reserved_); // this avoids the +1, +1 ...
 		}
 	char * ptr=(char*) dataStream_;
 	ptr += size_;
-	memcpy(ptr,data,N);
+	memcpy(ptr,data,N); 
 	size_=tot;
 	}
 	// --- remove
-void dataType::erase(int A,int B){
+void dataType::erase(dataTypeSize_t A,dataTypeSize_t B){
 	if( B > size_) B=size_;
 	if( A >= B ) return;
 	// 0....A---B....N-1
-	for(int i=A ; B+i-A<size_ ; ++i )	
+	for(dataTypeSize_t i=A ; B+i-A<size_ ; ++i )	
 		{
 		((char*)dataStream_)[i] =((char*)dataStream_)[B+i-A];
 		}
@@ -88,11 +103,12 @@ void dataType::clear(){
 	size_=0;
 	reserved_=0; 
 	if(dataStream_!=NULL)delete [] (char*)dataStream_; 
+	//if(dataStream_!=NULL)free(dataStream_); 
 	dataStream_=NULL;
 	//printf("Clearing dataType:DONE\n"); //DEBUG
 	}
 
-void dataType::copy(void* data,int N){
+void dataType::copy(void* data,dataTypeSize_t N){
 	if(reserved_<N) reserve(N);
 	memcpy(dataStream_,data,N);
 	size_=N;
@@ -108,7 +124,7 @@ void dataType::release(){
 // ---------- Event Builder
 EventBuilder::EventBuilder()
 {
-	mySpill_.reserve(1024); //reserve 1K for each stream
+	//mySpill_.reserve(2048); //reserve 1K for each stream
 	dumpEvent_=true;
 	sendEvent_=false;
 	recvEvent_=0;
@@ -165,7 +181,7 @@ void EventBuilder::BoardToStream(dataType &R ,WORD boardId,vector<WORD> &v)
 	BoardHeader(R,boardId   );
 	WORD N= v.size()*WORDSIZE;
 	WordToStream(R,N)  ; 
-	for(int i=0;i<v.size();i++) WordToStream(R,v[i])  ;
+	for(unsigned long long i=0;i<v.size();i++) WordToStream(R,v[i])  ;
 	BoardTrailer(R,boardId) ;
 
 	return ;
@@ -228,7 +244,7 @@ vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 }
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
-	for(int n=0; n< x.size() ; n++)
+	for(unsigned long long int n=0; n< x.size() ; n++)
 		{
 		R.push_back( *(WORD*)(  ((char*)x.data()) + n*WORDSIZE) );
 		}
@@ -241,7 +257,7 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	return R;
 }
 
-long long EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
+dataTypeSize_t EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
 
 	dataType H;BoardHeader(H,boardId);
 	dataType T;BoardTrailer(T,boardId);
@@ -280,17 +296,17 @@ long long EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
 
 }
 
-long long EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
+dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
 	{
 	// take ownership of myStream (*v)
 	dataType myStream(MaxN,v);
-	long long R= IsBoardOk(myStream,boardId);
+	dataTypeSize_t R= IsBoardOk(myStream,boardId);
 	// release ownership of myStream
 	myStream.release();
 	return R;
 	}
 
-long long EventBuilder::IsEventOk(dataType &x){
+dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*2); // read the first two WORDS
 	dataType H;EventHeader(H);
@@ -305,11 +321,11 @@ long long EventBuilder::IsEventOk(dataType &x){
 	// header is fine
 	WORD nBoard=myHead[1];
 
-	long long leftsize=x.size() - WORDSIZE*2;
+	dataTypeSize_t leftsize=x.size() - WORDSIZE*2;
 	ptr += WORDSIZE*2 ;
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
 		{
-		long long readByte=IsBoardOk(ptr, leftsize);
+		dataTypeSize_t readByte=IsBoardOk(ptr, leftsize);
 		if (readByte==0) return 0;
 		leftsize -= readByte;
 		ptr += readByte;
@@ -383,6 +399,7 @@ void EventBuilder::OpenSpill(WORD spillNum)
 		else newFileName +=".txt";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
+		Log("[EventBuilder]::[OpenSpill] Open file name:" + newFileName,2) ;
 	}
 	isSpillOpen_=true;
 	lastSpill_= spillNum;
@@ -402,20 +419,23 @@ Command EventBuilder::CloseSpill()
 	mySpill_.append(spillT);
 	if( dumpEvent_ && !recvEvent_) 
 	{
+		Log("[EventBuilder]::[CloseSpill] File Closed",2) ;
 		Dump(mySpill_);
 		dump_->Close();
 	}
 	if (recvEvent_) { 
+		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",2) ;
 		WORD spillNum=ReadSpillNum(mySpill_);
 		if ( spills_.find(spillNum) != spills_.end() ) 
 			{
-			spills_[spillNum] = pair<int,dataType>(1,dataType( mySpill_.size(),mySpill_.data())   );
+			spills_[spillNum] = pair<int,dataType>(1,dataType( mySpill_.size(),mySpill_.data())   ); // spills_[] take ownership of the structuer
 			mySpill_.release();
 			}
 		else MergeSpills(spills_[spillNum].second,mySpill_);
 	} 
 	if (sendEvent_) {//TODO -- also do the merging if recv
 		// --- Instruct Daemon to send them through the connection manager
+		Log("[EventBuilder]::[CloseSpill] File In Send Mode",2) ;
 		myCmd.cmd=SEND;
 		dataType myMex;
 		myMex.append((void*)"DATA\0",5);
@@ -431,12 +451,20 @@ Command EventBuilder::CloseSpill()
 void EventBuilder::AddEventToSpill(dataType &event){
 	if (!isSpillOpen_) return; // throw exception TODO
 	// find the N.Of.Event in the actual RUn
+	cout<<"1 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
-	WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
-	WORD nEvents= *nEventsPtr;
-	nEvents+=1;
-	(*nEventsPtr)=nEvents;
-	mySpill_.append(event);
+	// ---   WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
+	// ---   WORD nEvents= *nEventsPtr;
+	// ---   cout<<"2 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
+	// ---   cout<<"2.5 nEvents"<<nEvents<<endl;
+	// ---   nEvents+=1;
+	// ---   (*nEventsPtr)=nEvents;
+	//
+	//cout<<" ------SPILL------ "<<std::dec<< mySpill_.size() <<endl<<Utility::AsciiDataReadable(mySpill_.data(),mySpill_.size())<<endl<<"-----------"<<endl;
+	//cout<<" ------EVENT------ "<< std::dec<< event.size()<<endl<<Utility::AsciiDataReadable(event.data(),event.size())<<endl<<"-----------"<<endl;
+	mySpill_.append( (void*)"soueantnaeohuaoehunsoaheusntsaoehunsheoasnuthoasentuhsneoathusnoeathuntoehunah",WORDSIZE*3);
+	//mySpill_.append(event);
+	cout<<"3 AES MYSPILLSIZE"<<mySpill_.size()<<endl;
 	return;
 }
 void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
@@ -471,7 +499,7 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	long left2=spill2.size() - WORDSIZE*4;
 	ptr1+= WORDSIZE*4;
 	ptr2+= WORDSIZE*4;
-	for(int iEvent=0;iEvent< spillNevents1 ;iEvent++)
+	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
 		long eventSize1= IsEventOk(ptr1,left1);
 		long eventSize2= IsEventOk(ptr2,left2);

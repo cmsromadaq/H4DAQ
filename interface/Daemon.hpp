@@ -41,7 +41,7 @@ public:
 	Command(){cmd=NOP; data=NULL; N=0;}
 	~Command(){ if (data != NULL) delete [] (char*)data;}
 	void *data;
-	int N;
+	dataTypeSize_t N;
 	CMD_t cmd;
 	string name() ;
 };
@@ -77,7 +77,7 @@ public:
 	// --- Reset
 	virtual void Clear();
 	// --- this is meant to parse the commands that navigate through the network
-	Command ParseData(dataType mex);
+	Command ParseData(dataType &mex);
 	// ---
 	void MoveToStatus(STATUS_t newStatus);
 	// -- check if configuration is consistent with the subclasses

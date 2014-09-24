@@ -13,6 +13,7 @@ class Command; // fwd decl
 //typedef unsigned int WORD;
 typedef uint32_t WORD;
 #define WORDSIZE 4
+typedef unsigned long long dataTypeSize_t;
 
 class EventParser{
 public:
@@ -31,36 +32,36 @@ class dataType{
 	//the syntax is the same of string
 private:
 	void *dataStream_;
-	unsigned int size_; // store the used size of dataStream
-	unsigned int reserved_; //store the actual dimension in memory of dataStream
+	dataTypeSize_t size_; // store the used size of dataStream
+	dataTypeSize_t reserved_; //store the actual dimension in memory of dataStream
 public:
 	// --- Constructor
 	dataType();
 	//dataType(const char*);//init with a null terminated string
-	dataType(int N, void* );//init with a dataType
+	dataType(dataTypeSize_t N, void* );//init with a dataType
 	// --- Destructor
 	~dataType();
 	// --- Get size
-	unsigned int size(){return size_;}
+	dataTypeSize_t size(){return size_;}
 	// --- reserve N bytes in memory
-	void reserve(int N);
+	void reserve(dataTypeSize_t N);
 	// --- shrink N bytes in memory
-	void shrink(int N);
+	void shrink(dataTypeSize_t N);
 	// --- return stream pointer
 	const void* c_str(){return (const void*)dataStream_;}
 	void* data(){
 		return ( void*)dataStream_;
 		}
 	// --- append
-	void append(void* data, int N);
+	void append(void* data, dataTypeSize_t N);
 	// --- append using dataType
-	void append(dataType x){return append( x.data(), int(x.size()) ) ;};
+	void append(dataType &x){return append( x.data(), dataTypeSize_t(x.size()) ) ;};
 	// --- remove [A,B)
-	void erase(int A,int B);
+	void erase(dataTypeSize_t A,dataTypeSize_t B);
 	// --- clear
 	void clear();
 	// --- copy
-	void copy(void * data, int N);
+	void copy(void * data, dataTypeSize_t N);
 	// --- release ownership of data. This will lost control of data and location
 	void release();
 	//--- Operators
@@ -99,12 +100,20 @@ public:
 	// --- Destructor
 	~EventBuilder();
 	// --- Get Info
-	inline bool GetDumpEvent(){return dumpEvent_;};
-	inline bool GetSendEvent(){return sendEvent_;};
-	inline int GetRecvEvent() { return recvEvent_;};
+	inline bool 	GetDumpEvent(){return dumpEvent_;};
+	inline bool 	GetSendEvent(){return sendEvent_;};
+	inline int 	GetRecvEvent() { return recvEvent_;};
+	inline void*	GetStream(){ return mySpill_.data();};
+	inline int  	GetSize(){return mySpill_.size();};
+	inline string 	GetDirName()const {return dirName_;}
+	// --- Set  Info
+	inline void SetDumpCompress(bool x=true){dump_->SetCompress(x);};
+	inline void SetDumpEvent(bool x=true){dumpEvent_=x;};
+	inline void SetSendEvent(bool x=true){sendEvent_=x;};
+	inline void SetRecvEvent(int x=0) {recvEvent_=x;};
+	void 	SetRunNum(WORD x);// set also the filename ...
+	inline void  	SetDirName(string mydir="/tmp/") {dirName_=mydir;}
 	//void AppendToStream();
-	const void* GetStream(){ return mySpill_.c_str();};
-	int  GetSize(){return mySpill_.size();};
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check
@@ -119,7 +128,6 @@ public:
 	// merge in Spill1, Spill2. check i spillNum is to be dumped
 	void MergeSpills(dataType &spill2 ) ;//{WORD spillNum=ReadSpillNum(spill2); MergeSpills(spills_[spillNum].second,spill2); spills_[spillNum].first++; return;} ;
 	//
-	void SetRunNum(WORD x);//{ runNum_=x;}
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
 	static void WordToStream(dataType&R,WORD x);
@@ -137,10 +145,10 @@ public:
 	static void SpillTrailer(dataType&);
 	static void BoardToStream(dataType &R,WORD boardId,vector<WORD> &v);
 	static void MergeEventStream(dataType&R,dataType &x,dataType &y);
-	static long long IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
-	static long long IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
-	static long long IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM
-	static inline long long IsEventOk(void *v, int N){ dataType tmp(N,v);long long R= IsEventOk(tmp); tmp.release(); return R;};
+	static dataTypeSize_t IsBoardOk(dataType &x,WORD boardId); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
+	static dataTypeSize_t IsBoardOk(void *v,int MaxN,WORD boardId); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
+	static dataTypeSize_t IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM
+	static inline dataTypeSize_t IsEventOk(void *v, int N){ dataType tmp(N,v);dataTypeSize_t R= IsEventOk(tmp); tmp.release(); return R;};
 };
 
 #include "interface/Daemon.hpp" // Command -- fwd decl

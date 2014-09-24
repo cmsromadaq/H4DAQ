@@ -16,6 +16,25 @@ if( (N-1)%M != M-1 ) mex += "\n";
 return mex;
 }
 
+string Utility::AsciiDataReadable(void *data,int N)
+{
+string mex="";
+char buf[4];
+for(int i=0;i<N ;i++)
+	{
+	char c=((unsigned char*)data)[i];
+	if (  ('a' <= c && c<='z' ) ||
+	      ('A' <= c && c<='Z' ) ||
+	      ('0' <= c && c<='9' ) )
+		{ mex += c; continue; }
+	sprintf(buf,"%02X",((unsigned char*)data)[i] );
+	mex += " '" ;
+	mex += buf;
+	mex += "' ";
+	}
+return mex;
+}
+
 string Utility::AsciiData(void *data,void *data2,int N,int M)
 {
 string mex="";

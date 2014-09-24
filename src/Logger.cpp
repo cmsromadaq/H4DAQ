@@ -96,9 +96,9 @@ return;
 
 void Logger::Write(dataType &d, bool dryrun){
 	// implement the low level Dump. intended for binary
-	if (maxlines_>=0) return; // can't count lines
 	if ( compress_)
 		{
+		if (dryrun ) return;
 		#ifndef NO_ZLIB
 			gzwrite(gw_,d.data(),d.size());
 			gzflush(gw_,Z_SYNC_FLUSH);
@@ -107,7 +107,11 @@ void Logger::Write(dataType &d, bool dryrun){
 		#endif
 		}
 	else    {
-		if(!dryrun)fwrite(d.data(),1,d.size(),fw_);
+		if(!dryrun)
+			{
+			fwrite(d.data(),1,d.size(),fw_);
+			fflush(fw_);
+			}
 		}
 	return;
 }
@@ -149,6 +153,8 @@ void Logger::Close(){
 		{
 		if (gw_ == NULL ) return;
 		#ifndef NO_ZLIB
+			// Close Files
+			gzflush(gw_,Z_FINISH);
 			gzclose(gw_);
 			gw_=NULL;
 		#else
@@ -158,6 +164,7 @@ void Logger::Close(){
 	else 
 		{
 		if(fw_==NULL) return;
+		fflush(fw_);
 		fclose(fw_);
 		fw_=NULL;
 		}

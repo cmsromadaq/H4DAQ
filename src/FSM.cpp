@@ -69,6 +69,7 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
+		    cout<<"ENTER CLEARED"<<endl;
 		    // wait for we
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -109,13 +110,14 @@ while (true) {
 		    }
 	case READ:
 		    {
+			static int READED=0;
+			cout<<"Counter "<<READED++<<endl;
                         dataType event;
 			cout<<"READ"<<endl;
-			hwManager_->ReadAll(event);                                 
+			hwManager_->ReadAll(event);                                 /// DEBUG ME
 			cout<<"EVT READ "<<event.size()<<endl;
                         eventBuilder_->AddEventToSpill(event);                                
-			cout<<"ADDED TO SPILL"<<event.size()<<endl;
-			cout<<"DONE"<<event.size()<<endl;
+			cout<<"ADDED TO SPILL EB"<<std::dec<<eventBuilder_->GetSize()<<" EVT"<<event.size()<<endl;
 			MoveToStatus(CLEARBUSY);
 		    break;
 		    }
@@ -303,7 +305,7 @@ while (true) {
 			    dataType myMex;
 			    myMex.append((void*)"DIE\0",4);
 			    connectionManager_->Send(myMex);
-			    MoveToStatus(READ);
+			    MoveToStatus(START);
 			    break; // or return ?
 		    }
 

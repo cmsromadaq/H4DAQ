@@ -195,24 +195,16 @@ void HwManager::Read(int i,vector<WORD> &v)
 }
 
 void HwManager::ReadAll(dataType&R){
-cout<<"1"<<endl;
 	EventBuilder::EventHeader(R);
-cout<<"2"<<endl;
-	int M=hw_.size();
+	WORD M=hw_.size();
 	R.reserve(100);
-cout<<"2.5: "<<sizeof(M) <<endl;
-	R.append( (void*)&M,1);
-cout<<"3: M="<<M<<" R="<<R.size()<<endl;
 	EventBuilder::WordToStream(R,M);
-cout<<"4"<<endl;
 	vector<WORD> v; 
 	for(int i=0;i< hw_.size();i++)
 	{
-cout<<"5:"<<i<<endl;
 		hw_[i]->Read(v);
 		EventBuilder::BoardToStream( R, hw_[i]->GetId(), v )  ;
 	}
-cout<<"6"<<endl;
 	EventBuilder::EventTrailer(R);
 	return ;
 }
@@ -233,7 +225,8 @@ void HwManager::ClearBusy(){
 	    throw hw_exception();
 	  }
 	
-	if (!hw_[trigBoard_.boardIndex_]->ClearBusy())
+	int status = hw_[trigBoard_.boardIndex_]->ClearBusy();
+	if ( status )
 	  {
 	    ostringstream s;
 	    s << "[HwManager]::[ERROR]::ClearBusy failed";
@@ -263,10 +256,11 @@ void HwManager::TriggerAck(){
 	    throw hw_exception();
 	  }
 
-	if (!hw_[trigBoard_.boardIndex_]->TriggerAck())
+	int status=hw_[trigBoard_.boardIndex_]->TriggerAck();
+	if ( status )
 	  {
 	    ostringstream s;
-	    s << "[HwManager]::[ERROR]::TriggerAck failed";
+	    s << "[HwManager]::[ERROR]::TriggerAck failed " << status;
 	    Log(s.str(),1);
 	    throw hw_exception();
 	  }

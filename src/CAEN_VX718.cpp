@@ -147,6 +147,7 @@ int CAEN_VX718::ClearBusy()
   status = SendSignal(DAQ_CLEAR_BUSY);
   if  (status)
     return status;
+  return 0;
 }
 
 bool CAEN_VX718::TriggerReceived()
@@ -179,7 +180,7 @@ int CAEN_VX718::TriggerAck()
   int status = 0;
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
-
+  
   //send DAQ_TRIG_ACK
   status = SendSignal(DAQ_TRIG_ACK);
   if (status)
