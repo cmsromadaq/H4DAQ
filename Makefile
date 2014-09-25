@@ -45,6 +45,7 @@ SoLib		=$(BINDIR)/H4DAQ.$(DllSuf)
 
 .PRECIOUS:*.ObjSuf *.DepSuf *.DllSuf
 
+Deps=$(patsubst %,$(BINDIR)/%.$(DepSuf),$(Objects) $(Packages) )
 
 ############### EXPLICIT RULES ###############
 .PHONY: all
@@ -110,5 +111,12 @@ $(BINDIR)/%.$(ObjSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 $(BINDIR)/%.$(DepSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 	@echo $(call InfoLine , $@ )
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -M -o $@ $(SRCDIR)/$*.$(SrcSuf) -I$(INC_DIR) -I$(HDIR)
+	sed -i'' "s|^.*:|& Makefile $(BINDIR)/&|g" $@
 
-
+#-include $(Deps)
+#	%.d: %.c
+#		$(SHELL) -ec '$(CC) -M \
+#			$(CPPFLAGS) $< | \
+#			sed '\''s/$*.o/& $@/g'\'' \
+#			> $@'
+#	
