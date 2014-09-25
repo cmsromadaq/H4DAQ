@@ -1,16 +1,8 @@
 #include "interface/HwManager.hpp"
 #include "interface/CAEN_VX718.hpp"
 #include "interface/TimeBoard.hpp"
-#include "interface/BoardConfig.hpp"
+//#include "interface/BoardConfig.hpp"
 
-// --- Board
-Board::Board(){id_=0;bC_=NULL;};
-Board::~Board(){};
-int Board::Config(BoardConfig *bC){
-	bC_=bC;
-	return 0;
-};
-//unsigned int Board::GetId(){return id_;};
 
 // -------------------  HW Manager ---------------
 //
@@ -26,6 +18,7 @@ HwManager::HwManager(){
   digiBoard_.boardIndex_=-1;
   digiBoard_.boardHandle_=-1;
 
+  crateId_=-1;
   //runControl_=false;
 }
 // --- Destructor
@@ -45,6 +38,7 @@ void HwManager::Config(Configurator &c){
 		printf("Hardware not found in configuration\n");
 		throw  config_exception();
 		}
+	crateId_= Configurator::GetInt(getElementContent(c,"crateId",hw_node) );
 
 	// locate each board node and extract info
 	xmlNode *board_node = NULL;	
@@ -204,18 +198,29 @@ void HwManager::Read(int i,vector<WORD> &v)
 	return;
 }
 
-void HwManager::ReadAll(dataType&R){
+void HwManager::ReadAll(dataType&R,EventBuilder*eB){
+	// Construt the event
 	EventBuilder::EventHeader(R);
 	WORD M=hw_.size();
-	R.reserve(100);
+	//R.reserve(100);
+	EventBuilder::WordToStream(R, eB->GetEventId().eventInSpill_ );
+	WORD zero=0;
+	EventBuilder::WordToStream(R,zero); //eventSize in Byte
 	EventBuilder::WordToStream(R,M);
 	vector<WORD> v; 
 	for(int i=0;i< hw_.size();i++)
 	{
 		hw_[i]->Read(v);
-		EventBuilder::BoardToStream( R, hw_[i]->GetId(), v )  ;
+		BoardId bId;
+			bId.crateId_  = crateId_;
+			bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD
+			bId.boardId_  = hw_[i]->GetId() ; 
+		EventBuilder::BoardToStream( R, bId , v )  ;
 	}
 	EventBuilder::EventTrailer(R);
+	// N.Of Byte of the stream
+	WORD* EventSizePtr = ((WORD*)R.data() ) +2;
+	(*EventSizePtr) = (WORD)R.size();
 	return ;
 }
 
@@ -274,4 +279,12 @@ void HwManager::TriggerAck(){
 	    Log(s.str(),1);
 	    throw hw_exception();
 	  }
+}
+
+// ------------------ STATIC ----------------
+BoardTypes_t HwManager::GetBoardTypeId(string type){
+	if (type=="TIME" ) return _TIME_;
+	else if( type=="CAEN_VX718") return _CAENVX718_;
+	else if( type=="CAEN_V1742") return _CAENV1742_;
+	else return _UNKWN_;
 }

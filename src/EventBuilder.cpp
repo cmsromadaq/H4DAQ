@@ -1,118 +1,7 @@
 #include "interface/EventBuilder.hpp"
+#include "interface/DataType.hpp"
 #include "interface/Utility.hpp"
 
-// --- Implemantation of class dataType: a stream of data of size N
-const bool operator==(dataType &x, dataType &y)
-	{
-	if (x.size() != y.size() ) return false;
-	for(dataTypeSize_t i=0;i<x.size();i++)
-		{
-		if ( ((char*)x.data())[i] != ((char*)y.data())[i] ) return false;
-		}
-	return true;
-	}
-
-	
-	// --- Constructor
-dataType::dataType(){
-	dataStream_=NULL;
-	size_=0;
-	reserved_=0;
-	clear();
-}
-
-dataType::dataType(dataTypeSize_t N,void*v){
-	// this constructor will not do malloc and take ownership of the stream
-	dataStream_=v;
-	size_=N;
-	reserved_=N;
-}
-
-	// --- Destructor
-dataType::~dataType(){clear();}
-	// --- reserve N bytes in memory
-void dataType::reserve(dataTypeSize_t N)
-	{
-	if (reserved_ >= N) return; // nothing to be done
-	// allocate new space of size N
-	void *newStream=new char[N];
-	//void *newStream=malloc(N);
-	if(newStream == NULL ) {
-		cout <<" BAD ALLOC !!! "<<endl;
-		throw std::bad_alloc(); //mem fail
-		}
-	//copy content to new residence
-	memcpy(newStream,dataStream_,size_);
-	// release old memory
-	//free (dataStream_);
-	delete [] (char*)dataStream_;
-	//update pointers
-	dataStream_=newStream;
-	reserved_=N;
-	return;
-	}
-void dataType::shrink(dataTypeSize_t N){
-	if(size_>=N) return; // bad call
-	if(reserved_<=N) return; //nothing to be done
-	void *newStream=new char[N];
-	//void*newStream=malloc(N);
-	if(newStream == NULL ) throw std::bad_alloc(); //mem fail
-	memcpy(newStream,dataStream_,size_);
-	delete [] (char*)dataStream_;
-	//free(dataStream_);
-	//update pointers
-	dataStream_=newStream;
-	reserved_=N;
-	return;
-	}
-// --- append
-void dataType::append(void* data, dataTypeSize_t N){
-	dataTypeSize_t tot=N+size_;
-	if(tot>0 && reserved_==0) reserve(tot);
-	if(tot == 0 ) cout<<"TOT IS 0 "<<endl; // TODO something
-	while (reserved_<tot){
-		reserve(2*reserved_); // this avoids the +1, +1 ...
-		}
-	char * ptr=(char*) dataStream_;
-	ptr += size_;
-	memcpy(ptr,data,N); 
-	size_=tot;
-	}
-	// --- remove
-void dataType::erase(dataTypeSize_t A,dataTypeSize_t B){
-	if( B > size_) B=size_;
-	if( A >= B ) return;
-	// 0....A---B....N-1
-	for(dataTypeSize_t i=A ; B+i-A<size_ ; ++i )	
-		{
-		((char*)dataStream_)[i] =((char*)dataStream_)[B+i-A];
-		}
-	size_ -= B-A;
-	while(reserved_> 2*size_ && reserved_>2) shrink( reserved_/2); // shrikn to half of the reseserved. this avoid -1, -1...
-	return;
-	}
-	// --- clear
-void dataType::clear(){ 
-	//printf("Clearing dataType\n"); //DEBUG
-	size_=0;
-	reserved_=0; 
-	if(dataStream_!=NULL)delete [] (char*)dataStream_; 
-	//if(dataStream_!=NULL)free(dataStream_); 
-	dataStream_=NULL;
-	//printf("Clearing dataType:DONE\n"); //DEBUG
-	}
-
-void dataType::copy(void* data,dataTypeSize_t N){
-	if(reserved_<N) reserve(N);
-	memcpy(dataStream_,data,N);
-	size_=N;
-	return;
-}
-	// --- release
-void dataType::release(){
-	dataStream_=NULL; // don't destroy!
-	clear();
-}
 
 
 // ---------- Event Builder
@@ -149,17 +38,18 @@ void EventBuilder::WordToStream(dataType&R, WORD x)
 	return ;
 }
 
-void EventBuilder::BoardHeader(dataType &R,WORD boardId)
+void EventBuilder::BoardHeader(dataType &R, BoardId id)
 {
 	//R.reserve(2*WORDSIZE);
 	R.append((void*)"BRDH\0\0\0\0\0\0\0\0",WORDSIZE); //WORDSIZE<12
 	//dataType 
 	//R.append(WordToStream(boardId) ); 
-	WordToStream(R,boardId);	
+	WORD myId= ( id.crateId_&GetCrateIdBitMask() ) | (id.boardId_& GetBoardIdBitMask()  ) |  (id.boardType_ & GetBoardTypeIdBitMask() )  ;
+	WordToStream(R,myId);
 	return ;
 }
 
-void EventBuilder::BoardTrailer(dataType&R,WORD boardId)
+void EventBuilder::BoardTrailer(dataType&R)
 {
 	//R.reserve(WORDSIZE);
 	R.append((void*)"BRDT\0\0\0\0\0\0\0\0",WORDSIZE); // WORDSIZE<12
@@ -169,14 +59,14 @@ void EventBuilder::BoardTrailer(dataType&R,WORD boardId)
 
 // [HEAD][Nbytes][ ----- ][TRAILER]
 // [HEAD]="BRDH"+"BRDID" - WORD-WORD
-void EventBuilder::BoardToStream(dataType &R ,WORD boardId,vector<WORD> &v)
+void EventBuilder::BoardToStream(dataType &R ,BoardId id,vector<WORD> &v)
 {
 	//R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations
-	BoardHeader(R,boardId   );
+	BoardHeader(R, id );
 	WORD N= v.size()*WORDSIZE;
 	WordToStream(R,N)  ; 
 	for(unsigned long long i=0;i<v.size();i++) WordToStream(R,v[i])  ;
-	BoardTrailer(R,boardId) ;
+	BoardTrailer(R) ;
 
 	return ;
 }
@@ -251,50 +141,42 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	return R;
 }
 
-dataTypeSize_t EventBuilder::IsBoardOk(dataType &x,WORD boardId=0){
+dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 
-	dataType H;BoardHeader(H,boardId);
-	dataType T;BoardTrailer(T,boardId);
+	BoardId empty;
+	dataType H;BoardHeader(H,empty);
+	dataType T;BoardTrailer(T);
 	
 	// Look in the Header for the 
 	vector<WORD> Header  = StreamToWord( H );
 	vector<WORD> Trailer = StreamToWord( T );
-	if(x.size() < 3*WORDSIZE ) return 0;
-	vector<WORD> myHead  = StreamToWord( x.data(), 3*WORDSIZE ); // read the first three
+	if(x.size() < 4*WORDSIZE ) return 0;
+	vector<WORD> myHead  = StreamToWord( x.data(), 4*WORDSIZE ); // read the first three
 	
 	if (myHead[0]  != Header[0] ) return 0;
 
-	if( boardId !=0 )
-	{
-		if ( myHead.size()< 2 || boardId != myHead[1] ) return 0;
-	}
 
 	// the the N of bytes of the stream
-	if (myHead.size() <3) return 0;
-	WORD NBytes = myHead[2];
+	if (myHead.size() <4) return 0;
+	WORD NBytes = myHead[3];
 	WORD NWords  = NBytes / WORDSIZE;
-	if( boardId !=0 )
-	{
-		// TODO Add a check on NWORDS for the specific BoardId
-		// return 0;
-	}
 
-	if ( x.size() < (NWords+3+1)*WORDSIZE )  return 0;
-	vector<WORD> myWords = StreamToWord( x.data(), (NWords+3+1)*WORDSIZE  ); //
+	if ( x.size() < (NWords+4+1)*WORDSIZE )  return 0;
+	vector<WORD> myWords = StreamToWord( x.data(), (NWords+4+1)*WORDSIZE  ); //
 	// ------------------|TRAILER POS| +1 
-	if (myWords.size() < NWords + 3 + 1 ) return 0; // useless now
+	if (myWords.size() < NWords + 4 + 1 ) return 0; // useless now
 	//check trailer
-	if (myWords[NWords+3] != Trailer[0] ) return 0;
+	if (myWords[NWords+4] != Trailer[0] ) return 0;
 
-	return (NWords+3+1)*WORDSIZE; // interesting size
+	return (NWords+4+1)*WORDSIZE; // interesting size
 
 }
 
-dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
+dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN)
 	{
 	// take ownership of myStream (*v)
 	dataType myStream(MaxN,v);
-	dataTypeSize_t R= IsBoardOk(myStream,boardId);
+	dataTypeSize_t R= IsBoardOk(myStream);
 	// release ownership of myStream
 	myStream.release();
 	return R;
@@ -302,7 +184,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN,WORD boardId=0)
 
 dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	char *ptr=(char*)x.data();
-	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*2); // read the first two WORDS
+	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*4); // read the first two WORDS
 	dataType H;EventHeader(H);
 	dataType T;EventTrailer(T);
 	
@@ -310,13 +192,15 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	vector<WORD> Trailer=StreamToWord( T );
 
 	// check header
-	if( myHead.size() <2 ) return 0;
+	if( myHead.size() <4 ) return 0;
 	if( myHead[0] != Header[0] ) return 0;
 	// header is fine
-	WORD nBoard=myHead[1];
+	WORD nBoard=myHead[3];
+	WORD eventSize=myHead[2];
+	WORD eventNum=myHead[1];
 
-	dataTypeSize_t leftsize=x.size() - WORDSIZE*2;
-	ptr += WORDSIZE*2 ;
+	dataTypeSize_t leftsize=x.size() - WORDSIZE*4;
+	ptr += WORDSIZE*4 ;
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
 		{
 		dataTypeSize_t readByte=IsBoardOk(ptr, leftsize);
@@ -327,6 +211,8 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
 	ptr += WORDSIZE;
 	if ( myTrail[0] != Trailer[0] )  return 0;
+	//mismatch in size
+	if (eventSize != (WORD)(ptr -(char*)x.data()) ) return 0;
 	return ptr - (char*)x.data();
 } 
 
@@ -382,24 +268,25 @@ void EventBuilder::Clear(){
 }
 //
 // SPILL 
-void EventBuilder::OpenSpill(WORD spillNum)
+void EventBuilder::OpenSpill()
 {
 	if (isSpillOpen_) CloseSpill(); 
+	lastEvent_.spillNum_ ++;
+	lastEvent_.eventInSpill_=1;
 	if (dumpEvent_ && !recvEvent_) 
 	{ // open dumping file
 		dump_->Close();
-		string newFileName= dirName_ + "/" + to_string((unsigned long long) runNum_) + "/" + to_string((unsigned long long)spillNum);
-		if (dump_->GetCompress() )  newFileName += ".gz";
-		else newFileName +=".txt";
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + to_string((unsigned long long)lastEvent_.spillNum_);
+		if (dump_->GetCompress() )  newFileName += ".raw.gz";
+		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
-		Log("[EventBuilder]::[OpenSpill] Open file name:" + newFileName,2) ;
+		Log("[EventBuilder]::[OpenSpill] Open file name:" + newFileName,1) ;
 	}
 	isSpillOpen_=true;
-	lastSpill_= spillNum;
 	SpillHeader(mySpill_);
-	mySpill_.append( (void *)&runNum_,WORDSIZE);
-	mySpill_.append( (void *)&spillNum,WORDSIZE);
+	mySpill_.append( (void *)& lastEvent_.runNum_,WORDSIZE);
+	mySpill_.append( (void *)& lastEvent_.eventInSpill_,WORDSIZE);
 	WORD zero=0;
 	mySpill_.append( (void*)&zero, WORDSIZE);
 	
@@ -446,6 +333,8 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	if (!isSpillOpen_) return; // throw exception TODO
 	// find the N.Of.Event in the actual RUn
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
+	
+	lastEvent_.eventInSpill_++;
 	WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
 	WORD nEvents= *nEventsPtr;
 	nEvents+=1;
@@ -532,9 +421,10 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 
 void EventBuilder::SetRunNum(WORD x)
 {
-runNum_=x;
+//runNum_=x;
+lastEvent_.runNum_=x;
 if (dumpEvent_ || recvEvent_)  // POSIX
-  system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)runNum_) ).c_str() );
+  system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)x) ).c_str() );
 }
 
 

@@ -3,41 +3,15 @@
 #define HW_MANAGER_H
 
 #include "interface/StandardIncludes.hpp"
+
+class EventBuilder;
+
 #include "interface/Configurator.hpp"
+#include "interface/Board.hpp"
 #include "interface/BoardConfig.hpp"
 #include "interface/Logger.hpp"
 #include "interface/EventBuilder.hpp"
-#include "interface/BoardConfig.hpp"
 
-class Board  { // don't inheriths from configurable 'cause I use BoardConfig
-protected:
-	// this is the BaseClass. Each other class needs to implement this
-	unsigned int id_;
-	string type_;
-	BoardConfig *bC_; // don't destroy here
-public:
-	// --- Constructor 
-	Board();
-	// --- Destructor
-	~Board();
-	// -- Get Id
-	inline unsigned int GetId(){return id_;};
-	// --- GetType
-	inline string GetType() const { return type_;}
-	// --- Configurable  
-	virtual int Init()=0;
-	virtual int Clear()=0;
-	virtual int Print()=0;
-	virtual int BufferClear()=0;
-	virtual int Config(BoardConfig *bC)=0;
-        inline bool IsConfigured() const {return bC_!=0;};
-	virtual int Read(vector<WORD> &v)=0;
-	virtual int SetHandle(int)=0;
-	// --- this are meaningful only for trigger boards
-	virtual inline int ClearBusy(){return 0;};
-	virtual inline bool TriggerReceived(){return false;};
-	virtual inline int TriggerAck(){return 0;};
-};
 
 class HwManager: public Configurable, public LogUtility
 {
@@ -65,6 +39,8 @@ protected:
 	boardPtr controllerBoard_;
 	// -- Digitizer Board
 	boardPtr digiBoard_;
+	// -- Crate ID
+	int crateId_;
   // ------------------------------------
  	// -- Flag to set if it has the SPS Boards or not
 	//bool runControl_;
@@ -81,7 +57,7 @@ public:
 	// --- Read All the Boards
 	void BufferClearAll();
 	// Return Event
-	void ReadAll(dataType &);
+	void ReadAll(dataType &,EventBuilder*eB);
 	void Print();
 	// --- Trigger Utility
 	void ClearBusy();
@@ -90,6 +66,7 @@ public:
 	// --- Promote To Run Control
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}
+	static BoardTypes_t GetBoardTypeId(string type);
 
 private:
   //Initialize VME crate

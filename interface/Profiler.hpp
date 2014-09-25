@@ -1,9 +1,11 @@
-#include "interface/StandardIncludes.hpp"
-
 #ifndef PROF_H
 #define PROF_H
+
+#include "interface/StandardIncludes.hpp"
+
 class Profiler
 {
+// Inheriths from me, fi you want profile utils in seconds
 private:
 	//this class takes care of reading time and compute the time spent in each operation
 	time_t begin_;

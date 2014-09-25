@@ -1,7 +1,7 @@
-#include "interface/Daemon.hpp"
-
 #ifndef FSM_H
 #define FSM_H
+#include "interface/StandardIncludes.hpp"
+#include "interface/Daemon.hpp"
 
 
 class DataReadoutFSM : public Daemon {

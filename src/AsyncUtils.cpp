@@ -15,7 +15,7 @@ vector<pid_t> AsyncUtils::children;
 // --- 
 int AsyncUtils::GetN(){
 	int N=0;
-	for(int i=0;i<children.size();i++)
+	for(unsigned int i=0;i<children.size();i++)
 	{
 	int status;
 	pid_t pid=waitpid( children[i],  &status, WNOHANG);

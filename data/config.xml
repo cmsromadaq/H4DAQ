@@ -4,6 +4,7 @@
     <ConnectTo>localhost:5555</ConnectTo>
   </Network>
   <Hardware>
+    <crateID>1</crateID>
     <board>
       <ID>1</ID>
       <type>TIME</type>

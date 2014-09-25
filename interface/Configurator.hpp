@@ -1,9 +1,7 @@
-#include "interface/StandardIncludes.hpp"
-#include "interface/Handler.hpp"
-
-
 #ifndef CONFIG_H
 #define CONFIG_H
+
+#include "interface/StandardIncludes.hpp"
 
 class Configurator;
 
@@ -20,12 +18,8 @@ public:
 
 class Configurator 
 {
-//friend class Configurable;
 private:
-	//---- TXT ----
-	//map<string,string> config; //contains the configuration key->value
-	//string context_; // txt
-	// --- XML ---
+	//---
 public:
 	xmlDoc *doc;// = NULL;
 	xmlNode *root_element;// = NULL;
@@ -38,20 +32,6 @@ public:
 	virtual void Init();
 	virtual void Clear();
 	void ReadFromStream(string stream);
-	// --- Read from a dat file
-	//void ReadFromDat(string fileName);	
-	// --- Write to a file/stream
-	//string GetDatConfiguration();
-	// --- Read from a strem
-	//void Read(string stream);	
-	// -- Read a Single line
-	//void ReadLine(string stream);	
-	// -- Read Configuratio
-	//string GetValue(string key) { 
-	//			if ( config.find(key) ==config.end() )
-	//				throw config_exception();
-	//			return config[key]; 
-	//			}
 	static inline double GetDouble(string value) { return atof(value.c_str());}
 	static int    GetInt   (string value);// { return atoi(value.c_str());}
 	static inline long   GetLong  (string value) { return atol(value.c_str());}

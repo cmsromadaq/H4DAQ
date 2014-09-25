@@ -85,7 +85,8 @@ int CAEN_V1742::Init()
 };
 
 int CAEN_V1742::Clear(){
-  int i,j, ret = 0;
+  //int i,j, ret = 0;
+  int  ret = 0;
   
   /* reset the digitizer */
   ret |= CAEN_DGTZ_Reset(digitizerHandle_);

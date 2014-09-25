@@ -1,8 +1,8 @@
-#include "interface/StandardIncludes.hpp"
-#include "interface/Handler.hpp" // class fork_exception ;
 
 #ifndef ASYNC_H
 #define ASYNC_H
+
+#include "interface/StandardIncludes.hpp"
 
 #include <sys/types.h>
 #include <sys/wait.h>

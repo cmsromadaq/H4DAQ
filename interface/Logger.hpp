@@ -1,11 +1,11 @@
+#ifndef LOGGER_H
+#define LOGGER_H
+
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
 #include "interface/AsyncUtils.hpp"
 
-#ifndef LOGGER_H
-#define LOGGER_H
-
-class dataType;
+//class dataType;
 class LogUtility;
 
 class Logger: public Configurable, public AsyncUtils{

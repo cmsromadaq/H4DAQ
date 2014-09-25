@@ -126,7 +126,7 @@ while (true) {
 			}
 			//-----
                         dataType event;
-			hwManager_->ReadAll(event);                                 /// DEBUG ME
+			hwManager_->ReadAll(event,eventBuilder_);                                 /// DEBUG ME
                         eventBuilder_->AddEventToSpill(event);                                
 			MoveToStatus(CLEARBUSY);
 		    break;

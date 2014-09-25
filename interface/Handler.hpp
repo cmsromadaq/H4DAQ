@@ -1,9 +1,12 @@
-#include "interface/StandardIncludes.hpp"
-
-
 #ifndef HANDLER_H
 #define HANDLER_H
 
+
+#include "interface/StandardIncludes.hpp"
+
+
+
+// ----------------  will define the following exceptions
 class sigint_exception ;
 class counter_exception ;
 class no_zlib_exception ;
@@ -13,6 +16,13 @@ class configfile_exception;
 class hw_exception;
 //std::bad_alloc = almost sure memory is full
 
+//handle of the sigint signal
+void sigint_handler(int s);
+
+//this functions calls the definition in signal in order to deal with SIGINT ...
+void define_handlers() ;
+
+// ---------------------- EXCEPTIONS
 
 //define here all type of execptions that can go across the all program
 class sigint_exception: public exception
@@ -78,11 +88,5 @@ public:
  }
 };
 
-
-//handle of the sigint signal
-void sigint_handler(int s);
-
-//this functions calls the definition in signal in order to deal with SIGINT ...
-void define_handlers() ;
 
 #endif

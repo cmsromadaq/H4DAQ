@@ -1,10 +1,11 @@
-#include "interface/StandardIncludes.hpp"
-#include "interface/Configurator.hpp"
-#include "interface/EventBuilder.hpp"
-#include "interface/Logger.hpp"
 
 #ifndef CONNMNG_H
 #define CONNMNG_H
+
+#include "interface/StandardIncludes.hpp"
+#include "interface/Configurator.hpp"
+//#include "interface/EventBuilder.hpp"
+#include "interface/Logger.hpp"
 
 #ifndef CONTEXT_THREAD
 	#define CONTEXT_THREAD 2

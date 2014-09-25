@@ -53,3 +53,14 @@ using namespace std;
 #ifndef NO_ZLIB
 	#include <zlib.h>
 #endif
+
+
+// --------------- MY LIB ------------
+// Fwd declarations
+class dataType;
+class Command;
+//
+#include "interface/DataType.hpp"
+#include "interface/Utility.hpp"
+#include "interface/Handler.hpp" // class fork_exception ;
+#include "interface/Command.hpp"

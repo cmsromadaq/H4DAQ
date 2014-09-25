@@ -1,11 +1,10 @@
-#include "interface/StandardIncludes.hpp"
 
 
 using namespace std;
 
 #ifndef CTRLMNG_H
 #define CTRLMNG_H
-
+#include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
 #include "interface/Logger.hpp"
 

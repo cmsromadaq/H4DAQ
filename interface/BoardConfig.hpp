@@ -1,14 +1,18 @@
+#ifndef BOARDCONFIG_H
+#define BOARDCONFIG_H
+
+
 #include "interface/StandardIncludes.hpp"
 #include "interface/Configurator.hpp"
 
+class BoardConfig : public Configurator {
 
-#ifndef BOARDCONFIG_H
-#define BOARDCONFIG_H
-class BoardConfig: public Configurator{
 private:
 	bool ownConfig;	
+
 protected:
 	xmlNode *board_node;
+
 public:
 	// --- Constructor
 	BoardConfig();
