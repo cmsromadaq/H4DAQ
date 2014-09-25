@@ -135,7 +135,7 @@ void   Configurator::GetVecInt(string value,vector<int> &v) {
 /* assuming there's no sub-structure in the searched note */
 string Configurable::getElementContent (xmlDocPtr doc, const char * key, const xmlNode * node)
   {
-    char * content ;
+    char * content = "NULL" ;
     xmlNode *cur_node = NULL;
     for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
       {
