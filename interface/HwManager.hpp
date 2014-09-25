@@ -10,7 +10,7 @@ class EventBuilder;
 #include "interface/Board.hpp"
 #include "interface/BoardConfig.hpp"
 #include "interface/Logger.hpp"
-#include "interface/EventBuilder.hpp"
+//#include "interface/EventBuilder.hpp"
 
 
 class HwManager: public Configurable, public LogUtility
@@ -57,7 +57,7 @@ public:
 	// --- Read All the Boards
 	void BufferClearAll();
 	// Return Event
-	void ReadAll(dataType &,EventBuilder*eB);
+	void ReadAll(dataType &);
 	void Print();
 	// --- Trigger Utility
 	void ClearBusy();
@@ -67,6 +67,7 @@ public:
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}
 	static BoardTypes_t GetBoardTypeId(string type);
+	inline WORD GetNboards(){ return hw_.size();};
 
 private:
   //Initialize VME crate

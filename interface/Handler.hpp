@@ -14,6 +14,7 @@ class fork_exception ;
 class config_exception ;
 class configfile_exception;
 class hw_exception;
+class logic_exception;
 //std::bad_alloc = almost sure memory is full
 
 //handle of the sigint signal
@@ -87,6 +88,14 @@ public:
  	return "ZLib Support not included";
  }
 };
+class logic_exception: public exception
+{
+public:
+  virtual const char* what() const throw()
+  {
+    return "Error in the logic";
+  }
+} ;
 
 
 #endif
