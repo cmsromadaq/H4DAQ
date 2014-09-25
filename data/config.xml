@@ -7,7 +7,7 @@
     <crateID>1</crateID>
     <board>
       <ID>1</ID>
-      <type>TIME</type>
+      <type>TIME</type> <!-- Remember to put always TIME at the first location among boards -->
     </board>
     <board>
       <type>CAEN_VX718</type> <!-- CONTROLLER -->

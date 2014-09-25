@@ -67,7 +67,7 @@ class config_exception:public exception
 public:
  virtual const char*what() const throw()
  {
- 	return "No config key";
+ 	return "Configuration Error";
  }
 } ;
 class configfile_exception:public exception

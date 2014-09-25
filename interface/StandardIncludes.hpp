@@ -1,3 +1,5 @@
+#ifndef STANDARD_INCLUDES_H
+#define STANDARD_INCLUDES_H
 // GLOBAL OBJECTS 
 // NO_ROOT, NO_ZMQ, NO_ZLIB
 
@@ -64,3 +66,5 @@ class Command;
 #include "interface/Utility.hpp"
 #include "interface/Handler.hpp" // class fork_exception ;
 #include "interface/Command.hpp"
+
+#endif

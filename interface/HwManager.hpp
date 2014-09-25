@@ -5,6 +5,7 @@
 #include "interface/StandardIncludes.hpp"
 
 class EventBuilder;
+class Board;
 
 #include "interface/Configurator.hpp"
 #include "interface/Board.hpp"
