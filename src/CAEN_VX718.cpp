@@ -1,12 +1,14 @@
 #include "interface/CAEN_VX718.hpp"
 #include <iostream>
+#include <sstream>
 #include <string>
 
 int CAEN_VX718::Init()
 {
 
   int status = 0;
-  std::cout << "[VX718]::[INFO]::++++++ CAEN VX718 INIT ++++++" << std::endl;
+  ostringstream s; s << "[VX718]::[INFO]::++++++ CAEN VX718 INIT ++++++";
+  Log(s.str(),1);
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
   if (!IsConfigured())
@@ -53,7 +55,8 @@ int CAEN_VX718::Init()
   if (status)
     return ERR_PROGRAM;
 
-  std::cout << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++" << std::endl;  
+  s.clear(); s << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++";  
+  Log(s.str(),1);
   return 0;
 }
 
@@ -166,7 +169,10 @@ bool CAEN_VX718::TriggerReceived()
   if (data)
     {
       if (data>1)
-	std::cout << "[VX718]::[WARNING]::SCALER >1" << std::endl;
+	{
+	  ostringstream s; s << "[VX718]::[WARNING]::SCALER >1";
+	  Log(s.str(),1);
+	}
       return true;
     }
   else
@@ -231,7 +237,8 @@ int CAEN_VX718::PrintConfiguration()
       status != CAENVME_ReadRegister(handle_, myReg->second, &data);
       if (status)
 	return ERR_READ;
-      std::cout << "[VX718]::[INFO]::Register " << myReg->first << " 0x" << std::hex << data << std::endl;
+      ostringstream s; s << "[VX718]::[INFO]::Register " << myReg->first << " 0x" << std::hex << data;
+      Log(s.str(),1);
     }
   return 0;
 }
