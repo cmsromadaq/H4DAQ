@@ -206,15 +206,7 @@ void HwManager::Read(int i,vector<WORD> &v)
 	return;
 }
 
-void HwManager::ReadAll(dataType&R,EventBuilder*eB){
-	// Construt the event
-	EventBuilder::EventHeader(R);
-	WORD M=hw_.size();
-	//R.reserve(100);
-	EventBuilder::WordToStream(R, eB->GetEventId().eventInSpill_ );
-	WORD zero=0;
-	EventBuilder::WordToStream(R,zero); //eventSize in Byte
-	EventBuilder::WordToStream(R,M);
+void HwManager::ReadAll(dataType&R){ // don't construct the all event
 	vector<WORD> v; 
 	for(int i=0;i< hw_.size();i++)
 	{
@@ -225,10 +217,6 @@ void HwManager::ReadAll(dataType&R,EventBuilder*eB){
 			bId.boardId_  = hw_[i]->GetId() ; 
 		EventBuilder::BoardToStream( R, bId , v )  ;
 	}
-	EventBuilder::EventTrailer(R);
-	// N.Of Byte of the stream
-	WORD* EventSizePtr = ((WORD*)R.data() ) +2;
-	(*EventSizePtr) = (WORD)R.size();
 	return ;
 }
 

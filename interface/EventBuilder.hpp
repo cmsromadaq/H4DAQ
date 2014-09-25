@@ -84,19 +84,21 @@ public:
 	void  inline SetSpillNum(WORD x){ lastEvent_.spillNum_=x;};
 	void  inline SetEventNum(WORD x){ lastEvent_.eventInSpill_=x;};
 	inline void  SetDirName(string mydir="/tmp/") {dirName_=mydir;}
-	//void AppendToStream();
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check
 	void Clear(); //TODO -- check
 	inline void Dump(dataType&spill) {dump_->Dump(spill);};
+	// -- Open Spill
 	void OpenSpill(); 
-	inline void ResetSpillNumber(){lastEvent_.spillNum_=0;};
 	// -- close the spill. Return the command to be parsed by the daemon
-	Command CloseSpill( );
-	void AddEventToSpill(dataType &event ); 
+	Command CloseSpill( ); 
+	void OpenEvent(dataType &R,WORD nBoard);  
+	void CloseEvent(dataType &R); 
+	inline void ResetSpillNumber(){lastEvent_.spillNum_=0;}; 
+	void AddEventToSpill(dataType &event );  
 	// merge in Spill1, Spill2. check i spillNum is to be dumped
-	void MergeSpills(dataType &spill2 ) ;
+	void MergeSpills(dataType &spill2 ) ; 
 	// ---  this will be used by hwmanager to convert the output of a board in a stream
 	// ---  appends a header and trailer
 	static void WordToStream(dataType&R,WORD x);
@@ -106,6 +108,7 @@ public:
 	static WORD 	ReadRunNumFromSpill(dataType &x);
 	static WORD 	ReadSpillNevents(dataType &x);
 	static WORD 	ReadEventNboards(dataType &x);
+	static WORD 	ReadEventNumber(dataType &x);
 	static void BoardHeader(dataType &R,BoardId id);
 	static void BoardTrailer(dataType &R);
 	static void EventHeader(dataType&R);
@@ -113,17 +116,28 @@ public:
 	static void SpillHeader(dataType&R);
 	static void SpillTrailer(dataType&);
 	static void BoardToStream(dataType &R,BoardId id,vector<WORD> &v);
-	static void MergeEventStream(dataType&R,dataType &x,dataType &y);
+	static void MergeEventStream(dataType&R,dataType &x,dataType &y); // R should be empty
 	static dataTypeSize_t IsBoardOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL BOARD STREAM 
 	static dataTypeSize_t IsBoardOk(void *v,int MaxN); // if id==NULL don't check consistency for that id; MaxN is the space where it is safe to look into (allocated)
 	static dataTypeSize_t IsEventOk(dataType &x); // return 0 if NOT, otherwise the NBytes of the TOTAL Event STREAM
 	static inline dataTypeSize_t IsEventOk(void *v, int N){ dataType tmp(N,v);dataTypeSize_t R= IsEventOk(tmp); tmp.release(); return R;};
+
+	// ----- MASK for board id
 	static inline const WORD GetBoardIdBitMask(){return 0x0000FFFF;};
 	static inline const WORD GetCrateIdBitMask(){return 0x00FF0000;};
 	static inline const WORD GetBoardTypeIdBitMask (){return 0xFF000000;};
+	// ----- WORDS in event format
 	static inline const int SpillHeaderWords(){return 5;};	
 	static inline const int EventHeaderWords(){return 4;};	
 	static inline const int BoardHeaderWords(){return 3;};
+	static inline const int SpillTrailerWords(){return 1;};	
+	static inline const int EventTrailerWords(){return 1;};	
+	static inline const int BoardTrailerWords(){return 1;};
+	static inline const int SpillSizePos(){return 3;};	
+	static inline const int SpillNeventPos(){return 4;};	
+	static inline const int EventSizePos(){return 2;};	
+	static inline const int BoardSizePos(){return 2;};
+	static inline const int EventNboardsPos(){return 3;};
 };
 
 //#include "interface/Daemon.hpp" // Command -- fwd decl

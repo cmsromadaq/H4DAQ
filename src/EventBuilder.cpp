@@ -101,21 +101,39 @@ void EventBuilder::SpillTrailer(dataType &R)
 
 void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){ 
 	// takes two streams and merge them independently from the content
+	// R should be empty
+	if (R.size() >0 ) {
+			//Log("[EventBuilder]::[MergeEventStream] Return Size is more than 0", 1); // cannot Log, private
+			throw logic_exception();
+			}
 	//dataType R;
 	R.append(x);
 
 	WORD nboards1=ReadEventNboards(x);
 	WORD nboards2=ReadEventNboards(y);
+		
+	WORD eventNum1=ReadEventNumber(x);
+	WORD eventNum2=ReadEventNumber(y);
+		
+	if(eventNum1 != eventNum2) {
+		R.clear();
+		return;
+		}
+
 	long size1=IsEventOk(x);
 	long size2=IsEventOk(y);
-	WORD *ptrNboards=(WORD*)R.data() +1;
+
+	WORD *ptrNboards=(WORD*)R.data() + EventNboardsPos();
 	*ptrNboards=nboards1+nboards2;
 	R.reserve(size1+size2); // minus hedrs but it is just a reserve
-	R.erase(size1-WORDSIZE, size1); // delete trailer
+	R.erase(size1-WORDSIZE*EventTrailerWords(), size1); // delete trailer
 
-	WORD*ptr2= (WORD*)y.data() +2 ; // content
+	WORD*ptr2= (WORD*)y.data() + EventHeaderWords() ; // content
 
-	R.append( (void*)ptr2, size2 -WORDSIZE*2 ) ; // remove H, copy T
+	R.append( (void*)ptr2, size2 - WORDSIZE*EventHeaderWords() ) ; // remove H, copy T
+	// update size
+	WORD *sizepos=(WORD*)R.data() + EventSizePos();
+	*sizepos= (WORD)R.size();
 	return ;
 }
 
@@ -195,9 +213,9 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	if( myHead.size() <4 ) return 0;
 	if( myHead[0] != Header[0] ) return 0;
 	// header is fine
-	WORD nBoard=myHead[3];
-	WORD eventSize=myHead[2];
-	WORD eventNum=myHead[1];
+	WORD nBoard   = myHead[3];
+	WORD eventSize= myHead[2];
+	WORD eventNum = myHead[1];
 
 	dataTypeSize_t leftsize=x.size() - WORDSIZE*4;
 	ptr += WORDSIZE*4 ;
@@ -229,12 +247,17 @@ WORD 	EventBuilder::ReadSpillNum(dataType &x)
 }
 WORD 	EventBuilder::ReadEventNboards(dataType &x)
 {
-	WORD *spillNumPtr=(WORD*)x.data() + 1;
+	WORD *spillNumPtr=(WORD*)x.data() + EventNboardsPos();
 	return *spillNumPtr;
+}
+WORD 	EventBuilder::ReadEventNumber(dataType &x)
+{
+	WORD *eventNumPtr=(WORD*)x.data() + 1;
+	return *eventNumPtr;
 }
 WORD 	EventBuilder::ReadSpillNevents(dataType &x)
 {
-	WORD *spillNeventsPtr=(WORD*)x.data() + 2;
+	WORD *spillNeventsPtr=(WORD*)x.data() + 4;
 	return *spillNeventsPtr;
 }
 
@@ -289,6 +312,7 @@ void EventBuilder::OpenSpill()
 	mySpill_.append( (void *)& lastEvent_.eventInSpill_,WORDSIZE);
 	WORD zero=0;
 	mySpill_.append( (void*)&zero, WORDSIZE);
+	mySpill_.append( (void*)&zero, WORDSIZE);
 	
 }
 
@@ -296,8 +320,15 @@ Command EventBuilder::CloseSpill()
 {
 	Command myCmd; myCmd.cmd=NOP;
 	isSpillOpen_=false;	
-	dataType  spillT;SpillTrailer(spillT);
+	dataType  spillT;  SpillTrailer(spillT);
 	mySpill_.append(spillT);
+	// ack the position and the n.of.events
+	WORD *nEvents=((WORD*)mySpill_.data()) + SpillNeventPos();
+	WORD *spillSize=((WORD*)mySpill_.data()) + SpillSizePos();
+	(*spillSize)= (WORD)mySpill_.size();
+	(*nEvents)  = (WORD)lastEvent_.eventInSpill_; // TODO chekc offset by 1
+
+
 	if( dumpEvent_ && !recvEvent_) 
 	{
 		Log("[EventBuilder]::[CloseSpill] File Closed",2) ;
@@ -335,17 +366,17 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
 	
 	lastEvent_.eventInSpill_++;
-	WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
-	WORD nEvents= *nEventsPtr;
-	nEvents+=1;
-	(*nEventsPtr)=nEvents;
+	// this are updated in the CloseSpill -- should we keep them consistent
+	//WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
+	//WORD nEvents= *nEventsPtr;
+	//nEvents+=1;
+	//(*nEventsPtr)=nEvents;
 	
-	//cout<<" ------SPILL------ "<<std::dec<< mySpill_.size() <<endl<<Utility::AsciiDataReadable(mySpill_.data(),mySpill_.size())<<endl<<"-----------"<<endl;
-	//cout<<" ------EVENT------ "<< std::dec<< event.size()<<endl<<Utility::AsciiDataReadable(event.data(),event.size())<<endl<<"-----------"<<endl;
 	mySpill_.append(event);
 	return;
 }
-void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
+void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){ 
+	// TODO: update to the new dataformat
 	// --- can't merge inplace two events
 	WORD runNum1 = ReadRunNumFromSpill(spill1);
 	WORD runNum2 = ReadRunNumFromSpill(spill2);
@@ -356,27 +387,29 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	WORD spillNevents1 = ReadSpillNevents(spill1);
 	WORD spillNevents2 = ReadSpillNevents(spill2);
 
+	WORD zero=0; //spillSize
+
 	if (runNum1 != runNum2) return ; // TODO throw exception
 	if (spillNum1 != spillNum2) return ; // TODO throw exception
 	if (spillNevents1 != spillNevents2) return ; // TODO throw exception
-
 	dataType oldSpill(spill1.size(),spill1.data());	
 	spill1.release();spill1.clear();
 
-
 	dataType H;SpillHeader(H);
 	dataType T;SpillTrailer(T);
+
 	spill1.append(H);
-	spill1.append((void*)&runNum1,WORDSIZE); // TODO new runN- spillN
-	spill1.append((void*)&spillNum1,WORDSIZE); // TODO new runN- spillN
+	spill1.append((void*)&runNum1,WORDSIZE); // 
+	spill1.append((void*)&spillNum1,WORDSIZE); // 
+	spill1.append( (void*)&zero, WORDSIZE); // spillSize
 	spill1.append((void*)&spillNevents1,WORDSIZE);
 
 	char* ptr1=(char*)oldSpill.data();
 	char* ptr2=(char*)spill2  .data();
-	long left1=oldSpill.size() - WORDSIZE*4;
-	long left2=spill2.size() - WORDSIZE*4;
-	ptr1+= WORDSIZE*4;
-	ptr2+= WORDSIZE*4;
+	long left1=oldSpill.size() - WORDSIZE*SpillHeaderWords();
+	long left2=spill2.size() - WORDSIZE*SpillHeaderWords();
+	ptr1+= WORDSIZE*SpillHeaderWords();
+	ptr2+= WORDSIZE*SpillHeaderWords();
 	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
 		long eventSize1= IsEventOk(ptr1,left1);
@@ -396,6 +429,9 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	       }	
 	
 	spill1.append(T); 
+	// update Spill Size
+	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
+	(*spillSizePtr)=(WORD)spill1.size();
 }
 
 void EventBuilder::MergeSpills(dataType &spill2 ) {
@@ -408,8 +444,8 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
-		if (dump_->GetCompress() )  newFileName += ".gz";
-		else newFileName +=".txt";
+		if (dump_->GetCompress() )  newFileName += ".raw.gz";
+		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
 		Dump(spills_[spillNum].second);
@@ -428,3 +464,26 @@ if (dumpEvent_ || recvEvent_)  // POSIX
 }
 
 
+void EventBuilder::OpenEvent( dataType &R , WORD nBoard){
+	if (R.size() >0 ) {
+			Log("[EventBuilder]::[OpenEvent] Return Size is more than 0",1);
+			throw logic_exception();
+			}
+        // Construt the event
+        EventBuilder::EventHeader(R);
+
+        EventBuilder::WordToStream(R, lastEvent_.eventInSpill_ );
+        WORD zero=0;
+        EventBuilder::WordToStream(R,zero); //eventSize in Byte
+        EventBuilder::WordToStream(R,nBoard); // nBoard
+	return;
+}
+
+void EventBuilder::CloseEvent( dataType &R){
+	EventBuilder::EventTrailer(R);
+        // N.Of Byte of the stream
+        WORD* EventSizePtr = ((WORD*)R.data() ) + EventSizePos();
+        (*EventSizePtr) = (WORD)R.size();
+	return;
+
+}

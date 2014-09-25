@@ -124,9 +124,12 @@ while (true) {
 				Log(s.str(),1);
 				Counter=0;
 			}
-			//-----
+			//----- Costruct Events
                         dataType event;
-			hwManager_->ReadAll(event,eventBuilder_);                                 /// DEBUG ME
+			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
+			hwManager_->ReadAll(event);                                 /// DEBUG ME
+			eventBuilder_->CloseEvent(event);
+			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
 			MoveToStatus(CLEARBUSY);
 		    break;
