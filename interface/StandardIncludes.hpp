@@ -28,11 +28,13 @@ using namespace std;
 #define LINUX
 #endif
 
-#include "CAENVMElib.h"
-#include "CAENVMEtypes.h" 
-#include "CAENVMEoslib.h"
-
-#include <CAENDigitizer.h>
+#ifndef NO_CAEN
+	#include "CAENVMElib.h"
+	#include "CAENVMEtypes.h" 
+	#include "CAENVMEoslib.h"
+	
+	#include <CAENDigitizer.h>
+#endif
 
 /// XML
 #ifndef NO_XML
