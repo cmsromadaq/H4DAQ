@@ -93,6 +93,16 @@ void HwManager::Init(){
   if (hw_.size()>0 )
   	CrateInit();
   trigBoard_.boardIndex_=controllerBoard_.boardIndex_;
+
+  // check that Trigger Board, if present, inheriths from TriggerBoard
+  if ( trigBoard_.boardIndex_>=0) 
+	  {
+  	  TriggerBoard * tb= dynamic_cast<TriggerBoard*> (hw_[trigBoard_.boardIndex_]);
+  	  if (tb==NULL) {
+	  	Log("[HwManager]::[Init] Trigger Board does not inheriths from TriggerBoard class",1);
+		throw config_exception();
+  		}
+	  }
   for(unsigned int i=0;i<hw_.size();i++)
 	{
 	  if (hw_[i]->GetType() != "CAEN_V1742" )
@@ -238,7 +248,7 @@ void HwManager::ClearBusy(){
 	    throw hw_exception();
 	  }
 	
-	int status = ((TriggerBoard*)hw_[trigBoard_.boardIndex_])->ClearBusy();
+	int status = dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->ClearBusy();
 	if ( status )
 	  {
 	    ostringstream s;
@@ -257,7 +267,7 @@ bool HwManager::TriggerReceived(){
 	    throw hw_exception();
 	  }
 
-	return ((TriggerBoard*)hw_[trigBoard_.boardIndex_])->TriggerReceived();
+	return dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->TriggerReceived();
 }
 
 void HwManager::TriggerAck(){
@@ -269,7 +279,7 @@ void HwManager::TriggerAck(){
 	    throw hw_exception();
 	  }
 
-	int status=((TriggerBoard*)hw_[trigBoard_.boardIndex_])->TriggerAck();
+	int status=dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->TriggerAck();
 	if ( status )
 	  {
 	    ostringstream s;

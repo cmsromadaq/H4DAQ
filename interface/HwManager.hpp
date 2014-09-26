@@ -68,6 +68,7 @@ public:
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}
 	static BoardTypes_t GetBoardTypeId(string type);
+	// --- Get the N. of boards that will be read and add to the event stream
 	inline WORD GetNboards(){ return hw_.size();};
 
 private:
