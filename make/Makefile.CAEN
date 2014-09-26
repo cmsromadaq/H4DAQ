@@ -1,1 +1,1 @@
-LDFLAGS= -lCAENComm -lCAENDigitizer -lCAENVME
+LDFLAGS += -lCAENComm -lCAENDigitizer -lCAENVME

@@ -2,7 +2,7 @@ INC_DIR = ./
 CXX		=g++
 LD		=g++
 CXXFLAGS	=-O2 -ggdb -std=gnu++0x -Wall
-LDFLAGS		=-lz -lm -lzmq -lCAENComm -lCAENDigitizer -lCAENVME
+LDFLAGS		=-lz -lm
 SOFLAGS		=-fPIC -shared 
 SHELL		=bash
 ###
@@ -26,17 +26,22 @@ LibName		=H4DAQ
 
 ### ----- OPTIONS ABOVE ----- ####
 
-include Makefile.ROOT
-
-# libs for XML files
-CXXFLAGS	+=`xml2-config --cflags`
-LDFLAGS 	+=`xml2-config --libs`
-
+#InfoLine = \033[01\;31m compiling $(1) \033[00m
+InfoLine = compiling $(1)
 
 BASEDIR=$(shell pwd)
 BINDIR=$(BASEDIR)/bin
 SRCDIR = $(BASEDIR)/src
 HDIR = $(BASEDIR)/interface
+
+### Main Target, first
+.PHONY: all
+all: info $(Packages) | $(BINDIR)
+
+include make/Makefile.ROOT
+include make/Makefile.ZMQ
+include make/Makefile.CAEN
+include make/Makefile.XML
 
 BINOBJ	=$(patsubst %,$(BINDIR)/%.$(ObjSuf),$(Objects) )
 SRCFILES=$(patsubst %,$(SRCDIR)/%.$(SrcSuf),$(Objects) )
@@ -49,8 +54,6 @@ SoLib		=$(BINDIR)/H4DAQ.$(DllSuf)
 Deps=$(patsubst %,$(BINDIR)/%.$(DepSuf),$(Objects) $(Packages) )
 
 ############### EXPLICIT RULES ###############
-.PHONY: all
-all: info $(Packages) | $(BINDIR)
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
@@ -97,8 +100,6 @@ clean:
 ############### IMPLICIT RULES ###############
 
 
-#InfoLine = \033[01\;31m compiling $(1) \033[00m
-InfoLine = compiling $(1)
 
 #.o
 %.$(ObjSuf): $(BINDIR)/%.$(ObjSuf)
