@@ -238,7 +238,7 @@ void HwManager::ClearBusy(){
 	    throw hw_exception();
 	  }
 	
-	int status = hw_[trigBoard_.boardIndex_]->ClearBusy();
+	int status = ((TriggerBoard*)hw_[trigBoard_.boardIndex_])->ClearBusy();
 	if ( status )
 	  {
 	    ostringstream s;
@@ -257,7 +257,7 @@ bool HwManager::TriggerReceived(){
 	    throw hw_exception();
 	  }
 
-	return hw_[trigBoard_.boardIndex_]->TriggerReceived();
+	return ((TriggerBoard*)hw_[trigBoard_.boardIndex_])->TriggerReceived();
 }
 
 void HwManager::TriggerAck(){
@@ -269,7 +269,7 @@ void HwManager::TriggerAck(){
 	    throw hw_exception();
 	  }
 
-	int status=hw_[trigBoard_.boardIndex_]->TriggerAck();
+	int status=((TriggerBoard*)hw_[trigBoard_.boardIndex_])->TriggerAck();
 	if ( status )
 	  {
 	    ostringstream s;

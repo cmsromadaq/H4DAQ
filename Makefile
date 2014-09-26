@@ -27,6 +27,7 @@ LibName		=H4DAQ
 ### ----- OPTIONS ABOVE ----- ####
 
 include Makefile.ROOT
+
 # libs for XML files
 CXXFLAGS	+=`xml2-config --cflags`
 LDFLAGS 	+=`xml2-config --libs`

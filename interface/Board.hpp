@@ -19,7 +19,7 @@ public:
 	Board();
 	// --- Destructor
 	~Board();
-	// -- Get Id
+	// --- Get Id
 	inline unsigned int GetId(){return id_;};
 	// --- GetType
 	inline string GetType() const { return type_;}
@@ -27,15 +27,25 @@ public:
 	virtual int Init()=0;
 	virtual int Clear()=0;
 	virtual int Print()=0;
+	// --- Private members that must exist for each board
 	virtual int BufferClear()=0;
 	virtual int Config(BoardConfig *bC)=0;
         inline bool IsConfigured() const {return bC_!=0;};
 	virtual int Read(vector<WORD> &v)=0;
 	virtual int SetHandle(int)=0;
-	// --- this are meaningful only for trigger boards
-	virtual inline int ClearBusy(){return 0;};
+};
+
+class TriggerBoard : public Board {
+protected:
+
+public:
+	// --- Constructor. Calls Constructor Board
+	TriggerBoard() : Board() {};
+	// --- this are meaningful only for trigger boards. 
+	virtual inline int  ClearBusy(){return 0;};
 	virtual inline bool TriggerReceived(){return false;};
-	virtual inline int TriggerAck(){return 0;};
+	virtual inline int  TriggerAck(){return 0;};
+
 };
 
 #endif
