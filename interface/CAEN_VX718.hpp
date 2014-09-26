@@ -90,7 +90,7 @@ public:
 
   } CAEN_VX718_Config_t;
 
-  CAEN_VX718(): handle_(-1) { type_="CAEN_VX718"; };
+  CAEN_VX718(): handle_(-1), Board() { type_="CAEN_VX718"; };
 
   virtual int Init();
   virtual int Clear();

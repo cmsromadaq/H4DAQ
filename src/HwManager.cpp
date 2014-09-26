@@ -1,6 +1,7 @@
 #include "interface/HwManager.hpp"
 #include "interface/CAEN_VX718.hpp"
 #include "interface/TimeBoard.hpp"
+#include "interface/EventBuilder.hpp" // boardId
 //#include "interface/BoardConfig.hpp"
 
 
@@ -65,6 +66,7 @@ void HwManager::Config(Configurator &c){
 		else
 		  {
 		    //UNKNOWN board get to the next node
+		    Log("[HwManager]::[Config] No Board. Unknw board type",1);
 		    continue; 
 		  }
 		// else if ( ... ==... ) ... TODO

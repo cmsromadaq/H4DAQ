@@ -2,7 +2,7 @@
 #include "interface/Utility.hpp"
 
 TimeBoard::TimeBoard(): Board() {
-	type_="TIME";
+	type_ = string("TIME") ;
 }
 
 int TimeBoard::Init(){

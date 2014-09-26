@@ -86,7 +86,7 @@ public:
     
   } CAEN_V1742_Config_t;
 
-  CAEN_V1742():digitizerHandle_(-1) { type_="CAEN_V1742"; };
+  CAEN_V1742():digitizerHandle_(-1), Board() { type_="CAEN_V1742"; };
 
   virtual int Init();
   virtual int Clear();
