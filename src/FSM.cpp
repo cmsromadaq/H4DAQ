@@ -168,11 +168,13 @@ while (true) {
 		    }
 	case BYE:
 		    {
+		    exit(0); // return is not working correctly
 		    return;
 		    }
 
 	} // end switch 
 	} // end try
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
 	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
 } // while-true
 return;
@@ -334,6 +336,7 @@ while (true) {
 
 	} // end switch
 	} //end try
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
 	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
 }//end while
 return;

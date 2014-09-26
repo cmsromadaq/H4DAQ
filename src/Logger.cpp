@@ -69,8 +69,9 @@ void Logger::Init(){
 	
 	if (compress_){
 		#ifndef NO_ZLIB
-			if (binary_)gw_=gzopen(fileName.c_str(),"wb");
-			else gw_=gzopen(fileName.c_str(),"w");
+			//if (binary_)gw_=gzopen(fileName.c_str(),"w"); // no difference between binary and not binary
+			//else
+			gw_=gzopen(fileName.c_str(),"w");
 		#else
 			throw no_zlib_exception();
 		#endif
@@ -154,8 +155,10 @@ void Logger::Close(){
 		if (gw_ == NULL ) return;
 		#ifndef NO_ZLIB
 			// Close Files
-			gzflush(gw_,Z_FINISH);
+			//gzflush(gw_,Z_FINISH);
+			//gzflush(gw_,Z_SYNC_FLUSH);
 			gzclose(gw_);
+			sleep(1); // TODO: this sleep seems to fix something. Give the time to write buffers.
 			gw_=NULL;
 		#else
 			throw no_zlib_exception();
@@ -166,6 +169,7 @@ void Logger::Close(){
 		if(fw_==NULL) return;
 		fflush(fw_);
 		fclose(fw_);
+		sleep(1); // TODO: this sleep seems to fix something
 		fw_=NULL;
 		}
 	return;
