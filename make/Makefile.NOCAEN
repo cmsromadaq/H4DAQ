@@ -1,0 +1,20 @@
+CXXFLAGS += -D NO_CAEN
+
+$(BINDIR)/CAEN_%: 
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
+$(BINDIR)/HwManager.o: 
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
+$(BINDIR)/FSM.o: 
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
+$(BINDIR)/Daemon.o: 
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
+$(addprefix $(BINDIR)/,$(Packages)):  $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
+$(BINDIR)/datareadout: 
+	@echo $(call InfoLine , "NO CAEN WILL PLACE DUMMY FOR $@" )
+	touch $@
