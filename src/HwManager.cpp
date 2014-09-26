@@ -50,33 +50,41 @@ void HwManager::Config(Configurator &c){
 		int ID=Configurator::GetInt(getElementContent(c, "ID" , board_node));
 		Log("[2] Configuring Board ID="+ getElementContent(c, "ID" , board_node)+"type=" + getElementContent(c, "type" , board_node),2);
 		//TODO -- construct the board -- if elif ... else throw exception 
+		// keep the index where I'm constructing stuff
+		int bIdx=hw_.size();
 		if ( getElementContent(c,"type",board_node) == "CAEN_VX718" )
 			{
-				// keep the index where I'm constructing stuff
-				int bIdx=hw_.size();
-				// construct a CAEN_VX718 Board, and push it back
-				hw_.push_back( new CAEN_VX718() );
-				// construct a board configurator and ask the board to configure itself
-				BoardConfig bC;
-				bC.Init(c);
-				bC.SetBoardNode(board_node);
-				hw_[bIdx]->Config(&bC);
+			  // construct a CAEN_VX718 Board, and push it back
+			  hw_.push_back( new CAEN_VX718() );
 			}
 		else if( getElementContent(c,"type",board_node) == "TIME")
 			{
-				int bIdx=hw_.size();
-				hw_.push_back( new TimeBoard() );
-				BoardConfig bC;
-				bC.Init(c);
-				bC.SetBoardNode(board_node);
-				hw_[bIdx]->Config(&bC);
+			  //constructing a TimeStamp Board
+			  hw_.push_back( new TimeBoard() );
 			}
+		else
+		  {
+		    //UNKNOWN board get to the next node
+		    continue; 
+		  }
 		// else if ( ... ==... ) ... TODO
+		
+		//Initialize Board Logger
+		if (this->GetLogger() != NULL)
+		  hw_[bIdx]->LogInit(this->GetLogger());
+
+		// construct a board configurator and ask the board to configure itself
+		BoardConfig bC;
+		bC.Init(c);
+		bC.SetBoardNode(board_node);
+		hw_[bIdx]->Config(&bC);
+
 		}
 	}
 
 	return;	
 }
+
 // --- Init
 void HwManager::Init(){
   //Crate init

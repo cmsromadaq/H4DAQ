@@ -89,11 +89,12 @@ class LogUtility
 	void LogInit(Logger *l);//{log=l;}
 	// --- Disable logging
 	void LogClear();
+        inline Logger * GetLogger(){return log;} 
 	inline void LogClearDirty(){log=NULL;}
 	inline short int GetLogLevel(){ return log->logLevel_ ;}
 };
 
 // put this here in order to define dataType. Cannot put before because in it it requires logger. Therefore we use a fwd declaration of dataType
-#include "interface/EventBuilder.hpp"
+//#include "interface/EventBuilder.hpp"
 
 #endif

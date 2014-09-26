@@ -2,12 +2,13 @@
 #define BOARD_H
 
 #include "interface/StandardIncludes.hpp"
+#include "interface/Logger.hpp"
 
 enum BoardTypes_t { _TIME_=1, _CAENVX718_=2, _CAENV1742_=3, _UNKWN_=0 };
 
 class BoardConfig;
 
-class Board  { // don't inheriths from configurable 'cause I use BoardConfig
+class Board: public LogUtility  { // don't inheriths from configurable 'cause I use BoardConfig
 protected:
 	// this is the BaseClass. Each other class needs to implement this
 	unsigned int id_;
