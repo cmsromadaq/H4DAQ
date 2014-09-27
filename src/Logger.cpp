@@ -72,6 +72,9 @@ void Logger::Init(){
 			//if (binary_)gw_=gzopen(fileName.c_str(),"w"); // no difference between binary and not binary
 			//else
 			gw_=gzopen(fileName.c_str(),"w");
+			if (!gw_)
+			  throw logfile_open_exception();
+
 		#else
 			throw no_zlib_exception();
 		#endif
@@ -79,7 +82,11 @@ void Logger::Init(){
 	else {
 		if(binary_)fw_=fopen(fileName.c_str(),"wb"); 
 		else fw_=fopen(fileName.c_str(),"w"); 
-		}
+
+		if (!fw_)
+		  throw logfile_open_exception();
+	     }
+	
 	return ;
 }
 

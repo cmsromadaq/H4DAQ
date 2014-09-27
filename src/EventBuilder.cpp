@@ -16,7 +16,7 @@ EventBuilder::EventBuilder()
 	ResetSpillNumber();
 	// Init dumper
 	dump_=new Logger();
-	dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
+	// dump_->SetFileName("/tmp/dump.gz"); // rewritten by config
 	dump_->SetCompress();
 	dump_->SetBinary();
 	dump_->SetAsync(); // asyncronous dumping

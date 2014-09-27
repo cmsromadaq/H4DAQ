@@ -11,6 +11,7 @@ class sigint_exception ;
 class counter_exception ;
 class no_zlib_exception ;
 class fork_exception ;
+class logfile_open_exception ;
 class config_exception ;
 class configfile_exception;
 class hw_exception;
@@ -71,6 +72,15 @@ public:
  	return "Configuration Error";
  }
 } ;
+class logfile_open_exception:public exception
+{
+public:
+ virtual const char*what() const throw()
+ {
+ 	return "Cannot open log file";
+ }
+} ;
+
 class configfile_exception:public exception
 {
 public:
