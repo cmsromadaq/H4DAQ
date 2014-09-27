@@ -2,10 +2,10 @@
 #define COMMONTYPES_H
 
 enum TRG_t {
-  UNK=0,
-  BEAM=1,
-  PED=2,
-  LED=3
+  UNK_TRIG=0,
+  BEAM_TRIG=1,
+  PED_TRIG=2,
+  LED_TRIG=3
 };
 
 enum TRG_STATUS_t {
