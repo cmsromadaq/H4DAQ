@@ -1,16 +1,9 @@
 #ifndef CAEN_VX718_H
 #define CAEN_VX718_H
 
-#include "interface/HwManager.hpp"
+#include "interface/StandardIncludes.hpp"
+#include "interface/Board.hpp"
 #include "interface/BoardConfig.hpp"
-
-#ifdef __linux__
-#define LINUX
-#endif
-
-#include "CAENVMElib.h"
-#include "CAENVMEtypes.h" 
-#include "CAENVMEoslib.h"
 
 class CAEN_VX718: public TriggerBoard 
 {

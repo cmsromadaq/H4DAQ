@@ -1,10 +1,10 @@
 #ifndef CAEN_V1742_H
 #define CAEN_V1742_H
 
-#include "interface/HwManager.hpp"
+#include "interface/StandardIncludes.hpp"
+#include "interface/Board.hpp"
 #include "interface/BoardConfig.hpp"
 
-#include <CAENDigitizer.h>
 #define CAEN_V1742_MAXCH  64          /* max. number of channels */
 #define CAEN_V1742_MAXSET 8           /* max. number of independent settings */
 #define CAEN_V1742_MAXGW  1000        /* max. number of generic write commads */
@@ -14,7 +14,6 @@
 
 #define CAEN_V1742_INTERRUPT_MODE           CAEN_DGTZ_IRQ_MODE_ROAK
 #define CAEN_V1742_INTERRUPT_TIMEOUT        200  // ms
-
 
 class CAEN_V1742: public Board {
 

@@ -122,14 +122,14 @@ void HwManager::Init(){
 	    hw_[i]->SetHandle(controllerBoard_.boardHandle_);
 	  else
 	    hw_[i]->SetHandle(digiBoard_.boardHandle_);
-		int R=hw_[i]->Init();
-		if ( R )  
-		  {
-		    ostringstream s;
-		    s << "[HwManager]::[ERROR]::Error configuring board " << hw_[i]->GetType() << " exit code " << R;
-		    Log(s.str(),1);
-		    throw hw_exception();
-		  }
+	  int R=hw_[i]->Init();
+	  if ( R )  
+	    {
+	      ostringstream s;
+	      s << "[HwManager]::[ERROR]::Error configuring board " << hw_[i]->GetType() << " exit code " << R;
+	      Log(s.str(),1);
+	      throw hw_exception();
+	    }
 	}
 }
 
