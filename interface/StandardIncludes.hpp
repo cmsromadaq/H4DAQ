@@ -68,5 +68,6 @@ class Command;
 #include "interface/Utility.hpp"
 #include "interface/Handler.hpp" // class fork_exception ;
 #include "interface/Command.hpp"
+#include "interface/CommonTypes.hpp"
 
 #endif

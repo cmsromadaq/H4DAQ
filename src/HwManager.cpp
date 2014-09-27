@@ -13,6 +13,9 @@ HwManager::HwManager(){
   trigBoard_.boardIndex_=-1;
   trigBoard_.boardHandle_=-1;
 
+  ioControlBoard_.boardIndex_=-1;
+  ioControlBoard_.boardHandle_=-1;
+
   controllerBoard_.boardIndex_=-1;
   controllerBoard_.boardHandle_=-1;
 
@@ -103,6 +106,16 @@ void HwManager::Init(){
 		throw config_exception();
   		}
 	  }
+
+  if ( ioControlBoard_.boardIndex_>=0) 
+	  {
+  	  IOControlBoard * iob= dynamic_cast<IOControlBoard*> (hw_[ioControlBoard_.boardIndex_]);
+  	  if (iob==NULL) {
+	  	Log("[HwManager]::[Init] IOControl Board does not inheriths from IOControlBoard class",1);
+		throw config_exception();
+  		}
+	  }
+
   for(unsigned int i=0;i<hw_.size();i++)
 	{
 	  if (hw_[i]->GetType() != "CAEN_V1742" )
@@ -139,7 +152,16 @@ int HwManager::CrateInit()
       if ( hw_[i]->GetType() == "CAEN_VX718" )
 	{
 	  controllerBoard_.boardIndex_=i;
-	  break; //do not support >1 digitizer board for the moment...
+	  break; 
+	}
+    }
+
+  for(unsigned int i=0;i<hw_.size();i++)
+    {
+      if ( hw_[i]->GetType() == "CAEN_V513" || hw_[i]->GetType() == "CAEN_V262" )
+	{
+	  ioControlBoard_.boardIndex_=i;
+	  break; 
 	}
     }
  
@@ -289,10 +311,48 @@ void HwManager::TriggerAck(){
 	  }
 }
 
+bool HwManager::SignalReceived(CMD_t signal)
+{
+	if (ioControlBoard_.boardIndex_<0 ) 
+	  {	    
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::IOControl Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+	return dynamic_cast<IOControlBoard*>(hw_[ioControlBoard_.boardIndex_])->SignalReceived(signal);
+}
+
+
+void HwManager::SetTriggerStatus(TRG_t triggerType,TRG_STATUS_t triggerStatus)
+{
+	if (ioControlBoard_.boardIndex_<0 ) 
+	  {	    
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::IOControl Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+	int status=dynamic_cast<IOControlBoard*>(hw_[ioControlBoard_.boardIndex_])->SetTriggerStatus(triggerType,triggerStatus);
+	if ( status )
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::SetTriggerStatus failed " << status;
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+}
+
 // ------------------ STATIC ----------------
 BoardTypes_t HwManager::GetBoardTypeId(string type){
 	if (type=="TIME" ) return _TIME_;
 	else if( type=="CAEN_VX718") return _CAENVX718_;
 	else if( type=="CAEN_V1742") return _CAENV1742_;
+	else if( type=="CAEN_V513") return _CAENV513_;
+	else if( type=="CAEN_V262") return _CAENV262_;
+	else if( type=="CAEN_V792") return _CAENV792_;
+	else if( type=="CAEN_V1290") return _CAENV1290_;
+	else if( type=="CAEN_V1495PU") return _CAENV1495PU_;
+	else if( type=="CAEN_V560") return _CAENV560_;
 	else return _UNKWN_;
 }

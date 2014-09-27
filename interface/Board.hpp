@@ -4,7 +4,16 @@
 #include "interface/StandardIncludes.hpp"
 #include "interface/Logger.hpp"
 
-enum BoardTypes_t { _TIME_=1, _CAENVX718_=2, _CAENV1742_=3, _UNKWN_=0 };
+enum BoardTypes_t { _TIME_=1, //Fake board to get timestamps
+		    _CAENVX718_=2, //Crate Controller 
+		    _CAENV1742_=3, //5Gs Digitiser
+		    _CAENV513_=4,  //I/O Register
+		    _CAENV262_=5, //I/O Register
+		    _CAENV792_=6, //32ch Charge ADC
+		    _CAENV1290_=7, //16ch TDC
+		    _CAENV1495PU_=8, //General Purpose I/O. FW 2.1 PatternUnit
+		    _CAENV560_=9, //Scaler
+		    _UNKWN_=0 };
 
 class BoardConfig;
 
@@ -46,6 +55,17 @@ public:
 	virtual inline bool TriggerReceived(){return false;};
 	virtual inline int  TriggerAck(){return 0;};
 
+};
+
+class IOControlBoard : public Board {
+protected:
+
+public:
+	// --- Constructor. Calls Constructor Board
+	IOControlBoard() : Board() {};
+	// --- this are meaningful only for ioControl boards. 
+	virtual inline bool  SignalReceived(CMD_t signal)=0;
+        virtual inline int   SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus)=0;
 };
 
 #endif

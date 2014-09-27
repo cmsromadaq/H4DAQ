@@ -34,10 +34,12 @@ protected:
 	void Read(int i,vector<WORD> &v);
 
   // ----- Special functions boards -----
-	// -- Board associated to trigger
+	// -- Board associated to trigger (normally the crate controller)
 	boardPtr trigBoard_;
-	// -- Controller Board
-	boardPtr controllerBoard_;
+        // -- Board associated to the ioControl (the first in the board list to be either CAENV513 or CAENV262)
+	boardPtr ioControlBoard_;
+	// -- Controller Board (the first in the board list to be CAENVX718)
+	boardPtr controllerBoard_; 
 	// -- Digitizer Board
 	boardPtr digiBoard_;
 	// -- Crate ID
@@ -64,6 +66,10 @@ public:
 	void ClearBusy();
 	bool TriggerReceived();
 	void TriggerAck();
+	// --- RunControl Utility
+	bool SignalReceived(CMD_t signal);
+        void SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus); 
+
 	// --- Promote To Run Control
 	//inline void SetRunControl(bool rc=true){ runControl_=rc;}
 	//inline bool IsRunControl() const {return runControl_;}
