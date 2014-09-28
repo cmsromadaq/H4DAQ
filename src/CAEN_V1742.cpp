@@ -7,7 +7,7 @@ int CAEN_V1742::Init()
   int ret=CAEN_DGTZ_Success;
   ERROR_CODES ErrCode= ERR_NONE;
   ostringstream s;
-  s.str(""); s << "[V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++" ;
+  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++" ;
   Log(s.str(),1);
   if (bC_ == NULL ) {
     return ERR_CONF_NOT_FOUND;
@@ -20,16 +20,16 @@ int CAEN_V1742::Init()
     return ErrCode;
   }
 
-  s.str(""); s << "[V1742]::[INFO]::Connected to CAEN Digitizer Model "<< boardInfo_.ModelName ;
-  s << "[V1742]::[INFO]::ROC FPGA Release is " <<  boardInfo_.ROC_FirmwareRel;
-  s << "[V1742]::[INFO]::AMC FPGA Release is " <<boardInfo_.AMC_FirmwareRel;
+  s.str(""); s << "[CAEN_V1742]::[INFO]::Connected to CAEN Digitizer Model "<< boardInfo_.ModelName ;
+  s << "[CAEN_V1742]::[INFO]::ROC FPGA Release is " <<  boardInfo_.ROC_FirmwareRel;
+  s << "[CAEN_V1742]::[INFO]::AMC FPGA Release is " <<boardInfo_.AMC_FirmwareRel;
   Log(s.str(),1);
 
   // Check firmware rivision (DPP firmwares cannot be used with WaveDump */
   int MajorNumber;
   sscanf(boardInfo_.AMC_FirmwareRel, "%d", &MajorNumber);
   if (MajorNumber >= 128) {
-    s.str(""); s << "[V1742]::[ERROR]::This digitizer has a DPP firmware" ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::This digitizer has a DPP firmware" ;
     Log(s.str(),1);
     ErrCode = ERR_INVALID_BOARD_TYPE;
     return ErrCode;
@@ -81,7 +81,7 @@ int CAEN_V1742::Init()
   }
   
   CAEN_DGTZ_SWStartAcquisition(digitizerHandle_);
-  s.str(""); s << "[V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++" ;
+  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++" ;
   s << "**************************************************************" ;
   Log(s.str(),1);
 
@@ -96,7 +96,7 @@ int CAEN_V1742::Clear(){
   ret |= CAEN_DGTZ_Reset(digitizerHandle_);
 
   if (ret != 0) {
-    ostringstream s; s << "[V1742]::[ERROR]::Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" ;
+    ostringstream s; s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" ;
     return ERR_RESTART;
   }
 
