@@ -17,6 +17,8 @@ namespace Utility{
 	long timevaldiff(struct timeval *starttime, struct timeval *finishtime) ;
 	
 	long timestamp(struct timeval *time, time_t *ref);
+
+  int hibit(unsigned int n);
 };
 
 

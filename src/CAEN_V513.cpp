@@ -65,7 +65,7 @@ int CAEN_V513::Init()
     {
       s.str(""); s << "[CAEN_V513]::[ERROR]::Config error" << status;
       Log(s.str(),1);
-      return ERR_OPEN;
+      return ERR_CONFIG;
     } 
   s.str(""); s << "[CAEN_V513]::[INFO]::++++++ CAEN V513 CONFIGURED ++++++";  
   Log(s.str(),1);

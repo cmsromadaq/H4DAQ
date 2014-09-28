@@ -75,3 +75,7 @@ long Utility::timestamp(struct timeval *time, time_t *ref){
   time_msec+=time->tv_usec/1000;
   return time_msec;
 }
+
+int Utility::hibit(WORD n) {
+  return (n & 0x80000000) ? 31 : hibit((n << 1) | 1) - 1;
+}

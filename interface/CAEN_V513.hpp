@@ -93,12 +93,12 @@ public:
     unsigned int channelsInputModeWord;
     unsigned int channelsTransferModeWord;
 
-    //Signals bit
+    //Signals bit (only among input channels)
     unsigned int WWEReadBitMask;
     unsigned int WEReadBitMask;
     unsigned int EEReadBitMask;
 
-    //Trigger vetoes bit
+    //Trigger vetoes bit (only among output channels)
     unsigned int beamTriggerVetoBitMask;
     unsigned int pedTriggerVetoBitMask;
     unsigned int ledTriggerVetoBitMask;
@@ -114,7 +114,7 @@ public:
   virtual int Read(vector<WORD> &v);
   virtual int SetHandle(int handle) { handle_=handle;};
 
-  // --- this are meaningful only for ioControl boards. 
+  // --- these are meaningful only for ioControl boards. 
   virtual bool  SignalReceived(CMD_t signal);
   virtual int   SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus);
 
