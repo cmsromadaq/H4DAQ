@@ -129,6 +129,18 @@ int CAEN_V792::BufferClear()
 int CAEN_V792::Config(BoardConfig *bC)
 {
   Board::Config(bC);
+  GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+  
+  GetConfiguration()->model=static_cast<CAEN_V792_Model_t>(Configurator::GetInt( bC->getElementContent("model")));
+  
+  GetConfiguration()->blkEnd=static_cast<bool>(Configurator::GetInt( bC->getElementContent("blkEnd")));
+  GetConfiguration()->zeroSuppression=static_cast<bool>(Configurator::GetInt( bC->getElementContent("zeroSuppression")));
+  GetConfiguration()->emptyEnable=static_cast<bool>(Configurator::GetInt( bC->getElementContent("emptyEnable")));
+  GetConfiguration()->overRange=static_cast<bool>(Configurator::GetInt( bC->getElementContent("overRange")));
+  
+  GetConfiguration()->iped=Configurator::GetInt( bC->getElementContent("iped"));
+  GetConfiguration()->zsThreshold=Configurator::GetInt( bC->getElementContent("zsThreshold"));
+
   return 0;
 }
 
@@ -159,7 +171,7 @@ int CAEN_V792::Read(vector<WORD> &v)
       ++nt;
     }
 
-  if (status)
+  if (status || v792_rdy==0 || v792_busy==1)
     {
       ostringstream s; s << "[CAEN_V792]::[ERROR]::Cannot get a valid data from V792 board " << status; 
       Log(s.str(),1);

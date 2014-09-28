@@ -413,7 +413,7 @@ int CAEN_V1742::writeEventToOutputBuffer(vector<WORD>& CAEN_V1742_eventBuffer, C
   // Word[7+Ch0 #Words] = [ Ch1 Corr. samples  (float) ]
   //               ...   = [          .....             ]
 
-  //CAEN_V1742_eventBuffer.clear();
+  CAEN_V1742_eventBuffer.clear();
   CAEN_V1742_eventBuffer.resize(5);
   (CAEN_V1742_eventBuffer)[0]=0xA0000005; 
   (CAEN_V1742_eventBuffer)[1]=((eventInfo->BoardId)<<26)+eventInfo->Pattern;
