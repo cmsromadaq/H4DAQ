@@ -1,6 +1,11 @@
 #include "interface/HwManager.hpp"
+
+//Boards
 #include "interface/CAEN_VX718.hpp"
+#include "interface/CAEN_V1742.hpp"
+#include "interface/CAEN_V513.hpp"
 #include "interface/TimeBoard.hpp"
+
 #include "interface/EventBuilder.hpp" // boardId
 //#include "interface/BoardConfig.hpp"
 
@@ -65,6 +70,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a TimeStamp Board
 			  hw_.push_back( new TimeBoard() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V513")
+			{
+			  //constructing a CAEN_V513 board
+			  hw_.push_back( new CAEN_V513() );
 			}
 		else
 		  {

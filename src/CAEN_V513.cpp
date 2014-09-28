@@ -18,14 +18,14 @@ int CAEN_V513::Init()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_VERSION_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
   if (status)
     {
-      s.clear(); s << "[CAEN_V513]::[ERROR]::Cannot open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      s.str(""); s << "[CAEN_V513]::[ERROR]::Cannot open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
       Log(s.str(),1);
       return ERR_OPEN;
     }    
 
   int version = data&0xF000;
   int serial = data&0x0FFF;
-  s.clear(); s << "[CAEN_V513]::[INFO]::Open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec << " Version " << version << " S/N " << serial; 
+  s.str(""); s << "[CAEN_V513]::[INFO]::Open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec << " Version " << version << " S/N " << serial; 
   Log(s.str(),1);
   
   //Reset module
@@ -33,7 +33,7 @@ int CAEN_V513::Init()
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_RESET_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
   if (status)
     {
-      s.clear(); s << "[CAEN_V513]::[ERROR]::Cannot reset V513 board " << status << std::dec; 
+      s.str(""); s << "[CAEN_V513]::[ERROR]::Cannot reset V513 board " << status << std::dec; 
       Log(s.str(),1);
       return ERR_RESET;
     }    
@@ -63,11 +63,11 @@ int CAEN_V513::Init()
 
   if (status)
     {
-      s.clear(); s << "[CAEN_V513]::[ERROR]::Config error" << status;
+      s.str(""); s << "[CAEN_V513]::[ERROR]::Config error" << status;
       Log(s.str(),1);
       return ERR_OPEN;
     } 
-  s.clear(); s << "[CAEN_V513]::[INFO]::++++++ CAEN V513 CONFIGURED ++++++";  
+  s.str(""); s << "[CAEN_V513]::[INFO]::++++++ CAEN V513 CONFIGURED ++++++";  
   Log(s.str(),1);
   return 0;
 }
@@ -99,6 +99,25 @@ int CAEN_V513::Config(BoardConfig *bC)
 {
   Board::Config(bC);
   //here the parsing of the xmlnode...
+  GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+  GetConfiguration()->strobePolarity=static_cast<CAEN_V513_Strobe_Polarity_t>(Configurator::GetInt( bC->getElementContent("strobePolarity")));
+    
+  //Channels low-level configuration
+  GetConfiguration()->channelsDirectionWord=Configurator::GetInt( bC->getElementContent("channelsDirectionWord"));
+  GetConfiguration()->channelsPolarityWord=Configurator::GetInt( bC->getElementContent("channelsPolarityWord"));
+  GetConfiguration()->channelsInputModeWord=Configurator::GetInt( bC->getElementContent("channelsInputModeWord"));
+  GetConfiguration()->channelsTransferModeWord=Configurator::GetInt( bC->getElementContent("channelsTransferModeWord"));
+  
+  //Signals bit
+  GetConfiguration()->WWEReadBitMask=Configurator::GetInt( bC->getElementContent("WWEReadBitMask"));
+  GetConfiguration()->WEReadBitMask=Configurator::GetInt( bC->getElementContent("WEReadBitMask"));
+  GetConfiguration()->EEReadBitMask=Configurator::GetInt( bC->getElementContent("EEReadBitMask"));
+  
+  //Trigger vetoes bit
+  GetConfiguration()->beamTriggerVetoBitMask=Configurator::GetInt( bC->getElementContent("beamTriggerVetoBitMask"));
+  GetConfiguration()->pedTriggerVetoBitMask=Configurator::GetInt( bC->getElementContent("pedTriggerVetoBitMask"));
+  GetConfiguration()->ledTriggerVetoBitMask=Configurator::GetInt( bC->getElementContent("ledTriggerVetoBitMask"));
+
   return 0;
 }
 
@@ -178,17 +197,17 @@ int CAEN_V513::SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus)
   if (triggerType == BEAM_TRIG)
     {
 	if (triggerStatus == TRIG_ON)
-	  dataRegister_ &= ~configuration_.BeamTriggerVetoBitMask;
+	  dataRegister_ &= ~configuration_.beamTriggerVetoBitMask;
       }
   else if ( triggerType == PED_TRIG )
       {
 	if (triggerStatus == TRIG_ON)
-	  dataRegister_ &= ~configuration_.PedTriggerVetoBitMask;
+	  dataRegister_ &= ~configuration_.pedTriggerVetoBitMask;
       }
   else if ( triggerType == LED_TRIG ) 
       {
 	if (triggerStatus == TRIG_ON)
-	  dataRegister_ &= ~configuration_.PedTriggerVetoBitMask;
+	  dataRegister_ &= ~configuration_.ledTriggerVetoBitMask;
       }
   else 
     {

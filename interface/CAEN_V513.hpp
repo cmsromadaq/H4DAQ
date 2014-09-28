@@ -58,9 +58,14 @@ public:
   } ERROR_CODES;
   
   typedef enum {
-    CAEN_V513_POS_POL=0,
-    CAEN_V513_NEG_POL=1
+    CAEN_V513_POS_POL=1,
+    CAEN_V513_NEG_POL=0
   } CAEN_V513_Polarity_t;
+
+  typedef enum {
+    CAEN_V513_STROBE_POS_POL=0,
+    CAEN_V513_STROBE_NEG_POL=1
+  } CAEN_V513_Strobe_Polarity_t;
 
   typedef enum {
     CAEN_V513_OUTPUT=0,
@@ -80,7 +85,7 @@ public:
   typedef struct CAEN_V513_Config_t {
     unsigned int baseAddress;
 
-    CAEN_V513_Polarity_t strobePolarity;
+    CAEN_V513_Strobe_Polarity_t strobePolarity;
     
     //Channels low-level configuration
     unsigned int channelsDirectionWord;
@@ -94,9 +99,9 @@ public:
     unsigned int EEReadBitMask;
 
     //Trigger vetoes bit
-    unsigned int BeamTriggerVetoBitMask;
-    unsigned int PedTriggerVetoBitMask;
-    unsigned int LedTriggerVetoBitMask;
+    unsigned int beamTriggerVetoBitMask;
+    unsigned int pedTriggerVetoBitMask;
+    unsigned int ledTriggerVetoBitMask;
   } CAEN_V513_Config_t;
 
   CAEN_V513(): IOControlBoard(), handle_(-1), dataRegister_(0) { type_="CAEN_V513"; };
@@ -104,6 +109,7 @@ public:
   virtual int Init();
   virtual int Clear();
   virtual int BufferClear(); //reset the scaler
+  virtual int Print() { return 0; }
   virtual int Config(BoardConfig *bC);
   virtual int Read(vector<WORD> &v);
   virtual int SetHandle(int handle) { handle_=handle;};

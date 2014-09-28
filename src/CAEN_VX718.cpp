@@ -55,7 +55,7 @@ int CAEN_VX718::Init()
   if (status)
     return ERR_PROGRAM;
 
-  s.clear(); s << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++";  
+  s.str(""); s << "[VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++";  
   Log(s.str(),1);
   return 0;
 }
