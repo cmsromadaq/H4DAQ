@@ -73,6 +73,7 @@ public:
 	inline int 	GetRecvEvent() { return recvEvent_;};
 	inline void*	GetStream(){ return mySpill_.data();};
 	inline int  	GetSize(){return mySpill_.size();};
+	inline bool 	AreSpillsMerged(){ return spills_.empty() ; };
 	inline string 	GetDirName()const {return dirName_;}
 	inline EventId  GetEventId() const { return lastEvent_;}
 	// --- Set  Info

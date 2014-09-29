@@ -8,6 +8,7 @@ class Daemon;
 #include "interface/FSM.hpp"
 #include "interface/Handler.hpp"
 #include "interface/EventBuilder.hpp"
+#include "interface/Logger.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -55,6 +56,13 @@ define_handlers();
      print_usage(); 
      exit(EXIT_FAILURE);
    }
+// -----------------
+string logFileName="/tmp/logRC.txt";
+Logger l;
+l.SetLogLevel(3);
+printf("[RunControllerDaemon]::Init Logfile => %s\n",logFileName.c_str());
+l.SetFileName(logFileName);
+l.Init();
 
 //
 //Daemon *d=new Daemon();
@@ -63,6 +71,7 @@ RunControllerFSM *d=new RunControllerFSM();
 printf("INIT\n");
 //d->Init("data/configRC.xml");
 printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());
+d->LogInit(&l);
 d->Init(configFileName);
 try{
 	printf("LOOP\n");

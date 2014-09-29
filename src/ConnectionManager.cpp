@@ -208,7 +208,9 @@ bool RequestAndReply::Reply(){
 
 bool ConnectionManager::Recv(dataType &mex){
 	for( int i=0;i< subs.size() ;i++)
+	{
 		if( subs[i]->RecvMessage(mex) == 0 ) return 0;
+	}
 	return 1;
 }
 
@@ -234,12 +236,18 @@ void ConnectionManager::Init(){
 		pubs.push_back(new Publisher() );
 		pubs[i]->SetPort(sendPorts[i]); // move in config ? 
 		pubs[i]->Init();
+		ostringstream s;
+		s<<"[ConnectionManager]::[Init] Init Publish:"<<sendPorts[i]<<" size="<<pubs.size();
+		Log(s.str(),2);
 		}
 	for(int i=0;i<recvAddresses.size();i++)
 		{
 		subs.push_back(new Subscriber() ) ;
 		subs[i]->SetAddress(recvAddresses[i]);
 		subs[i]->Init();
+		ostringstream s;
+		s<<"[ConnectionManager]::[Init] Init Subscriber:"<<recvAddresses[i]<< "size="<< subs.size();
+		Log(s.str(),2);
 		}
 }
 

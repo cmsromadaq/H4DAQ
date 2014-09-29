@@ -75,6 +75,7 @@ try
   }
  catch (logfile_open_exception &l)
    {
+     printf("Cannot Open Log File: %s\n",logFileName.c_str());
      exit(EXIT_FAILURE);
    }
 //

@@ -487,17 +487,44 @@ while (true) {
 				myMex.append(myCmd.data,myCmd.N);
 				connectionManager_->Send(myMex);
 			}
-			MoveToStatus(SENTBUFFER);
+			MoveToStatus(RECVBUFFER);
+		    break;
+		    }
+	case RECVBUFFER:
+		    { // wait for ALL the BUFFERS
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )    
+		    {                                                                     
+			    Command myNewCmd = ParseData( myMex); 
+			    if ( myNewCmd.cmd == DATA ) {
+				    // pass the structure to a dataType
+				    dataType myData(myNewCmd.N,myNewCmd.data);
+				    // release the destruction from Command
+				    myNewCmd.release();
+				    //Merge Spills
+				    eventBuilder_->MergeSpills(myData);
+			    }
+		    }
+		    if ( eventBuilder_->AreSpillsMerged() )
+		   	 {
+			// SENT STATUS BUFFER COMPLETED
+			 dataType myMex;
+			 //inform run controller that spill has been completed
+			 myMex.append((void*)"STATUS\0SPILLCOMPL\0\0\0",18);
+			 connectionManager_->Send(myMex);
+			 MoveToStatus(SENTBUFFER);
+		    
+		   	 }
 		    break;
 		    }
 	case SENTBUFFER:
-		    { // wait for SPILLCOMPLETED
+		    { // wait for SPILLCOMPLETED -- instructions from the Run Control
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == SPILLCOMPL )  {
-				    MoveToStatus(BEGINSPILL);
+			            MoveToStatus(BEGINSPILL);
 			    }
 			    else if (myNewCmd.cmd == ENDRUN){
 				    MoveToStatus(INITIALIZED);
@@ -505,11 +532,7 @@ while (true) {
 			    else if (myNewCmd.cmd == DIE){
 				    MoveToStatus(BYE);
 			    }
-			    else if ( myNewCmd.cmd == DATA ) {
-				    // TODO Merge Events
-			    }
 		    }
-			
 		    break;
 		    }
 	case BYE:
