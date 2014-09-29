@@ -8,7 +8,11 @@ DataReadoutFSM::DataReadoutFSM(): Daemon() {
 }
 
 bool DataReadoutFSM::IsOk(){
-	if ( eventBuilder_->GetSendEvent() != true ) return false;
+	if ( eventBuilder_->GetSendEvent() != true ) 
+		{	
+		Log("[DataReadoutFSM]::[IsOk] FSM not configured to send event",1);
+		return false;
+		}
 	return true;
 }
 
@@ -345,11 +349,179 @@ return;
 
 // ------------------- EVENT BUILDER
 bool EventBuilderFSM::IsOk(){
-	if( eventBuilder_->GetRecvEvent() != true) return false;
+	if( eventBuilder_->GetRecvEvent() != true) {
+		Log("[EventBuilderFSM]::[IsOk] Machine is not configured to receive events",1);
+		return false;
+		}
 	return true;
 }
 
 void EventBuilderFSM::Loop(){
 
 if ( !IsOk() ) throw config_exception();
-}
+
+while (true) {
+	try{
+		// check source that can populate the commands -- Connection and HW
+		// check Connection Manager
+		// if cmds not empty do something
+	switch (myStatus_ ) {
+	case START: {// not in the LOOP
+			    MoveToStatus(INIT);
+			    break;
+		    } 
+	case INIT:  {   // not in the LOOP
+			    MoveToStatus(INITIALIZED);
+			    break;
+		    } 
+	case INITIALIZED:
+		    {
+		    // wait for start run
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  STARTRUN ) 
+			   	 {
+				   hwManager_->BufferClearAll();
+				   eventBuilder_->ResetSpillNumber();
+				   WORD myRunNum=*(WORD*)myCmd.data;
+				   ostringstream s;
+				   s << "[EventBuilderFSM]::[INFO]::Starting a new run " <<  myRunNum;
+				   Log(s.str(),1);
+				   // init RunNum in eventBuilder
+				   eventBuilder_->SetRunNum(myRunNum);
+				   MoveToStatus(BEGINSPILL);
+				 }
+			    }
+		    break;
+		    }
+	case BEGINSPILL:
+		    {
+		    // wait for wwe
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  WWE ) 
+			   	 {
+					 hwManager_->BufferClearAll();
+					 eventBuilder_->OpenSpill();
+					 MoveToStatus(CLEARED);
+				 }
+			    }
+		    break;
+		    }
+	case CLEARED:
+		    {
+		    // wait for we
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  WE ) 
+			   	 {
+					 hwManager_->BufferClearAll();
+					 MoveToStatus(CLEARBUSY);
+				 }
+			    }
+		    break;
+		    }
+	case CLEARBUSY: {
+		        hwManager_->ClearBusy();
+			MoveToStatus(WAITTRIG);
+			}
+	case WAITTRIG:
+		    {
+		     // check network
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )    
+		    {                                                                     
+			    Command myNewCmd = ParseData( myMex); 
+			    if (myNewCmd.cmd == EE )  {
+				    MoveToStatus(ENDSPILL);
+				    break;
+			    }
+		    }
+		     /// check trigger
+		    if( hwManager_->TriggerReceived() ){ 
+			cout<<"TRIGGER RECEIVED"<<endl;
+			hwManager_->TriggerAck();
+			MoveToStatus(READ);
+                        }  
+
+		    break;
+		    }
+	case READ:
+		    {
+			static int READED=0;
+			cout<<"Counter "<<std::dec<<++READED<<endl;
+			static int Counter=0; 
+			if (Counter==0 )  gettimeofday(&stopwatch_start_time,NULL);
+			++Counter;
+			if (Counter >= 500) {
+				gettimeofday(&stopwatch_stop_time,NULL);
+				long elapsed=  Utility::timevaldiff(&stopwatch_start_time,&stopwatch_stop_time);
+				ostringstream s; s <<"[DataReadOutFSM]::[READ] "<<"Triggers in spill "<< READED<<" Rate "<< double(Counter)/elapsed* 1e6 <<" Hz";
+				cout <<s.str()<<endl;
+				Log(s.str(),1);
+				Counter=0;
+			}
+			//----- Costruct Events
+                        dataType event;
+			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
+			hwManager_->ReadAll(event);                                 /// DEBUG ME
+			eventBuilder_->CloseEvent(event);
+			// ----- Add Event To Spill
+                        eventBuilder_->AddEventToSpill(event);                                
+			MoveToStatus(CLEARBUSY);
+		    break;
+		    }
+	case ENDSPILL:
+		    {
+			    // received EE
+			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
+			if (myCmd.cmd == SEND)
+			{
+				dataType myMex;
+				myMex.append(myCmd.data,myCmd.N);
+				connectionManager_->Send(myMex);
+			}
+			MoveToStatus(SENTBUFFER);
+		    break;
+		    }
+	case SENTBUFFER:
+		    { // wait for SPILLCOMPLETED
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )    
+		    {                                                                     
+			    Command myNewCmd = ParseData( myMex); 
+			    if (myNewCmd.cmd == SPILLCOMPL )  {
+				    MoveToStatus(BEGINSPILL);
+			    }
+			    else if (myNewCmd.cmd == ENDRUN){
+				    MoveToStatus(INITIALIZED);
+			    }
+			    else if (myNewCmd.cmd == DIE){
+				    MoveToStatus(BYE);
+			    }
+			    else if ( myNewCmd.cmd == DATA ) {
+				    // TODO Merge Events
+			    }
+		    }
+			
+		    break;
+		    }
+	case BYE:
+		    {
+		    exit(0); // return is not working correctly
+		    return;
+		    }
+
+	} // end switch
+	} //end try
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+
+} // end while
+} // end Loop
