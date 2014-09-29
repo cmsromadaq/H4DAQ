@@ -3,6 +3,13 @@
 
 #include "interface/StandardIncludes.hpp"
 
+#include <vector>
+#include <string>
+#include <utility>
+
+using namespace std ;
+ 
+
 class Configurator;
 
 class Configurable{ // base class - abstract
@@ -14,6 +21,10 @@ public:
 	static string getElementContent (Configurator&c, const char * key, const xmlNode * node);
 	static vector<string> getElementVector (Configurator&c, const char * key, const xmlNode * node);
 	static vector<string> getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node);
+	static vector<pair<string, string> > getNodeContentList (xmlDocPtr doc, const xmlNode * node) ;
+	static vector<pair<string, string> > getNodeContentList (Configurator & c, const xmlNode * node) ;
+
+
 };
 
 class Configurator 
