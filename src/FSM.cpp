@@ -37,6 +37,7 @@ while (true) {
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
+			    Log("[DataReadoutFSM]::[Loop]::[INITIALIZED] Received a message on the incoming connection",3);
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  STARTRUN ) 
 			   	 {

@@ -1,7 +1,7 @@
 <general>
   <Network>
-    <ListenPort>5555</ListenPort>
-    <ConnectTo>localhost:5556</ConnectTo>
+    <ListenPort>5557</ListenPort>
+    <ConnectTo>localhost:5558</ConnectTo>
   </Network>
   <Hardware>
   </Hardware>

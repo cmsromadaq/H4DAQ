@@ -43,8 +43,16 @@ void EventBuilder::BoardHeader(dataType &R, BoardId id)
 	//R.reserve(2*WORDSIZE);
 	R.append((void*)"BRDH\0\0\0\0\0\0\0\0",WORDSIZE); //WORDSIZE<12
 	//dataType 
-	//R.append(WordToStream(boardId) ); 
-	WORD myId= ( id.crateId_&GetCrateIdBitMask() ) | (id.boardId_& GetBoardIdBitMask()  ) |  (id.boardType_ & GetBoardTypeIdBitMask() )  ;
+	//
+	//compute shifts for BitMasks: 
+	//crate id starts from 1->n independently from the bit mask
+	int myCrateIdShift=GetCrateIdShift();
+	int myBoardIdShift=GetBoardIdShift();
+	int myBoardTypeShift=GetBoardTypeShift();
+
+	WORD myId= 	( (id.crateId_<<myCrateIdShift)       & GetCrateIdBitMask()     ) | 
+			( (id.boardId_<<myBoardIdShift)     & GetBoardIdBitMask()     ) |  
+			( (id.boardType_<<myBoardTypeShift) & GetBoardTypeIdBitMask() )  ;
 	WordToStream(R,myId);
 	return ;
 }
@@ -58,7 +66,7 @@ void EventBuilder::BoardTrailer(dataType&R)
 
 
 // [HEAD][Nbytes][ ----- ][TRAILER]
-// [HEAD]="BRDH"+"BRDID" - WORD-WORD
+// [HEAD]="BRDH"+"BRDID"+[BOADSIZE] - WORD-WORD
 void EventBuilder::BoardToStream(dataType &R ,BoardId id,vector<WORD> &v)
 {
 	//R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations

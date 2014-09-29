@@ -30,6 +30,7 @@ public:
 	~Board();
 	// --- Get Id
 	inline unsigned int GetId(){return id_;};
+	inline unsigned int SetId(unsigned int id){id_=id;};
 	// --- GetType
 	inline string GetType() const { return type_;}
 	// --- Configurable  

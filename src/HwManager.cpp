@@ -94,6 +94,8 @@ void HwManager::Config(Configurator &c){
 		if (this->GetLogger() != NULL)
 		  hw_[bIdx]->LogInit(this->GetLogger());
 
+		//Make Sure Id Is setted	
+		hw_[bIdx]->SetId(ID);
 		// construct a board configurator and ask the board to configure itself
 		BoardConfig bC;
 		bC.Init(c);

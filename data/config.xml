@@ -1,10 +1,10 @@
 <general>
   <Network>
-    <ListenPort>5556</ListenPort>
-    <ConnectTo>localhost:5555</ConnectTo>
+    <ListenPort>5558</ListenPort>
+    <ConnectTo>localhost:5557</ConnectTo>
   </Network>
   <Hardware>
-    <crateID>1</crateID>
+    <crateId>1</crateId>
     <board>
       <ID>1</ID>
       <type>TIME</type> <!-- Remember to put always TIME at the first location among boards -->

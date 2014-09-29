@@ -14,13 +14,14 @@ Publisher::~Publisher(){
 } // give 0mq the time to flush
 
 void Publisher::Init(){
-	Log("[3] Publisher::Init",3);
+	Log("[3] [Publisher]::[Init]",3);
 	char buffer[256];
 	sprintf(buffer,"tcp://*:%s",Port.c_str());
 	socket=new zmq::socket_t(*context,ZMQ_PUB);
 	//bind
-	Log(string("[3] Publisher::Init buffer='")+buffer+"'",3);
-	socket->bind(buffer);
+	Log(string("[Publisher]::[Init] buffer='")+buffer+"'",2);
+	socket->bind(buffer); // this is void in c++
+	if ( errno == EADDRINUSE ) Log("[Publisher]::[Init] Binding unsuccesful",1);
 }
 
 void Publisher::Clear(){
