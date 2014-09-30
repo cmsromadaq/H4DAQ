@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-#define CAEN_V513_DEBUG
+//#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -87,6 +87,36 @@ int CAEN_V513::Init()
     } 
 
 
+#ifdef CAEN_V513_DEBUG
+  SetTriggerStatus(BEAM_TRIG,TRIG_ON);
+  s.str(""); s << "[CAEN_V513]::[INFO]::REMOVED BEAM VETO. DATAREGISTER: 0x"<< std::hex << dataRegister_ << std::dec;  
+  Log(s.str(),3);
+  int ncycle=0;
+  while (ncycle<20)
+    {
+      s.str(""); s << "[CAEN_V513]::[INFO]::READ TEST #"<< ncycle;
+      Log(s.str(),3);
+
+      unsigned int nt=0;
+      while(!SignalReceived(WE))
+	{
+	  usleep(1000);
+	  ++nt;
+	}
+      s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR WE "<< nt << " TIMES";
+      Log(s.str(),3);
+      nt=0;
+      while(!SignalReceived(EE))
+	{
+	  usleep(1000);
+	  ++nt;
+	}
+      s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR EE "<< nt << " TIMES";
+      Log(s.str(),3);
+      ++ncycle;
+    }
+#endif
+      
   s.str(""); s << "[CAEN_V513]::[INFO]::++++++ CAEN V513 CONFIGURED ++++++";  
   Log(s.str(),1);
   return 0;
@@ -162,6 +192,9 @@ int CAEN_V513::ReadInput(WORD& data)
 
   int status=0;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_INPUT_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+  WORD writeData=0xFF;
+  //Cleaning Input register after reading
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
   if (status)
     {
       ostringstream s; s << "[CAEN_V513]::[ERROR]::Cannot read I/O register " << status; 
