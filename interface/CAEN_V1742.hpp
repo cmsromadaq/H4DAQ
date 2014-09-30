@@ -110,6 +110,7 @@ private:
   int setDefaults () ;
   /* reads params from cfg file */  
   int ParseConfiguration (BoardConfig * bC) ;
+  int ParseConfigForGroups (BoardConfig * bC, const xmlNode * node) ;
 
 private:
 					

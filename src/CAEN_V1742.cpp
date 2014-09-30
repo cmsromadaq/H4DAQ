@@ -514,418 +514,505 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-//Fill V1742 config struct from xmlNode
+/**
+Fill V1742 config struct from xmlNode
+First reads all the generic voices expected to be common to the whole digitizer setup.
+Then, searches the setup of the external triggers.
+This means that trigger settings for the external triggers will override the global ones.
+Eventually, search for nodes called CHANNEL, to setup channel groups.
+This means that trigger settings for the single channels will override the ones of the 
+external triggers.
+*/
 int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 {
 
-  int tr = -1 ;
-  int ch = -1 ;
-/* PG FIXME this still needs to be handled
-    // Section (COMMON or individual channel) //PG FIXME still to be traduced, once I got what TR blah is
-    if (str[0] == '[') 
-        {
-          if (strstr (str, "COMMON")) 
-              {
-                ch = -1 ;
-                continue ; 
-              }
-          if (strstr (str, "TR")) 
-            {
-              sscanf (str+1, "TR%d", &val) ;
-              if (val < 0 || val >= MAX_SET) 
-                {
-                  printf ("%s: Invalid channel number\n", str) ;
-                } else {
-                  tr = val ;
-                }
-            } else {
-              sscanf (str+1, "%d", &val) ;
-              if (val < 0 || val >= MAX_SET) 
-                {
-                  printf ("%s: Invalid channel number\n", str) ;
-                } else {
-                  ch = val ;
-                }
-            }
-        }
-*/
+//  int tr = -1 ;
+//  int ch = -1 ;
         
-    // OPEN: read the details of physical path to the digitizer
-    string content = bC->getElementContent ("OPEN") ;
-    if (content.find ("NULL") != string::npos)
-        {
-          std::stringstream ststream (content) ; //PG FIXME se facessi ritornare un sstram direttamente?
-          string linkType ;
-          ststream >> linkType ;
-          if      (linkType == "USB") digitizerConfiguration_.LinkType = CAEN_DGTZ_USB ;
-          else if (linkType == "PCI") digitizerConfiguration_.LinkType = CAEN_DGTZ_PCI_OpticalLink ;
-          else 
-            {
-              cerr << "[V1742]::[ERROR]::Invalid connection type: " << linkType << endl ;
-              return -1 ; 
-            }
-          ststream >> digitizerConfiguration_.LinkNum ;
-          if (digitizerConfiguration_.LinkType == CAEN_DGTZ_USB) digitizerConfiguration_.ConetNode = 0 ;
-          else ststream >> digitizerConfiguration_.ConetNode ;
-          ststream >> digitizerConfiguration_.BaseAddress ;
-        }
-    else 
+  // OPEN: read the details of physical path to the digitizer
+  string content = bC->getElementContent ("OPEN") ;
+  if (content.find ("NULL") != string::npos)
       {
-        cerr << "[V1742]::[ERROR]:: Field OPEN not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // Generic VME Write (address offset + data, both exadecimal)
-    vector<pair<string, string> > contentList = bC->getNodeContentList ("WRITE_REGISTER") ;
-    if (contentList.size () > 0 &&
-        (digitizerConfiguration_.GWn < MAX_GW))
-      {
-        for (int i = 0 ; i < contentList.size () ; ++i)
+        std::stringstream ststream (content) ; //PG FIXME se facessi ritornare un sstram direttamente?
+        string linkType ;
+        ststream >> linkType ;
+        if      (linkType == "USB") digitizerConfiguration_.LinkType = CAEN_DGTZ_USB ;
+        else if (linkType == "PCI") digitizerConfiguration_.LinkType = CAEN_DGTZ_PCI_OpticalLink ;
+        else 
           {
-            if (digitizerConfiguration_.GWn >= MAX_GW) 
-              {
-                cout << "[V1742]::[WARNING]:: not all the WRITE_REGISTER fields have been acquired" << endl ;
-                break ;
-              }
-            digitizerConfiguration_.GWaddr[digitizerConfiguration_.GWn] = stoi (contentList.at (i).first) ;
-            digitizerConfiguration_.GWdata[digitizerConfiguration_.GWn] = stoi (contentList.at (i).second) ;
-            digitizerConfiguration_.GWn++ ;
+            cerr << "[V1742]::[ERROR]::Invalid connection type: " << linkType << endl ;
+            return -1 ; 
           }
+        ststream >> digitizerConfiguration_.LinkNum ;
+        if (digitizerConfiguration_.LinkType == CAEN_DGTZ_USB) digitizerConfiguration_.ConetNode = 0 ;
+        else ststream >> digitizerConfiguration_.ConetNode ;
+        ststream >> digitizerConfiguration_.BaseAddress ;
       }
+  else 
+    {
+      cerr << "[V1742]::[ERROR]:: Field OPEN not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Generic VME Write (address offset + data, both exadecimal)
+  vector<pair<string, string> > contentList = bC->getNodeContentList ("WRITE_REGISTER") ;
+  if (contentList.size () > 0 &&
+      (digitizerConfiguration_.GWn < MAX_GW))
+    {
+      for (int i = 0 ; i < contentList.size () ; ++i)
+        {
+          if (digitizerConfiguration_.GWn >= MAX_GW) 
+            {
+              cout << "[V1742]::[WARNING]:: not all the WRITE_REGISTER fields have been acquired" << endl ;
+              break ;
+            }
+          digitizerConfiguration_.GWaddr[digitizerConfiguration_.GWn] = stoi (contentList.at (i).first) ;
+          digitizerConfiguration_.GWdata[digitizerConfiguration_.GWn] = stoi (contentList.at (i).second) ;
+          digitizerConfiguration_.GWn++ ;
+        }
+    }
+    
+  // Acquisition Record Length (number of samples)
+  content = bC->getElementContent ("RECORD_LENGTH") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      std::stringstream ststream (content) ;
+      ststream >> digitizerConfiguration_.RecordLength ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field RECORD_LENGTH not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Correction Level (mask)
+  content = bC->getElementContent ("CORRECTION_LEVEL") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string isAuto ;
+      ststream >> isAuto ;
+      if (isAuto == "AUTO") digitizerConfiguration_.useCorrections = -1 ;
+      else                  digitizerConfiguration_.useCorrections = atoi (isAuto.c_str ()) ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field CORRECTION_LEVEL not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Test Pattern
+  content = bC->getElementContent ("TEST_PATTERN") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "YES") digitizerConfiguration_.TestPattern = 1 ;
+      else if (dummy != "NO")
+        {
+           cout << "[V1742]::[WARNING]:: TEST_PATTERN " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field TEST_PATTERN not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Trigger Edge
+  content = bC->getElementContent ("TRIGGER_EDGE") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "FALLING") digitizerConfiguration_.TriggerEdge = 1 ;
+      else if (dummy != "RISING")
+        {
+           cout << "[V1742]::[WARNING]:: TRIGGER_EDGE " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field TRIGGER_EDGE not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // External Trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
+  content = bC->getElementContent ("EXTERNAL_TRIGGER") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "DISABLED")                    digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_DISABLED ;
+      else if (dummy == "ACQUISITION_ONLY")       digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
+      else if (dummy == "ACQUISITION_AND_TRGOUT") digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
+      else
+        {
+           cout << "[V1742]::[WARNING]:: EXTERNAL_TRIGGER " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field EXTERNAL_TRIGGER not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Max. number of events for a block transfer (0 to 1023)
+  content = bC->getElementContent ("MAX_NUM_EVENTS_BLT") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      ststream >> digitizerConfiguration_.NumEvents ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field MAX_NUM_EVENTS_BLT not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  //PG FIXME did not translate this yet
+  /* // GNUplot path */
+  /* if (strstr (str, "GNUPLOT_PATH")!=NULL) { */
+  /*     read = fscanf (f_ini, "%s", digitizerConfiguration_.GnuPlotPath) ; */
+  /*     continue ; */
+  /* } */
+
+  // Post Trigger (percent of the acquisition window)
+  content = bC->getElementContent ("POST_TRIGGER") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      ststream >> digitizerConfiguration_.PostTrigger ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field POST_TRIGGER not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // DesMode (Double sampling frequency for the Mod 731 and 751)
+  content = bC->getElementContent ("ENABLE_DES_MODE") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "YES") digitizerConfiguration_.DesMode = 1 ;
+      else if (dummy != "NO")
+        {
+           cout << "[V1742]::[WARNING]:: ENABLE_DES_MODE " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field ENABLE_DES_MODE not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  //PG FIXME did not translate this yet
+  /* // Output file format (BINARY or ASCII) */
+  /* if (strstr (str, "OUTPUT_FILE_FORMAT")!=NULL) { */
+  /*     read = fscanf (f_ini, "%s", str1) ; */
+  /*     if (strcmp (str1, "BINARY")==0) */
+  /*         digitizerConfiguration_.OutFileFlags|= OFF_BINARY ; */
+  /*     else if (strcmp (str1, "ASCII")!=0) */
+  /*         printf ("%s: invalid output file format\n", str1) ; */
+  /*     continue ; */
+  /* } */
+
+  //PG FIXME did not translate this yet
+  /* // Header into output file (YES or NO) */
+  /* if (strstr (str, "OUTPUT_FILE_HEADER")!=NULL) { */
+  /*     read = fscanf (f_ini, "%s", str1) ; */
+  /*     if (strcmp (str1, "YES")==0) */
+  /*         digitizerConfiguration_.OutFileFlags|= OFF_HEADER ; */
+  /*     else if (strcmp (str1, "NO")!=0) */
+  /*         printf ("%s: invalid option\n", str) ; */
+  /*     continue ; */
+  /* } */
+
+  // Interrupt settings (request interrupt when there are at least N events to read ;
+  // 0=disable interrupts (polling mode))
+  content = bC->getElementContent ("USE_INTERRUPT") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      ststream >> digitizerConfiguration_.InterruptNumEvents ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field USE_INTERRUPT not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  content = bC->getElementContent ("FAST_TRIGGER") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "DISABLED")         digitizerConfiguration_.FastTriggerMode = CAEN_DGTZ_TRGMODE_DISABLED ;
+      if (dummy == "ACQUISITION_ONLY") digitizerConfiguration_.FastTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
+      else if (dummy != "NO")
+        {
+           cout << "[V1742]::[WARNING]:: FAST_TRIGGER " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field FAST_TRIGGER not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  content = bC->getElementContent ("ENABLED_FAST_TRIGGER_DIGITIZING") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "YES") digitizerConfiguration_.FastTriggerEnabled= 1 ;
+      else if (dummy != "NO")
+        {
+           cout << "[V1742]::[WARNING]:: ENABLED_FAST_TRIGGER_DIGITIZING " << dummy 
+                << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field ENABLED_FAST_TRIGGER_DIGITIZING not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // DC offset (percent of the dynamic range, -50 to 50)
+  content = bC->getElementContent ("DC_OFFSET") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      float dc ;
+      ststream >> dc ;
+      int val = (int) ( (dc+50) * 65535 / 100) ;
+      for (int i = 0 ; i < MAX_SET ; ++i) digitizerConfiguration_.DCoffset[i] = val ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field DC_OFFSET not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
+
+  // Threshold
+  content = bC->getElementContent ("TRIGGER_THRESHOLD") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      int val ;
+      ststream >> val ;
+      for (int i = 0 ; i < MAX_SET ; ++i) digitizerConfiguration_.Threshold[i] = val ;
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field TRIGGER_THRESHOLD not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
       
-    // Acquisition Record Length (number of samples)
-    content = bC->getElementContent ("RECORD_LENGTH") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        std::stringstream ststream (content) ;
-        ststream >> digitizerConfiguration_.RecordLength ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field RECORD_LENGTH not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
+  // Channel Auto trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
+  content = bC->getElementContent ("CHANNEL_TRIGGER") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      int ok = 1 ;
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      CAEN_DGTZ_TriggerMode_t tm ;
+      if (dummy == "DISABLED")                    tm = CAEN_DGTZ_TRGMODE_DISABLED ;
+      else if (dummy == "ACQUISITION_ONLY")       tm = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
+      else if (dummy == "ACQUISITION_AND_TRGOUT") tm = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
+      else
+        {  
+           ok = 0 ;
+           cout << "[V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+      if (ok)  
+        {
+          for (int i = 0; i < MAX_SET; ++i) digitizerConfiguration_.ChannelTriggerMode[i] = tm ;
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field CHANNEL_TRIGGER not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
 
-    // Correction Level (mask)
-    content = bC->getElementContent ("CORRECTION_LEVEL") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string isAuto ;
-        ststream >> isAuto ;
-        if (isAuto == "AUTO") digitizerConfiguration_.useCorrections = -1 ;
-        else                  digitizerConfiguration_.useCorrections = atoi (isAuto.c_str ()) ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field CORRECTION_LEVEL not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
+  // Front Panel LEMO I/O level (NIM, TTL)
+  content = bC->getElementContent ("FPIO_LEVEL") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "TTL") digitizerConfiguration_.FPIOtype = 1 ;
+      else if (dummy != "NIM")
+        {  
+           cout << "[V1742]::[WARNING]:: FPIO_LEVEL " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field FPIO_LEVEL not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
 
-    // Test Pattern
-    content = bC->getElementContent ("TEST_PATTERN") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "YES") digitizerConfiguration_.TestPattern = 1 ;
-        else if (dummy != "NO")
-          {
-             cout << "[V1742]::[WARNING]:: TEST_PATTERN " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field TEST_PATTERN not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
+  // Channel Enable (or Group enable for the V1740) (YES/NO)
+  content = bC->getElementContent ("ENABLE_INPUT") ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "YES")     digitizerConfiguration_.EnableMask = 0xFF ;
+      else if (dummy == "NO") digitizerConfiguration_.EnableMask = 0x00 ;
+      else 
+        {  
+           cout << "[V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+  else 
+    {
+      cout << "[V1742]::[WARNING]:: Field ENABLE_INPUT not found in board xml node config" << endl ;
+      //PG FIXME abort run start?
+    }
 
-    // Trigger Edge
-    content = bC->getElementContent ("TRIGGER_EDGE") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "FALLING") digitizerConfiguration_.TriggerEdge = 1 ;
-        else if (dummy != "RISING")
-          {
-             cout << "[V1742]::[WARNING]:: TRIGGER_EDGE " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field TRIGGER_EDGE not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // External Trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
-    content = bC->getElementContent ("EXTERNAL_TRIGGER") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "DISABLED")                    digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_DISABLED ;
-        else if (dummy == "ACQUISITION_ONLY")       digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
-        else if (dummy == "ACQUISITION_AND_TRGOUT") digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
-        else
-          {
-             cout << "[V1742]::[WARNING]:: EXTERNAL_TRIGGER " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field EXTERNAL_TRIGGER not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // Max. number of events for a block transfer (0 to 1023)
-    content = bC->getElementContent ("MAX_NUM_EVENTS_BLT") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        ststream >> digitizerConfiguration_.NumEvents ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field MAX_NUM_EVENTS_BLT not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    //PG FIXME did not translate this yet
-    /* // GNUplot path */
-    /* if (strstr (str, "GNUPLOT_PATH")!=NULL) { */
-    /*     read = fscanf (f_ini, "%s", digitizerConfiguration_.GnuPlotPath) ; */
-    /*     continue ; */
-    /* } */
-
-    // Post Trigger (percent of the acquisition window)
-    content = bC->getElementContent ("POST_TRIGGER") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        ststream >> digitizerConfiguration_.PostTrigger ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field POST_TRIGGER not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // DesMode (Double sampling frequency for the Mod 731 and 751)
-    content = bC->getElementContent ("ENABLE_DES_MODE") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "YES") digitizerConfiguration_.DesMode = 1 ;
-        else if (dummy != "NO")
-          {
-             cout << "[V1742]::[WARNING]:: ENABLE_DES_MODE " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field ENABLE_DES_MODE not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    //PG FIXME did not translate this yet
-    /* // Output file format (BINARY or ASCII) */
-    /* if (strstr (str, "OUTPUT_FILE_FORMAT")!=NULL) { */
-    /*     read = fscanf (f_ini, "%s", str1) ; */
-    /*     if (strcmp (str1, "BINARY")==0) */
-    /*         digitizerConfiguration_.OutFileFlags|= OFF_BINARY ; */
-    /*     else if (strcmp (str1, "ASCII")!=0) */
-    /*         printf ("%s: invalid output file format\n", str1) ; */
-    /*     continue ; */
-    /* } */
-
-    //PG FIXME did not translate this yet
-    /* // Header into output file (YES or NO) */
-    /* if (strstr (str, "OUTPUT_FILE_HEADER")!=NULL) { */
-    /*     read = fscanf (f_ini, "%s", str1) ; */
-    /*     if (strcmp (str1, "YES")==0) */
-    /*         digitizerConfiguration_.OutFileFlags|= OFF_HEADER ; */
-    /*     else if (strcmp (str1, "NO")!=0) */
-    /*         printf ("%s: invalid option\n", str) ; */
-    /*     continue ; */
-    /* } */
-
-    // Interrupt settings (request interrupt when there are at least N events to read ;
-    // 0=disable interrupts (polling mode))
-    content = bC->getElementContent ("USE_INTERRUPT") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        ststream >> digitizerConfiguration_.InterruptNumEvents ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field USE_INTERRUPT not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    content = bC->getElementContent ("FAST_TRIGGER") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "DISABLED")         digitizerConfiguration_.FastTriggerMode = CAEN_DGTZ_TRGMODE_DISABLED ;
-        if (dummy == "ACQUISITION_ONLY") digitizerConfiguration_.FastTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
-        else if (dummy != "NO")
-          {
-             cout << "[V1742]::[WARNING]:: FAST_TRIGGER " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field FAST_TRIGGER not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    content = bC->getElementContent ("ENABLED_FAST_TRIGGER_DIGITIZING") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "YES") digitizerConfiguration_.FastTriggerEnabled= 1 ;
-        else if (dummy != "NO")
-          {
-             cout << "[V1742]::[WARNING]:: ENABLED_FAST_TRIGGER_DIGITIZING " << dummy 
-                  << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field ENABLED_FAST_TRIGGER_DIGITIZING not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // DC offset (percent of the dynamic range, -50 to 50)
-    content = bC->getElementContent ("DC_OFFSET") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        float dc ;
-        ststream >> dc ;
-        if (tr != -1) 
-          {
-            //                 digitizerConfiguration_.FTDCoffset[tr] = dc ;
-            digitizerConfiguration_.FTDCoffset[tr*2] = (uint32_t)dc ;
-            digitizerConfiguration_.FTDCoffset[tr*2+1] = (uint32_t)dc ;
-          }
-        else 
-          {  
-            int val = (int) ( (dc+50) * 65535 / 100) ;
-            for (int i = 0 ; i < MAX_SET ; ++i) digitizerConfiguration_.DCoffset[i] = val ;
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field DC_OFFSET not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // Threshold
-    content = bC->getElementContent ("TRIGGER_THRESHOLD") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        int val ;
-        ststream >> val ;
-        for (int i = 0 ; i < MAX_SET ; ++i) digitizerConfiguration_.Threshold[i] = val ;
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field TRIGGER_THRESHOLD not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-        
-    // Channel Auto trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
-    content = bC->getElementContent ("CHANNEL_TRIGGER") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        int ok = 1 ;
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        CAEN_DGTZ_TriggerMode_t tm ;
-        if (dummy == "DISABLED")                    tm = CAEN_DGTZ_TRGMODE_DISABLED ;
-        else if (dummy == "ACQUISITION_ONLY")       tm = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
-        else if (dummy == "ACQUISITION_AND_TRGOUT") tm = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
-        else
-          {  
-             ok = 0 ;
-             cout << "[V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-        if (ok)  
-          {
-            for (int i = 0; i < MAX_SET; ++i) digitizerConfiguration_.ChannelTriggerMode[i] = tm ;
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field CHANNEL_TRIGGER not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // Front Panel LEMO I/O level (NIM, TTL)
-    content = bC->getElementContent ("FPIO_LEVEL") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "TTL") digitizerConfiguration_.FPIOtype = 1 ;
-        else if (dummy != "NIM")
-          {  
-             cout << "[V1742]::[WARNING]:: FPIO_LEVEL " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field FPIO_LEVEL not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
-    // Channel Enable (or Group enable for the V1740) (YES/NO)
-    content = bC->getElementContent ("ENABLE_INPUT") ;
-    if (content.find ("NULL") != string::npos)
-      {
-        stringstream ststream (content) ;
-        string dummy ;
-        ststream >> dummy ;
-        if (dummy == "YES")     digitizerConfiguration_.EnableMask = 0xFF ;
-        else if (dummy == "NO") digitizerConfiguration_.EnableMask = 0x00 ;
-        else 
-          {  
-             cout << "[V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option" << endl ;
-             //PG FIXME abort run start?
-          }
-      }
-    else 
-      {
-        cout << "[V1742]::[WARNING]:: Field ENABLE_INPUT not found in board xml node config" << endl ;
-        //PG FIXME abort run start?
-      }
-
+  //PG searching for nodes called "TRIGGER"
+  
+  //PG searching for nodes called "CHANNEL"
+  xmlNode * ch_node = NULL;	
+  for (ch_node = bC->GetBoardNodePtr ()->children; ch_node ; ch_node = ch_node->next)
+	{
+		if (ch_node->type == XML_ELEMENT_NODE &&
+				xmlStrEqual (ch_node->name, xmlCharStrdup ("CHANNEL"))  )
+          ParseConfigForGroups (bC, ch_node) ;
+	}
+  
   return 0 ;
 
 } ;
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+int 
+CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
+{
+  int ch = -1 ;
+
+  string content = Configurable::getElementContent (*bC, "ID", node) ;
+  if (content.find ("NULL") != string::npos)
+      {
+        std::stringstream ststream (content) ;
+        ststream >> ch ;
+      }
+  else 
+    {
+      cerr << "[V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
+      return -1 ;
+      //PG FIXME abort run start?
+    }
+
+  content = Configurable::getElementContent (*bC, "ENABLE_INPUT", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      if (dummy == "YES")     digitizerConfiguration_.EnableMask |= (1 << ch) ;
+      else if (dummy == "NO") digitizerConfiguration_.EnableMask &= ~ (1 << ch) ;
+      else 
+        {  
+           cout << "[V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option" << endl ;
+           //PG FIXME abort run start?
+        }
+    }
+
+  content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      float dc ;
+      ststream >> dc ;
+      int val = (int) ( (dc+50) * 65535 / 100) ;
+      digitizerConfiguration_.DCoffset[ch] = val ;
+    }
+
+  content = Configurable::getElementContent (*bC, "GRP_CH_DC_OFFSET", node) ;
+  if (content.find ("NULL") != string::npos)
+      {
+        stringstream ststream (content) ;
+        float dc[8] ;
+        for (int i = 0 ; i < 8 ; ++i) ststream >> dc[i] ;
+        for (int i = 0 ; i < MAX_SET ; ++i) 
+            {
+              int val = (int) ( (dc[i]+50) * 65535 / 100) ; 
+              digitizerConfiguration_.DCoffsetGrpCh[ch][i] = val ;
+            }
+      }
+
+  // Threshold
+  content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      int val ;
+      ststream >> val ;
+      digitizerConfiguration_.Threshold[ch] = val ;
+    }
+
+  content = Configurable::getElementContent (*bC, "CHANNEL_TRIGGER", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      int ok = 1 ;
+      stringstream ststream (content) ;
+      string dummy ;
+      ststream >> dummy ;
+      CAEN_DGTZ_TriggerMode_t tm ;
+      if (dummy == "DISABLED")                    tm = CAEN_DGTZ_TRGMODE_DISABLED ;
+      else if (dummy == "ACQUISITION_ONLY")       tm = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
+      else if (dummy == "ACQUISITION_AND_TRGOUT") tm = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
+      else
+        {  
+          ok = 0 ;
+          cout << "[V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option" << endl ;
+          //PG FIXME abort run start?
+        }
+      if (ok)  
+        {
+          digitizerConfiguration_.ChannelTriggerMode[ch] = tm ; 
+        }
+    }
+
+  // Group Trigger Enable Mask (hex 8 bit)
+  content = Configurable::getElementContent (*bC, "GROUP_TRG_ENABLE_MASK", node) ;
+  if (content.find ("NULL") != string::npos)
+      {
+        stringstream ststream (content) ;
+        int val ; //PG FIXME is this integer or hexadecimal?
+        ststream >> val ;
+        digitizerConfiguration_.GroupTrgEnableMask[ch] = val & 0xFF ;
+      }
+
+  return ch ;
+}
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
