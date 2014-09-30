@@ -1,5 +1,6 @@
 #include "interface/BoardConfig.hpp"
 
+using namespace std ;
 
 // --- Constructor
 BoardConfig::BoardConfig(){
@@ -34,3 +35,17 @@ void BoardConfig::Init(Configurator&c){
 	root_element=c.root_element;
 }
 //
+
+vector<pair<string, string> > 
+BoardConfig::getNodeContentList (const char * key)
+{
+  xmlNode * cur_node = NULL;
+  for (cur_node = board_node->children; cur_node ; cur_node = cur_node->next)
+    {
+      if ((!xmlStrcmp (cur_node->name, (const xmlChar *) key)))
+        {
+          return Configurable::getNodeContentList (*this, cur_node) ;
+        }
+     }
+  return vector<pair<string, string> > () ;
+}

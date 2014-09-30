@@ -148,6 +148,11 @@ string Configurable::getElementContent (xmlDocPtr doc, const char * key, const x
     return string (content) ;
   }
 
+string Configurable::getElementContent(Configurator&c, const char * key, const xmlNode * node)
+{
+	return getElementContent(c.doc, key,node);
+}
+
 vector<string> Configurable::getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node)
   {
     vector<string> R;
@@ -164,15 +169,11 @@ vector<string> Configurable::getElementVector (xmlDocPtr doc, const char * key, 
     return R ;
   }
 
-string Configurable::getElementContent(Configurator&c, const char * key, const xmlNode * node)
-{
-	return getElementContent(c.doc, key,node);
-}
-
 vector<string> Configurable::getElementVector(Configurator&c, const char * key, const xmlNode * node)
 {
 	return getElementVector(c.doc, key,node);
 }
+
 int    Configurator::GetInt   (string value) {// { return atoi(value.c_str());}
 	if ( value.find("0x") != string::npos ) {
 	int mynum;
@@ -182,3 +183,27 @@ int    Configurator::GetInt   (string value) {// { return atoi(value.c_str());}
 	else return atoi(value.c_str());
 
 }
+
+/** assuming there's only one sub-structure in the searched node, 
+composed by the replication of the same pattern */
+vector<pair<string, string> >
+Configurable::getNodeContentList (xmlDocPtr doc, const xmlNode * node)
+  {
+    string name ;
+    string content ;
+    vector<pair<string, string> > output ;
+    xmlNode *cur_node = NULL;
+    for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
+      {
+        name    = (char *) cur_node->name ;
+        content = (char *) xmlNodeListGetString (doc, cur_node->xmlChildrenNode, 1) ;
+        output.push_back (pair<string, string> (name, content)) ;
+       }
+    return output ;
+  }
+
+vector<pair<string, string> >
+Configurable::getNodeContentList (Configurator & c, const xmlNode * node)
+{
+  return getNodeContentList (c.doc, node) ;
+ }
