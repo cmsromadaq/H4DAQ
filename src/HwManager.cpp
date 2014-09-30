@@ -179,6 +179,10 @@ int HwManager::CrateInit()
       if ( hw_[i]->GetType() == "CAEN_V513" || hw_[i]->GetType() == "CAEN_V262" )
 	{
 	  ioControlBoard_.boardIndex_=i;
+	  if(dynamic_cast<IOControlBoard*>(hw_[i]) == NULL ){
+		  	Log("[HwManager]::[CrateInit] Controller Board do not inheriths from IOControlBoard",1);
+			throw hw_exception();
+	  		}
 	  break; 
 	}
     }
@@ -264,9 +268,9 @@ void HwManager::ReadAll(dataType&R){ // don't construct the all event
 	{
 		hw_[i]->Read(v);
 		BoardId bId;
-			bId.crateId_  = crateId_;
-			bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD
-			bId.boardId_  = hw_[i]->GetId() ; 
+		bId.crateId_  = crateId_;
+		bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD
+		bId.boardId_  = hw_[i]->GetId() ; 
 		EventBuilder::BoardToStream( R, bId , v )  ;
 	}
 	return ;

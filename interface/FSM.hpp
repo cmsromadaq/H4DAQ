@@ -24,10 +24,26 @@ public:
 	bool IsOk();
 };
 
-class RunControllerFSM : public Daemon{
+class DummyRunControlFSM : public Daemon{
 
 public:
-	RunControllerFSM();
+	DummyRunControlFSM();
+	void Loop();
+	inline void Clear(){Daemon::Clear();}
+	inline int Init(string configFileName="data/config.xml"){return Daemon::Init(configFileName);};
+	bool IsOk();
+};
+
+class RunControlFSM : public Daemon{
+
+protected:
+	TRG_t trgType_;
+	TRG_STATUS_t trgStatus_;
+	long trgNevents_;
+	long trgRead_;
+
+public:
+	RunControlFSM();
 	void Loop();
 	inline void Clear(){Daemon::Clear();}
 	inline int Init(string configFileName="data/config.xml"){return Daemon::Init(configFileName);};
