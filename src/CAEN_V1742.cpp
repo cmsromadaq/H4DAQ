@@ -23,7 +23,7 @@ int CAEN_V1742::Init ()
   ERROR_CODES ErrCode = ERR_NONE ;
   
   cout << "[V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++" << endl ;
-  if (bC_ == NULL ) //PG FIXME what is bC_?
+  if (bC_ == NULL )
     {
       return ERR_CONF_NOT_FOUND ;
     }
@@ -1121,3 +1121,51 @@ int CAEN_V1742::setDefaults ()
 }
 
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+void CAEN_V1742::printConfiguration ()
+{
+  cout << " BaseAddress        " << digitizerConfiguration_.BaseAddress        << "\n" ;                                                               
+  cout << " LinkType           " << digitizerConfiguration_.LinkType           << "\n" ;                                                               
+  cout << " LinkNum            " << digitizerConfiguration_.LinkNum            << "\n" ;                                                               
+  cout << " ConetNode          " << digitizerConfiguration_.ConetNode          << "\n" ;                                                               
+  cout << " Nch                " << digitizerConfiguration_.Nch                << "\n" ;                                                               
+  cout << " Nbit               " << digitizerConfiguration_.Nbit               << "\n" ;                                                               
+  cout << " Ts                 " << digitizerConfiguration_.Ts                 << "\n" ;                                                               
+  cout << " RecordLength       " << digitizerConfiguration_.RecordLength       << "\n" ;                                                               
+  cout << " PostTrigger        " << digitizerConfiguration_.PostTrigger        << "\n" ;                                                               
+  cout << " NumEvents          " << digitizerConfiguration_.NumEvents          << "\n" ;                                                               
+  cout << " InterruptNumEvents " << digitizerConfiguration_.InterruptNumEvents << "\n" ;                                                               
+  cout << " TestPattern        " << digitizerConfiguration_.TestPattern        << "\n" ;                                                               
+  cout << " DesMode            " << digitizerConfiguration_.DesMode            << "\n" ;                                                               
+  cout << " TriggerEdge        " << digitizerConfiguration_.TriggerEdge        << "\n" ;                                                               
+  cout << " FPIOtype           " << digitizerConfiguration_.FPIOtype           << "\n" ;                                                               
+  cout << " ExtTriggerMode     " << digitizerConfiguration_.ExtTriggerMode     << "\n" ;                                                               
+  cout << " EnableMask         " << digitizerConfiguration_.EnableMask         << "\n" ;                                                               
+  cout << " FastTriggerMode    " << digitizerConfiguration_.FastTriggerMode    << "\n" ;                                                               
+  cout << " FastTriggerEnabled " << digitizerConfiguration_.FastTriggerEnabled << "\n" ;                                                                 
+  cout << " GWn                " << digitizerConfiguration_.GWn                << "\n" ;                                                               
+  cout << " useCorrections     " << digitizerConfiguration_.useCorrections     << "\n" ;                                                               
+
+  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
+    {
+      cout << "ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
+      cout << "DCoffset[" << i << "]           : " << digitizerConfiguration_.DCoffset[i]           << "\n" ;  
+      cout << "Threshold[" << i << "]          : " << digitizerConfiguration_.Threshold[i]          << "\n" ;  
+      cout << "GroupTrgEnableMask[" << i << "] : " << digitizerConfiguration_.GroupTrgEnableMask[i] << "\n" ;  
+      cout << "FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
+      cout << "FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
+    }
+
+  for (int i = 0 ; i < CAEN_V1742_MAXGW ; ++i) 
+    {
+      cout << "GWaddr[" << i << "] : " << digitizerConfiguration_.GWaddr[i] << "\n" ;                                                           
+      cout << "GWdata[" << i << "] : " << digitizerConfiguration_.GWdata[i] << "\n" ;                                                           
+    }
+
+  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
+    for (int j = 0 ; j < CAEN_V1742_MAXSET ; ++j) 
+      cout << "DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
+
+}

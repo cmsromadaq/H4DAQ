@@ -96,6 +96,7 @@ public:
   virtual int SetHandle (int digitizerHandle) { digitizerHandle_ = digitizerHandle ; } ;
 
   inline CAEN_V1742_Config_t* GetConfiguration () { return &digitizerConfiguration_ ; } ;
+  void printConfiguration () ;
 
 private:
 
