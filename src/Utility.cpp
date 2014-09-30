@@ -92,6 +92,7 @@ void Utility::SpaceToNull(int N,void*data,bool first)
 }
 int Utility::FindNull(int N,void*data,int iPos)
 {
+	printf("[Utility]::[FindNull] Start\n");
 	int counter=0;
 	for(int i=0;i<N ;i++) 
 		if( ((char*)data)[i] =='\0') 
@@ -99,5 +100,6 @@ int Utility::FindNull(int N,void*data,int iPos)
 			counter++;
 			if(counter == iPos && i+1<N) return i+1;
 		}
+	printf("[Utility]::[FindNull] End\n");
 	return -1;
 }

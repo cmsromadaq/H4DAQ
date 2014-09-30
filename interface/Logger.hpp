@@ -86,6 +86,7 @@ class LogUtility
 	LogUtility(){log=NULL;}
 	~LogUtility();//{log=NULL;} // dont delete it - disable logging
 	void Log(string line,short level){ if(log!=NULL) log->Log(line,level);}
+	void Log(ostringstream s,short level){ Log(s.str(),level);}
 	void LogInit(Logger *l);//{log=l;}
 	// --- Disable logging
 	void LogClear();

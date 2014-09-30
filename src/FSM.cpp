@@ -147,7 +147,7 @@ while (true) {
 			{
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,DataSck);
 			}
 			MoveToStatus(SENTBUFFER);
 		    break;
@@ -221,7 +221,7 @@ while (true) {
 			    printf("Starting Run %u\n",runNum);
 			    dataType myFufMex;
 			    myFufMex.append((void*)"NOP\0",4);
-			    connectionManager_->Send(myFufMex);
+			    connectionManager_->Send(myFufMex,CmdSck);
 			    dataType myMex;
 			    myMex.append((void*)"STARTRUN\0",9);
 			    myMex.append((void*)&runNum,WORDSIZE);
@@ -230,7 +230,7 @@ while (true) {
 				//fwrite(myMex.data(),1,myMex.size(),stdout);
 				printf("%s",Utility::AsciiData(myMex.data(),myMex.size()).c_str() );
 				printf("------------------\n");
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			    break;
 		    }
@@ -240,7 +240,7 @@ while (true) {
 			    printf("WWE\n");
 			    dataType myMex;
 			    myMex.append((void*)"WWE\0",4);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			    break;
 
@@ -251,7 +251,7 @@ while (true) {
 			    printf("WE\n");
 			    dataType myMex;
 			    myMex.append((void*)"WE\0",3);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			    break;
 		    }
@@ -281,7 +281,7 @@ while (true) {
 			    printf("EE\n");
 			    dataType myMex;
 			    myMex.append((void*)"EE\0",3);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			    break;
 		    }
@@ -291,7 +291,7 @@ while (true) {
 			    printf("End Of Run\n");
 			    dataType myMex;
 			    myMex.append((void*)"ENDRUN\0",7);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			    break;
 		    }
@@ -325,7 +325,7 @@ while (true) {
 			    printf("SPILLCOMPL!\n");
 			    dataType myMex;
 			    myMex.append((void*)"SPILLCOMPL\0",11);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(READ);
 			break;
 			}
@@ -334,7 +334,7 @@ while (true) {
 			    printf("BYE BYE DAQ!\n");
 			    dataType myMex;
 			    myMex.append((void*)"DIE\0",4);
-			    connectionManager_->Send(myMex);
+			    connectionManager_->Send(myMex,CmdSck);
 			    MoveToStatus(START);
 			    break; // or return ?
 		    }
@@ -479,13 +479,13 @@ while (true) {
 		    }
 	case ENDSPILL:
 		    {
-			    // received EE
+			    // received EE TODO NOT Open Close Spill
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,DataSck);
 			}
 			MoveToStatus(RECVBUFFER);
 		    break;
@@ -505,13 +505,13 @@ while (true) {
 				    eventBuilder_->MergeSpills(myData);
 			    }
 		    }
-		    if ( eventBuilder_->AreSpillsMerged() )
+		    if ( eventBuilder_->AreSpillsMerged() ) // RUN CONTROL SEND COMMOND EB_SPILLCOMPL TODO
 		   	 {
 			// SENT STATUS BUFFER COMPLETED
 			 dataType myMex;
 			 //inform run controller that spill has been completed
 			 myMex.append((void*)"STATUS\0SPILLCOMPL\0\0\0",18);
-			 connectionManager_->Send(myMex);
+			 connectionManager_->Send(myMex,StatusSck);
 			 MoveToStatus(SENTBUFFER);
 		    
 		   	 }
@@ -592,6 +592,7 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  GUI_STARTRUN ) 
 			   	 {
+				   Log("[RunControlFSM]::[Loop] Is GUI START RUN 2",3);
 				   hwManager_->BufferClearAll();
 				   eventBuilder_->ResetSpillNumber();
 
@@ -600,6 +601,8 @@ while (true) {
 				   sscanf( (char*)myCmd.data,"%u",&myRunNum);
 				   // find out the type of RUN and the Trigger rate (if exists)
 				   int shift=Utility::FindNull(myCmd.N,myCmd.data,1);
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop] Enter GUI_STARTRUN Routine. shift1="<<shift ;
+				   Log(s2.str(),3);
 				   if (shift<0) {
 					   Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored",1);
 					   break;
@@ -639,15 +642,22 @@ while (true) {
 		    wweMex.append((void*)"WWE\0",4);
 		    if (trgType_==PED_TRIG ) 
 		    {
-			    connectionManager_->Send(wweMex);
+			    connectionManager_->Send(wweMex,CmdSck);
 			    MoveToStatus(CLEARED);
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
 		   	 // read the boards for WWE
-			 if (hwManager_->SignalReceived(WWE))
+			 if (
+#define RC_DEBUG
+#ifndef RC_DEBUG
+					 hwManager_->SignalReceived(WWE)
+#else
+					 true
+#endif
+					 )
 			 {
-			    connectionManager_->Send(wweMex);
+			    connectionManager_->Send(wweMex,CmdSck);
 			    MoveToStatus(CLEARED);
 			 }
 
@@ -662,7 +672,8 @@ while (true) {
 		    weMex.append((void*)"WE\0",3);
 		    if (trgType_==PED_TRIG ) 
 		    {
-			    connectionManager_->Send(weMex);
+		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+			    connectionManager_->Send(weMex,CmdSck);
 			    trgRead_=0;
 			    MoveToStatus(CLEARBUSY);
 		    }
@@ -671,7 +682,8 @@ while (true) {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
-			    connectionManager_->Send(weMex);
+		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+			    connectionManager_->Send(weMex,CmdSck);
 			    MoveToStatus(CLEARBUSY);
 			 }
 
@@ -684,7 +696,7 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
-		     // check for END OF SPILL
+		    // check for END OF SPILL
 		    dataType eeMex;
 		    eeMex.append((void*)"EE\0",3);
 		    // check end of spill conditions
@@ -692,7 +704,7 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
-				connectionManager_->Send(eeMex);
+				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				}
 		    	}
@@ -701,7 +713,7 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				// send EE
-				connectionManager_->Send(eeMex);
+				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				}
 		    	}
@@ -749,7 +761,7 @@ while (true) {
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
 				// TODO check if myCmd slhould destruct data/N or not
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,DataSck);
 			}
 			MoveToStatus(SENTBUFFER);
 		    break;
@@ -774,7 +786,7 @@ while (true) {
 				    gui_pauserun=true;
 			    else if (myNewCmd.cmd == GUI_DIE)
 				    gui_die=true;
-			    else if (myNewCmd.cmd == GUI_PAUSERUN)
+			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
 				    gui_restartrun=true;
 			    
 		    }
@@ -783,7 +795,7 @@ while (true) {
 		   	 { 
 				dataType myMex;
 				myMex.append((void*)"ENDRUN\0",7);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,CmdSck);
 				MoveToStatus(INITIALIZED);
 		    	 }
 		    else if (gui_pauserun)
@@ -792,7 +804,7 @@ while (true) {
 		   	{
 				dataType myMex;
 				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,CmdSck);
 			    	//SEND beginSPILL
 				MoveToStatus(BEGINSPILL);
 			}
@@ -801,7 +813,7 @@ while (true) {
 			{
 				dataType myMex;
 				myMex.append((void*)"DIE\0",4);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,CmdSck);
 			        MoveToStatus(BYE);
 			}
 		    else if ( eb_endspill )
@@ -809,7 +821,7 @@ while (true) {
 			    {
 				dataType myMex;
 				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex);
+				connectionManager_->Send(myMex,CmdSck);
 				MoveToStatus(BEGINSPILL);
 			    }
 			    

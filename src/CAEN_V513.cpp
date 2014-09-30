@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-//#define CAEN_V513_DEBUG
+#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -53,10 +53,9 @@ int CAEN_V513::Init()
       bool channelTransferMode=(configuration_.channelsTransferModeWord & (1 << i));
       data= (channelDirection*CAEN_V513_CHANNEL_DIR_BITMASK) | (channelPolarity*CAEN_V513_CHANNEL_POL_BITMASK) | (channelInputMode*CAEN_V513_CHANNEL_IM_BITMASK) | (channelTransferMode*CAEN_V513_CHANNEL_TM_BITMASK);
 
-#ifdef CAEN_V513_DEBUG
-      s.str(""); s << "[CAEN_V513]::[DEBUG]::CHANNEL "<< i << " CONFIG: 0b" << (bitset<3>) data;
-      Log(s.str(),3);
-#endif
+      s.str(""); s << "[CAEN_V513]::[INFO]::CHANNEL "<< i << " CONFIG: 0b" << (bitset<3>) data;
+      Log(s.str(),1);
+
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CHANNEL0_STATUS_REGISTER+i*CAEN_V513_CHANNEL_STATUS_SIZE,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
     }
   
@@ -67,10 +66,9 @@ int CAEN_V513::Init()
 	// && (configuration_.channelsPolarityWord & (1 << i)) == CAEN_V513_POS_POL ) 
 	{
 	  dataRegister_ |= 1<<i;
-#ifdef CAEN_V513_DEBUG
-	  s.str(""); s << "[CAEN_V513]::[DEBUG]::SETTING TO 1 BIT "<< i << " DATAREGISTER: 0x" << std::hex << dataRegister_ << std::dec;  
-	  Log(s.str(),3);
-#endif
+
+	  s.str(""); s << "[CAEN_V513]::[INFO]::SETTING TO 1 BIT "<< i << " DATAREGISTER: 0x" << std::hex << dataRegister_ << std::dec;  
+	  Log(s.str(),1);
 	}
     }
 
@@ -92,7 +90,7 @@ int CAEN_V513::Init()
   s.str(""); s << "[CAEN_V513]::[INFO]::REMOVED BEAM VETO. DATAREGISTER: 0x"<< std::hex << dataRegister_ << std::dec;  
   Log(s.str(),3);
   int ncycle=0;
-  while (ncycle<20)
+  while (ncycle<3)
     {
       s.str(""); s << "[CAEN_V513]::[INFO]::READ TEST #"<< ncycle;
       Log(s.str(),3);

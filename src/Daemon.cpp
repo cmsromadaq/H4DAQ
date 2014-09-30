@@ -126,13 +126,19 @@ Command Daemon::ParseData(dataType &mex)
 
 		dataType mex2;
 		mex2.copy(mex.data(),mex.size()) ;
-		Utility::SpaceToNull(mex2.size(),mex2.data(),true); // true=only the first
+		Utility::SpaceToNull(mex2.size(),mex2.data(),false); // true=only the first
+
+		ostringstream s; s<<"[Daemon]::[ParseCommand] GUI Mex: '"<< (char*)mex2.data()<<"'";
+		Log(s.str(),3);
 
 		if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_STARTRUN")  )
 		   {
-		   mex.erase(0,12);
+		   Log("[Daemon]::[ParseCommand] [DEBUG] Is GUI START RUN",3 );
+		   mex.erase(0,13);
+		   Log("[Daemon]::[ParseCommand] [DEBUG] Is GUI START RUN 2",3 );
 		   myCmd.cmd=GUI_STARTRUN;
 		   Utility::SpaceToNull(mex.size(),mex.data() ) ;
+		   Log("[Daemon]::[ParseCommand] [DEBUG] Space To Null Done",3 );
 		   myCmd.data = mex.data();
 		   myCmd.N    = mex.size();
 		   mex.release();
@@ -166,7 +172,7 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	myMex.append((void*)"STATUS\0",7);
 	WORD myStatus=(WORD)newStatus;
 	myMex.append((void*)&myStatus,WORDSIZE);
-	connectionManager_->Send(myMex,1);
+	connectionManager_->Send(myMex,StatusSck);
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
 	Log(s.str(),3);
