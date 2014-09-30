@@ -13,6 +13,7 @@ enum BoardTypes_t { _TIME_=1, //Fake board to get timestamps
 		    _CAENV1290_=7, //16ch TDC
 		    _CAENV1495PU_=8, //General Purpose I/O. FW 2.1 PatternUnit
 		    _CAENV560_=9, //Scaler
+		    _MAXBOARDTYPE_, // USED By DQM
 		    _UNKWN_=0 };
 
 class BoardConfig;
