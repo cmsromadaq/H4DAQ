@@ -687,7 +687,7 @@ while (true) {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); //UNCOMMENT
 			    connectionManager_->Send(weMex,CmdSck);
 			    hwManager_->BufferClearAll();
 			    MoveToStatus(CLEARBUSY);
@@ -712,6 +712,7 @@ while (true) {
 				{
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
+				break;
 				}
 		    	}
 		    else if (trgType_ == PED_TRIG ) 
@@ -721,6 +722,7 @@ while (true) {
 				// send EE
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
+				break;
 				}
 		    	}
 		     /// check trigger
@@ -761,6 +763,7 @@ while (true) {
 	case ENDSPILL: 
 		    {
 			    // received EE
+		        hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{

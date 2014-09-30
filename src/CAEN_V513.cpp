@@ -256,16 +256,22 @@ int CAEN_V513::SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus)
     {
 	if (triggerStatus == TRIG_ON)
 	  dataRegister_ &= ~configuration_.beamTriggerVetoBitMask;
+	else
+	  dataRegister_ |= configuration_.beamTriggerVetoBitMask;
       }
   else if ( triggerType == PED_TRIG )
       {
 	if (triggerStatus == TRIG_ON)
 	  dataRegister_ &= ~configuration_.pedTriggerVetoBitMask;
+	else
+	  dataRegister_ |= configuration_.pedTriggerVetoBitMask;
       }
   else if ( triggerType == LED_TRIG ) 
       {
 	if (triggerStatus == TRIG_ON)
 	  dataRegister_ &= ~configuration_.ledTriggerVetoBitMask;
+	else
+	  dataRegister_ |= configuration_.ledTriggerVetoBitMask;
       }
   else 
     {
