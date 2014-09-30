@@ -238,7 +238,7 @@ void ConnectionManager::Init(){
 		pubs[i]->Init();
 		ostringstream s;
 		s<<"[ConnectionManager]::[Init] Init Publish:"<<sendPorts[i]<<" size="<<pubs.size();
-		Log(s.str(),2);
+		Log(s.str(),1);
 		}
 	for(int i=0;i<recvAddresses.size();i++)
 		{
@@ -247,7 +247,7 @@ void ConnectionManager::Init(){
 		subs[i]->Init();
 		ostringstream s;
 		s<<"[ConnectionManager]::[Init] Init Subscriber:"<<recvAddresses[i]<< "size="<< subs.size();
-		Log(s.str(),2);
+		Log(s.str(),1);
 		}
 }
 

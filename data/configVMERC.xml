@@ -2,7 +2,7 @@
   <Network>
     <ListenPort>5556</ListenPort>
     <!-- <ConnectTo>localhost:5555</ConnectTo> -->
-    <ConnectTo>gui.cern.ch:guiport</ConnectTo> 
+    <ConnectTo>pcethtb1.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo> <!--6000 is the status communication system -->
   </Network>
   <Hardware>
