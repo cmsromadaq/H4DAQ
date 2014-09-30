@@ -37,6 +37,10 @@ timeval start_time;
 timeval stopwatch_start_time;
 timeval stopwatch_stop_time;
 
+const static int DataSck = 0;
+const static int StatusSck = 1;
+const static int CmdSck = 2;
+
 public:
 	// --- Constructor
 	Daemon();
