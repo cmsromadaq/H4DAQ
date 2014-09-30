@@ -643,6 +643,8 @@ while (true) {
 		    if (trgType_==PED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
+			    hwManager_->BufferClearAll();
+			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
 		    else if (trgType_==BEAM_TRIG)
@@ -658,6 +660,8 @@ while (true) {
 					 )
 			 {
 			    connectionManager_->Send(wweMex,CmdSck);
+			    hwManager_->BufferClearAll();
+			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 			 }
 
@@ -675,6 +679,7 @@ while (true) {
 		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 			    connectionManager_->Send(weMex,CmdSck);
 			    trgRead_=0;
+			    hwManager_->BufferClearAll();
 			    MoveToStatus(CLEARBUSY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
@@ -684,6 +689,7 @@ while (true) {
 			 {
 		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 			    connectionManager_->Send(weMex,CmdSck);
+			    hwManager_->BufferClearAll();
 			    MoveToStatus(CLEARBUSY);
 			 }
 

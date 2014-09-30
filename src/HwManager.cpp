@@ -263,7 +263,7 @@ void HwManager::Print(){
 void HwManager::Read(int i,vector<WORD> &v)
 {
 	v.clear();
-	hw_[i]->Read(v);
+	if (hw_[i]->Read(v) ) throw hw_exception();
 	return;
 }
 
@@ -271,7 +271,7 @@ void HwManager::ReadAll(dataType&R){ // don't construct the all event
 	vector<WORD> v; 
 	for(int i=0;i< hw_.size();i++)
 	{
-		hw_[i]->Read(v);
+		Read(i,v);
 		BoardId bId;
 		bId.crateId_  = crateId_;
 		bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD

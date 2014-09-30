@@ -1,6 +1,9 @@
 #include "interface/EventBuilder.hpp"
 #include "interface/DataType.hpp"
 #include "interface/Utility.hpp"
+#include <sstream>
+
+//#define EB_DEBUG
 
 
 
@@ -54,6 +57,15 @@ void EventBuilder::BoardHeader(dataType &R, BoardId id)
 			( (id.boardId_<<myBoardIdShift)     & GetBoardIdBitMask()     ) |  
 			( (id.boardType_<<myBoardTypeShift) & GetBoardTypeIdBitMask() )  ;
 	WordToStream(R,myId);
+#ifdef EB_DEBUG
+	ostringstream s;
+	s<<"[EventBuilder]::[BoardId]::[DEBUG] CrateId="<< id.crateId_
+		<<" BID="<<id.boardId_
+		<<" TYP="<<id.boardType_
+		<<" WORD="<<std::hex<< myId<<std::dec;
+	printf("%s\n",s.str().c_str());
+#endif
+
 	return ;
 }
 
@@ -71,7 +83,7 @@ void EventBuilder::BoardToStream(dataType &R ,BoardId id,vector<WORD> &v)
 {
 	//R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations
 	BoardHeader(R, id );
-	WORD N= v.size()*WORDSIZE;
+	WORD N= (v.size() + BoardHeaderWords() + BoardTrailerWords() )*WORDSIZE  ;
 	WordToStream(R,N)  ; 
 	for(unsigned long long i=0;i<v.size();i++) WordToStream(R,v[i])  ;
 	BoardTrailer(R) ;

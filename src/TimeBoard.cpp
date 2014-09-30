@@ -29,8 +29,8 @@ int TimeBoard::Config(BoardConfig *bC){
   	ref_date.tm_min = 0;
   	ref_date.tm_sec = 0;
   	ref_date.tm_year = 114;
-  	ref_date.tm_mon = 9;
-  	ref_date.tm_mday = 1;
+  	ref_date.tm_mon = 8; // start from 0 ?
+  	ref_date.tm_mday = 29;
   	ref=mktime(&ref_date);
 
 	return 0;
@@ -41,9 +41,11 @@ int TimeBoard::Read(vector<WORD> &v)
 	//WORD x=(WORD) ((unsigned)time(NULL) );
 	timeval tv;
 	gettimeofday(&tv,NULL);
-	long x	= Utility::timestamp(&tv,&ref);
-	WORD x_msb = x>>32; 
+	unsigned long x	= Utility::timestamp(&tv,&ref);
+	unsigned long x_prime= x>>32;
+	WORD x_msb = (( x_prime ) & 0xFFFFFFFF ); 
 	WORD x_lsb = x & (0xFFFFFFFF);
+	//printf("[TimeBoard]::[Read] %lu xprime=%lu %X %X\n",x,x_prime,x_lsb,x_msb); //DEBUG
 	v.push_back(x_lsb);
 	v.push_back(x_msb);
 	return 0;

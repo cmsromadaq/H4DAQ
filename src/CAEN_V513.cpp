@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-#define CAEN_V513_DEBUG
+//#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -90,7 +90,7 @@ int CAEN_V513::Init()
   s.str(""); s << "[CAEN_V513]::[INFO]::REMOVED BEAM VETO. DATAREGISTER: 0x"<< std::hex << dataRegister_ << std::dec;  
   Log(s.str(),3);
   int ncycle=0;
-  while (ncycle<3)
+  while (ncycle<10)
     {
       s.str(""); s << "[CAEN_V513]::[INFO]::READ TEST #"<< ncycle;
       Log(s.str(),3);
@@ -98,7 +98,7 @@ int CAEN_V513::Init()
       unsigned int nt=0;
       while(!SignalReceived(WE))
 	{
-	  usleep(1000);
+	  //usleep(1000);
 	  ++nt;
 	}
       s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR WE "<< nt << " TIMES";
@@ -106,7 +106,7 @@ int CAEN_V513::Init()
       nt=0;
       while(!SignalReceived(EE))
 	{
-	  usleep(1000);
+	  //usleep(1000);
 	  ++nt;
 	}
       s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR EE "<< nt << " TIMES";

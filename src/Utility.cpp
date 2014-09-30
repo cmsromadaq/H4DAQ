@@ -68,11 +68,12 @@ long Utility::timevaldiff(struct timeval *starttime, struct timeval *finishtime)
   return usec;
 }
 
-long Utility::timestamp(struct timeval *time, time_t *ref){
+unsigned long Utility::timestamp(struct timeval *time, time_t *ref){
 		
-  long time_msec;
+  unsigned long time_msec;
   time_msec=(time->tv_sec-*ref)*1000;
   time_msec+=time->tv_usec/1000;
+  //printf("Utility::temstamp %lu %lu \n",time->tv_sec,*ref);
   return time_msec;
 }
 

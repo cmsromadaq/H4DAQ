@@ -134,6 +134,7 @@ int CAEN_VX718::Config(BoardConfig *bC)
 int CAEN_VX718::Read(vector<WORD> &v)
 {
   //Nothing to read for VX718
+  return 0;
 }
 
 int CAEN_VX718::ClearBusy()
