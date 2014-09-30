@@ -8,7 +8,7 @@
 //PG settings for the board
 
 #define MAX_CH  32          /* max. number of channels */
-#define MAX_SET 4           /* max. number of independent settings */
+#define MAX_SET 8           /* max. number of independent settings */
 #define MAX_GW  1000        /* max. number of generic write commads */
 
 //#define VME_INTERRUPT_LEVEL      1
@@ -1149,7 +1149,7 @@ int CAEN_V1742::Print (int full)
   cout << " GWn                " << digitizerConfiguration_.GWn                << "\n" ;                                                               
   cout << " useCorrections     " << digitizerConfiguration_.useCorrections     << "\n" ;                                                               
 
-  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
+  for (int i = 0 ; i < 4 ; ++i)  //PG NB the hardcoded limits instead of  CAEN_V1742_MAXSET
     {
       cout << " ---- channel " << i << " ---- ---- ---- ---- ---- \n" ;
       cout << " ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
@@ -1158,12 +1158,10 @@ int CAEN_V1742::Print (int full)
       cout << " GroupTrgEnableMask[" << i << "] : " << bitset<8> (digitizerConfiguration_.GroupTrgEnableMask[i]) << "\n" ;  
       cout << " FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
       cout << " FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
+      cout << "   ---- ---- ---- ---- \n" ;
+      for (int j = 0 ; j < 8 ; ++j)  //PG NB the hardcoded limits instead of CAEN_V1742_MAXCH
+        cout << "   DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
     }
-
-  cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
-  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
-    for (int j = 0 ; j < CAEN_V1742_MAXSET ; ++j) 
-      cout << " DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
 
   if (full)
     {

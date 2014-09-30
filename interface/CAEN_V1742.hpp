@@ -67,7 +67,7 @@ public:
     CAEN_DGTZ_TriggerMode_t ChannelTriggerMode[CAEN_V1742_MAXSET] ;
     
     uint32_t DCoffset[CAEN_V1742_MAXSET] ;
-    int32_t  DCoffsetGrpCh[CAEN_V1742_MAXSET][CAEN_V1742_MAXSET] ;
+    int32_t  DCoffsetGrpCh[CAEN_V1742_MAXSET][CAEN_V1742_MAXCH] ;
     uint32_t Threshold[CAEN_V1742_MAXSET] ;
     uint8_t GroupTrgEnableMask[CAEN_V1742_MAXSET] ;
     
