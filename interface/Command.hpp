@@ -6,7 +6,7 @@
 
 // this are the cmd that the finate state machine can receive
 enum CMD_t {	NOP=0,
-		WWE,
+		WWE,     // Run Controller Commands 1-99
 		WE,
 		EE,
 		WBE,
@@ -20,7 +20,15 @@ enum CMD_t {	NOP=0,
 		STATUS,
 		SPILLCOMPL,
 		ENDRUN,
-		DIE
+		DIE,
+		// GUI Commands 100 - 199: Parsed only by the RunControl
+		GUI_STARTRUN= 100, // run# type#(PED,PHYSICS) freq# (int)
+		GUI_RESTARTRUN,
+		GUI_STOPRUN,
+		GUI_PAUSERUN,
+		GUI_DIE,
+		// EB Commands
+		EB_SPILLCOMPLETED= 200
 		};
 // this are the status of the finate state machines
 enum STATUS_t { START 		= 0, 
@@ -35,7 +43,7 @@ enum STATUS_t { START 		= 0,
 		RECVBUFFER	= 9,
 		SENTBUFFER	= 10,
 		SPILLCOMPLETED	= 11,
-		BYE		= 12  
+		BYE		= 12
 		};
 
 /* Command description:
@@ -53,7 +61,7 @@ enum STATUS_t { START 		= 0,
  * READ: check if board with sps status generated something
  */
 
-class Command{
+class Command{ // TODO pass to dataType
 public:
 	Command(){cmd=NOP; data=NULL; N=0;}
 	~Command(){ if (data != NULL) delete [] (char*)data;}

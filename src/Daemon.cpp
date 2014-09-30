@@ -1,4 +1,5 @@
 #include "interface/Daemon.hpp"
+#include "interface/Utility.hpp"
 
 // --- Constructor 
 Daemon::Daemon(){
@@ -114,12 +115,47 @@ Command Daemon::ParseData(dataType &mex)
 		}
 	else if (N >=11  and !strcmp( (char*) mex.data(), "SPILLCOMPL")  )
 		myCmd.cmd=SPILLCOMPL;
+	else if (N >=14  and !strcmp( (char*) mex.data(), "EB_SPILLCOMPL")  )
+		myCmd.cmd=EB_SPILLCOMPLETED;
 	else if (N >=7  and !strcmp( (char*) mex.data(), "ENDRUN")  )
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
+	// GUI CMD are not NULL Terminated
+	else 	{ // GUI
 
-	mex.release();
+		dataType mex2;
+		mex2.copy(mex.data(),mex.size()) ;
+		Utility::SpaceToNull(mex2.size(),mex2.data(),true); // true=only the first
+
+		if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_STARTRUN")  )
+		   {
+		   mex.erase(0,12);
+		   myCmd.cmd=GUI_STARTRUN;
+		   Utility::SpaceToNull(mex.size(),mex.data() ) ;
+		   myCmd.data = mex.data();
+		   myCmd.N    = mex.size();
+		   mex.release();
+		   }
+		else if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_PAUSERUN")  )
+		   {
+		   myCmd.cmd=GUI_PAUSERUN;
+		   }
+		else if (N >=11  and !strcmp( (char*) mex2.data(), "GUI_STOPRUN")  )
+		   {
+		   myCmd.cmd=GUI_STOPRUN;
+		   }
+		else if (N >=14  and !strcmp( (char*) mex2.data(), "GUI_RESTARTRUN")  )
+		   {
+		   myCmd.cmd=GUI_RESTARTRUN;
+		   }
+		else if (N >=8  and !strcmp( (char*) mex2.data(), "GUI_DIE")  )
+		   {
+		   myCmd.cmd=GUI_DIE;
+		   }
+		} // ENDGUI
+
+	if(myCmd.data !=NULL ) mex.release();
 	return myCmd;
 }
 

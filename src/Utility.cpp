@@ -79,3 +79,25 @@ long Utility::timestamp(struct timeval *time, time_t *ref){
 int Utility::hibit(WORD n) {
   return (n & 0x80000000) ? 31 : hibit((n << 1) | 1) - 1;
 }
+
+void Utility::SpaceToNull(int N,void*data,bool first)
+{
+	for(int i=0;i<N ;i++) 
+		if( ((char*)data)[i] ==' ') 
+		{
+			((char*)data)[i] =='\0';
+			if (first) break;
+		}
+	return ;
+}
+int Utility::FindNull(int N,void*data,int iPos)
+{
+	int counter=0;
+	for(int i=0;i<N ;i++) 
+		if( ((char*)data)[i] =='\0') 
+		{
+			counter++;
+			if(counter == iPos && i+1<N) return i+1;
+		}
+	return -1;
+}

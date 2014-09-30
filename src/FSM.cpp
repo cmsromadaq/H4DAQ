@@ -187,14 +187,14 @@ return;
 
 // ------------------------- RUN CONTROLLER
 // --- Constructor
-RunControllerFSM::RunControllerFSM() : Daemon() {};
+DummyRunControlFSM::DummyRunControlFSM() : Daemon() {};
 
-bool RunControllerFSM::IsOk(){
+bool DummyRunControlFSM::IsOk(){
 	//if( hwManager_->GetRunControl() != true) return false;
 	return true;
 }
 
-void RunControllerFSM::Loop(){
+void DummyRunControlFSM::Loop(){
 
 if ( !IsOk() ) throw config_exception();
 
@@ -547,4 +547,284 @@ while (true) {
 	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
 
 } // end while
+} // end Loop
+
+
+
+// ----------------------- RUN CONTROL FSM -----------
+RunControlFSM::RunControlFSM(): Daemon() {
+
+}
+
+bool RunControlFSM::IsOk(){
+	if ( !hwManager_->HaveControlBoard() ){
+		Log("[RunControlFSM]::[IsOk] does not have a control board",1);
+		return false;
+		}
+	return true;
+}
+
+void RunControlFSM::Loop(){
+// not constructed in the constructor -- should take this from the configuration
+
+if ( !IsOk() ) throw config_exception();
+
+while (true) {
+	try{
+		// check source that can populate the commands -- Connection and HW
+		// check Connection Manager
+		// if cmds not empty do something
+	switch (myStatus_ ) {
+	case START: {// not in the LOOP
+			    MoveToStatus(INIT);
+			    break;
+		    } 
+	case INIT:  {   // not in the LOOP
+			    MoveToStatus(INITIALIZED);
+			    break;
+		    } 
+	case INITIALIZED:
+		    {
+		    // wait for gui start run
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  GUI_STARTRUN ) 
+			   	 {
+				   hwManager_->BufferClearAll();
+				   eventBuilder_->ResetSpillNumber();
+
+				   // read runNum
+				   WORD myRunNum;
+				   sscanf( (char*)myCmd.data,"%u",&myRunNum);
+				   // find out the type of RUN and the Trigger rate (if exists)
+				   int shift=Utility::FindNull(myCmd.N,myCmd.data,1);
+				   if (shift<0) {
+					   Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored",1);
+					   break;
+					   }
+				   char *ptr= (char*)myCmd.data + shift;
+				   if (!strcmp(ptr,"PED")) // pedestal run
+						   {
+				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
+						   if (shift <0 ) {
+					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							break;
+						  	}
+				   		   char*ptr2= (char*)myCmd.data + shift;
+						   sscanf(ptr2,"%ld",trgNevents_);
+						   trgType_=PED_TRIG;
+						   }
+				   else if (!strcmp(ptr,"PHYSICS"))
+						   {
+						   trgType_=BEAM_TRIG;
+						   }
+				   else trgType_=UNK_TRIG; // LED_TRIG not impl
+
+				   ostringstream s;
+				   s << "[RunControlFSM]::[INFO]::Starting a new run " <<  myRunNum;
+				   Log(s.str(),1);
+				   // init RunNum in eventBuilder
+				   eventBuilder_->SetRunNum(myRunNum);
+				   MoveToStatus(BEGINSPILL);
+				 }
+			    }
+		    break;
+		    }
+	case BEGINSPILL: 
+		    {
+		    // wait for wwe
+		    dataType wweMex;
+		    wweMex.append((void*)"WWE\0",4);
+		    if (trgType_==PED_TRIG ) 
+		    {
+			    connectionManager_->Send(wweMex);
+			    MoveToStatus(CLEARED);
+		    }
+		    else if (trgType_==BEAM_TRIG)
+		    {
+		   	 // read the boards for WWE
+			 if (hwManager_->SignalReceived(WWE))
+			 {
+			    connectionManager_->Send(wweMex);
+			    MoveToStatus(CLEARED);
+			 }
+
+		    }
+
+		    break;
+		    }
+	case CLEARED:
+		    {
+		    // wait for we
+		    dataType weMex;
+		    weMex.append((void*)"WE\0",3);
+		    if (trgType_==PED_TRIG ) 
+		    {
+			    connectionManager_->Send(weMex);
+			    trgRead_=0;
+			    MoveToStatus(CLEARBUSY);
+		    }
+		    else if (trgType_==BEAM_TRIG)
+		    {
+		   	 // read the boards for WWE
+			 if (hwManager_->SignalReceived(WE))
+			 {
+			    connectionManager_->Send(weMex);
+			    MoveToStatus(CLEARBUSY);
+			 }
+
+		    }
+		    break;
+		    }
+	case CLEARBUSY: {
+		        hwManager_->ClearBusy();
+			MoveToStatus(WAITTRIG);
+			}
+	case WAITTRIG:
+		    {
+		     // check for END OF SPILL
+		    dataType eeMex;
+		    eeMex.append((void*)"EE\0",3);
+		    // check end of spill conditions
+		    if (trgType_== BEAM_TRIG ) 
+		   	{
+			if (hwManager_->SignalReceived(EE) )
+				{
+				connectionManager_->Send(eeMex);
+				MoveToStatus(ENDSPILL);
+				}
+		    	}
+		    else if (trgType_ == PED_TRIG ) 
+		    	{
+				if (trgRead_ >= trgNevents_)
+				{
+				// send EE
+				connectionManager_->Send(eeMex);
+				MoveToStatus(ENDSPILL);
+				}
+		    	}
+		     /// check trigger
+		    if( hwManager_->TriggerReceived() ){ 
+			cout<<"TRIGGER RECEIVED"<<endl;
+			hwManager_->TriggerAck();
+			MoveToStatus(READ);
+                        }  
+
+		    break;
+		    }
+	case READ:
+		    {
+			trgRead_++;
+			static int READED=0;
+			cout<<"Counter "<<std::dec<<++READED<<endl;
+			static int Counter=0; 
+			if (Counter==0 )  gettimeofday(&stopwatch_start_time,NULL);
+			++Counter;
+			if (Counter >= 500) {
+				gettimeofday(&stopwatch_stop_time,NULL);
+				long elapsed=  Utility::timevaldiff(&stopwatch_start_time,&stopwatch_stop_time);
+				ostringstream s; s <<"[DataReadOutFSM]::[READ] "<<"Triggers in spill "<< READED<<" Rate "<< double(Counter)/elapsed* 1e6 <<" Hz";
+				cout <<s.str()<<endl;
+				Log(s.str(),1);
+				Counter=0;
+			}
+			//----- Costruct Events
+                        dataType event;
+			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
+			hwManager_->ReadAll(event); 
+			eventBuilder_->CloseEvent(event);
+			// ----- Add Event To Spill
+                        eventBuilder_->AddEventToSpill(event);                                
+			MoveToStatus(CLEARBUSY);
+		    break;
+		    }
+	case ENDSPILL: 
+		    {
+			    // received EE
+			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
+			if (myCmd.cmd == SEND)
+			{
+				dataType myMex;
+				myMex.append(myCmd.data,myCmd.N);
+				// TODO check if myCmd slhould destruct data/N or not
+				connectionManager_->Send(myMex);
+			}
+			MoveToStatus(SENTBUFFER);
+		    break;
+		    }
+	case SENTBUFFER:// TODO ---> I'm HERE,// Loop over the whole queue of messages
+		    { // wait for EB_SPILLCOMPLETED
+		    dataType myMex;
+		    bool gui_pauserun 	= false;
+		    bool gui_restartrun = false;
+		    bool gui_stoprun 	= false;
+		    bool gui_die 	= false;
+		    bool eb_endspill 	= false;
+		    while (connectionManager_->Recv(myMex) ==0 )     // while I have messages on the network buffer
+		    {                                                                     
+			    Command myNewCmd = ParseData( myMex); 
+			    //todo_.push_back(myNewCmd);
+			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
+				    eb_endspill=true;
+			    else if (myNewCmd.cmd == GUI_STOPRUN)
+				    gui_stoprun = true;
+			    else if (myNewCmd.cmd == GUI_PAUSERUN)
+				    gui_pauserun=true;
+			    else if (myNewCmd.cmd == GUI_DIE)
+				    gui_die=true;
+			    else if (myNewCmd.cmd == GUI_PAUSERUN)
+				    gui_restartrun=true;
+			    
+		    }
+		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
+		    if (gui_stoprun)
+		   	 { 
+				dataType myMex;
+				myMex.append((void*)"ENDRUN\0",7);
+				connectionManager_->Send(myMex);
+				MoveToStatus(INITIALIZED);
+		    	 }
+		    else if (gui_pauserun)
+				break;
+		    else if( gui_restartrun ) 
+		   	{
+				dataType myMex;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex);
+			    	//SEND beginSPILL
+				MoveToStatus(BEGINSPILL);
+			}
+		    else if( gui_die )
+			    	//SEND DIE
+			{
+				dataType myMex;
+				myMex.append((void*)"DIE\0",4);
+				connectionManager_->Send(myMex);
+			        MoveToStatus(BYE);
+			}
+		    else if ( eb_endspill )
+			    // SEND BEGINSPILL
+			    {
+				dataType myMex;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex);
+				MoveToStatus(BEGINSPILL);
+			    }
+			    
+		    break;
+		    }
+	case BYE:
+		    {
+		    exit(0); // return is not working correctly
+		    return;
+		    }
+
+	} // end switch 
+	} // end try
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+} // while-true
+return;
 } // end Loop

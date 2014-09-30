@@ -67,7 +67,7 @@ l.Init();
 //
 //Daemon *d=new Daemon();
 printf("RC\n");
-RunControllerFSM *d=new RunControllerFSM();
+DummyRunControlFSM *d=new DummyRunControlFSM();
 printf("INIT\n");
 //d->Init("data/configRC.xml");
 printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());

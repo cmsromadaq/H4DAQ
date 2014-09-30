@@ -179,6 +179,10 @@ int HwManager::CrateInit()
       if ( hw_[i]->GetType() == "CAEN_V513" || hw_[i]->GetType() == "CAEN_V262" )
 	{
 	  ioControlBoard_.boardIndex_=i;
+	  if(dynamic_cast<IOControlBoard*>(hw_[i]) == NULL ){
+		  	Log("[HwManager]::[CrateInit] Controller Board do not inheriths from IOControlBoard",1);
+			throw hw_exception();
+	  		}
 	  break; 
 	}
     }
