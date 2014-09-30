@@ -1,9 +1,11 @@
 <general>
   <Network>
-    <ListenPort>5556</ListenPort>
-    <!-- <ConnectTo>localhost:5555</ConnectTo> -->
-    <ConnectTo>gui.cern.ch:guiport</ConnectTo> 
-    <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo> <!--6000 is the status communication system -->
+    <ListenPort>5556</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6000</ListenPort> <!-- STATUS PORT -->
+    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <!--<ConnectTo>pcethtb1.cern.ch:6000</ConnectTo> -->
+    <!--<ConnectTo>pcethtb2.cern.ch:6000</ConnectTo> -->
+    <ConnectTo>localhost:5555</ConnectTo>
   </Network>
   <Hardware>
     <crateID>1</crateID>
@@ -69,7 +71,7 @@
     <board>
       <type>CAEN_V513</type> <!-- I/O REGISTER -->
       <ID>1</ID>
-      <baseAddress>0x00110000</baseAddress>
+      <baseAddress>0x22000000</baseAddress>
       <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
       <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
       <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->

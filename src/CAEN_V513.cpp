@@ -2,6 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <bitset>
+
+#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -44,20 +47,35 @@ int CAEN_V513::Init()
 
   for (unsigned int i=0;i<CAEN_V513_CHANNELS;++i)
     {
-      int channelDirection=(configuration_.channelsDirectionWord & (1 << i));
-      int channelPolarity=(configuration_.channelsPolarityWord & (1 << i));
-      int channelInputMode=(configuration_.channelsInputModeWord & (1 << i));
-      int channelTransferMode=(configuration_.channelsTransferModeWord & (1 << i));
+      bool channelDirection=(configuration_.channelsDirectionWord & (1 << i));
+      bool channelPolarity=(configuration_.channelsPolarityWord & (1 << i));
+      bool channelInputMode=(configuration_.channelsInputModeWord & (1 << i));
+      bool channelTransferMode=(configuration_.channelsTransferModeWord & (1 << i));
       data= (channelDirection*CAEN_V513_CHANNEL_DIR_BITMASK) | (channelPolarity*CAEN_V513_CHANNEL_POL_BITMASK) | (channelInputMode*CAEN_V513_CHANNEL_IM_BITMASK) | (channelTransferMode*CAEN_V513_CHANNEL_TM_BITMASK);
+
+#ifdef CAEN_V513_DEBUG
+      s.str(""); s << "[CAEN_V513]::[DEBUG]::CHANNEL "<< i << " CONFIG: 0b" << (bitset<3>) data;
+      Log(s.str(),3);
+#endif
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CHANNEL0_STATUS_REGISTER+i*CAEN_V513_CHANNEL_STATUS_SIZE,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
     }
   
   //Now set all the output channels to 1 (Will enable trigger veto)
   for (unsigned int i=0;i<CAEN_V513_CHANNELS;++i)
     {
-      if ( (configuration_.channelsDirectionWord & (1 << i)) == CAEN_V513_OUTPUT  && (configuration_.channelsPolarityWord & (1 << i)) == CAEN_V513_POS_POL ) 
-	dataRegister_ |= 1>>i;
+      if ( (configuration_.channelsDirectionWord & (1 << i)) == CAEN_V513_OUTPUT )
+	// && (configuration_.channelsPolarityWord & (1 << i)) == CAEN_V513_POS_POL ) 
+	{
+	  dataRegister_ |= 1<<i;
+#ifdef CAEN_V513_DEBUG
+	  s.str(""); s << "[CAEN_V513]::[DEBUG]::SETTING TO 1 BIT "<< i << " DATAREGISTER: 0x" << std::hex << dataRegister_ << std::dec;  
+	  Log(s.str(),3);
+#endif
+	}
     }
+
+  s.str(""); s << "[CAEN_V513]::[INFO]::INITIAL PATTERN 0x"<< std::hex << dataRegister_ << std::dec;  
+  Log(s.str(),1);
 
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_OUTPUT_REGISTER,&dataRegister_,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
 
@@ -67,6 +85,8 @@ int CAEN_V513::Init()
       Log(s.str(),1);
       return ERR_CONFIG;
     } 
+
+
   s.str(""); s << "[CAEN_V513]::[INFO]::++++++ CAEN V513 CONFIGURED ++++++";  
   Log(s.str(),1);
   return 0;
@@ -127,6 +147,10 @@ int CAEN_V513::Read(vector<WORD> &v)
   //Put in output the value of the I/O register
   WORD data=0;
   ReadInput(data);
+#ifdef CAEN_V513_DEBUG
+  ostringstream s; s << "[CAEN_V513]::[DEBUG]::DATA PATTERN 0x"<< std::hex << data << std::dec;
+  Log(s.str(),3);
+#endif
   v.push_back(data);
   return 0;
 }
@@ -171,15 +195,15 @@ bool CAEN_V513::SignalReceived(CMD_t signal)
 
   if (signal == WWE ) 
       {
-	return data & configuration_.WWEReadBitMask;
+	return (data & configuration_.WWEReadBitMask);
       }
   else if (signal == WE ) 
       {
-	return data & configuration_.WEReadBitMask;
+	return (data & configuration_.WEReadBitMask);
       }
   else if (signal == EE ) 
       {
-	return data & configuration_.EEReadBitMask;
+	return (data & configuration_.EEReadBitMask);
       }
    else
       {

@@ -87,8 +87,9 @@ printf("RC\n");
 RunControlFSM *d=new RunControlFSM();
 printf("INIT\n");
 //d->Init("data/configRC.xml");
-printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());
 d->LogInit(&l);
+printf("]RunControllerDaemon]::Init LogLevel=%d\n",d->GetLogLevel() ) ;
+printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());
 d->Init(configFileName);
 try{
 	printf("LOOP\n");
