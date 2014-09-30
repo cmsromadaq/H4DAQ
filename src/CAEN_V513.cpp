@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#define CAEN_V513_DEBUG
+
 int CAEN_V513::Init()
 {
   int status=0;
@@ -127,6 +129,10 @@ int CAEN_V513::Read(vector<WORD> &v)
   //Put in output the value of the I/O register
   WORD data=0;
   ReadInput(data);
+#ifdef CAEN_V513_DEBUG
+  ostringstream s; s << "[CAEN_V513]::[DEBUG] DATA PATTERN 0x"<< data ;
+  Log(s.str(),3);
+#endif
   v.push_back(data);
   return 0;
 }
