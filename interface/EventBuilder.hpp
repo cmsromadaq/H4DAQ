@@ -73,6 +73,7 @@ public:
 	inline int 	GetRecvEvent() { return recvEvent_;};
 	inline void*	GetStream(){ return mySpill_.data();};
 	inline int  	GetSize(){return mySpill_.size();};
+	inline bool 	AreSpillsMerged(){ return spills_.empty() ; };
 	inline string 	GetDirName()const {return dirName_;}
 	inline EventId  GetEventId() const { return lastEvent_;}
 	// --- Set  Info
@@ -126,6 +127,9 @@ public:
 	static inline const WORD GetBoardIdBitMask(){return 0x0000FFFF;};
 	static inline const WORD GetCrateIdBitMask(){return 0x00FF0000;};
 	static inline const WORD GetBoardTypeIdBitMask (){return 0xFF000000;};
+	static inline const int  GetCrateIdShift() {for (int i=0;i<32 ;i++) if ( (GetCrateIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
+	static inline const int  GetBoardIdShift() {for (int i=0;i<32 ;i++) if ( (GetBoardIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
+	static inline const int  GetBoardTypeShift() {for (int i=0;i<32 ;i++) if ( (GetBoardTypeIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
 	// ----- WORDS in event format
 	static inline const int SpillHeaderWords(){return 5;};	
 	static inline const int EventHeaderWords(){return 4;};	

@@ -14,13 +14,14 @@ Publisher::~Publisher(){
 } // give 0mq the time to flush
 
 void Publisher::Init(){
-	Log("[3] Publisher::Init",3);
+	Log("[3] [Publisher]::[Init]",3);
 	char buffer[256];
 	sprintf(buffer,"tcp://*:%s",Port.c_str());
 	socket=new zmq::socket_t(*context,ZMQ_PUB);
 	//bind
-	Log(string("[3] Publisher::Init buffer='")+buffer+"'",3);
-	socket->bind(buffer);
+	Log(string("[Publisher]::[Init] buffer='")+buffer+"'",2);
+	socket->bind(buffer); // this is void in c++
+	if ( errno == EADDRINUSE ) Log("[Publisher]::[Init] Binding unsuccesful",1);
 }
 
 void Publisher::Clear(){
@@ -207,7 +208,9 @@ bool RequestAndReply::Reply(){
 
 bool ConnectionManager::Recv(dataType &mex){
 	for( int i=0;i< subs.size() ;i++)
+	{
 		if( subs[i]->RecvMessage(mex) == 0 ) return 0;
+	}
 	return 1;
 }
 
@@ -233,12 +236,18 @@ void ConnectionManager::Init(){
 		pubs.push_back(new Publisher() );
 		pubs[i]->SetPort(sendPorts[i]); // move in config ? 
 		pubs[i]->Init();
+		ostringstream s;
+		s<<"[ConnectionManager]::[Init] Init Publish:"<<sendPorts[i]<<" size="<<pubs.size();
+		Log(s.str(),2);
 		}
 	for(int i=0;i<recvAddresses.size();i++)
 		{
 		subs.push_back(new Subscriber() ) ;
 		subs[i]->SetAddress(recvAddresses[i]);
 		subs[i]->Init();
+		ostringstream s;
+		s<<"[ConnectionManager]::[Init] Init Subscriber:"<<recvAddresses[i]<< "size="<< subs.size();
+		Log(s.str(),2);
 		}
 }
 

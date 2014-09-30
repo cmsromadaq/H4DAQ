@@ -126,15 +126,15 @@ Command Daemon::ParseData(dataType &mex)
 
 
 void Daemon::MoveToStatus(STATUS_t newStatus){
-	//dataType myMex;
-	//myMex.append((void*)"STATUS\0",7);
-	//WORD myStatus=(WORD)newStatus;
-	//myMex.append((void*)&myStatus,WORDSIZE);
+	dataType myMex;
+	myMex.append((void*)"STATUS\0",7);
+	WORD myStatus=(WORD)newStatus;
+	myMex.append((void*)&myStatus,WORDSIZE);
+	connectionManager_->Send(myMex,1);
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
-	//connectionManager_->Send(myMex);
 	myStatus_=newStatus;
 }
 

@@ -32,9 +32,10 @@ enum STATUS_t { START 		= 0,
 		WAITTRIG 	= 6, 
 		READ     	= 7, 
 		ENDSPILL	= 8, 
-		SENTBUFFER	= 9,
-		SPILLCOMPLETED	= 10,
-		BYE		= 11  
+		RECVBUFFER	= 9,
+		SENTBUFFER	= 10,
+		SPILLCOMPLETED	= 11,
+		BYE		= 12  
 		};
 
 /* Command description:
@@ -60,6 +61,7 @@ public:
 	dataTypeSize_t N;
 	CMD_t cmd;
 	string name() ;
+	inline void release(){data=NULL;N=0;};
 };
 
 #endif
