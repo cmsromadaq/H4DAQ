@@ -268,9 +268,9 @@ void HwManager::ReadAll(dataType&R){ // don't construct the all event
 	{
 		hw_[i]->Read(v);
 		BoardId bId;
-			bId.crateId_  = crateId_;
-			bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD
-			bId.boardId_  = hw_[i]->GetId() ; 
+		bId.crateId_  = crateId_;
+		bId.boardType_= GetBoardTypeId( hw_[i]->GetType() ); // WORD
+		bId.boardId_  = hw_[i]->GetId() ; 
 		EventBuilder::BoardToStream( R, bId , v )  ;
 	}
 	return ;
