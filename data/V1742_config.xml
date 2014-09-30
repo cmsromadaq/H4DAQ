@@ -1,7 +1,9 @@
 <general>
+  <Hardware>
+    <crateID>1</crateID>
     <board>
-        <ID>V1742_0<ID>
-        <type>V1742</type>
+        <ID>V1742_0</ID>
+        <type>CAEN_V1742</type>
     
         <!--
         # ****************************************************************
@@ -44,7 +46,7 @@
         # board interleaves two channels to make one channel running at double sampling frequency.
         # This setting is ignored for the boards that don't support DES mode.
         # options: YES, NO
-        <!--
+        -->
         <ENABLE_DES_MODE>NO</ENABLE_DES_MODE>
 
         <!--
@@ -158,20 +160,20 @@
 
         <TRIGGER>
           <ID>0</ID>
-          <DC_OFFSET>32768<DC_OFFSET>
+          <DC_OFFSET>32768</DC_OFFSET>
           <TRIGGER_THRESHOLD>20934</TRIGGER_THRESHOLD>
         </TRIGGER>
 
         <TRIGGER>
           <ID>1</ID>
-          <DC_OFFSET>32768<DC_OFFSET>
+          <DC_OFFSET>32768</DC_OFFSET>
           <TRIGGER_THRESHOLD>20934</TRIGGER_THRESHOLD>
         </TRIGGER>
 
         <CHANNEL>
           <ID>0</ID>
-          <ENABLE_INPUT>NO<ENABLE_INPUT>
-          <DC_OFFSET>-5<DC_OFFSET>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
+          <DC_OFFSET>-5</DC_OFFSET>
           <GRP_CH_DC_OFFSET>-10,-10,-10,-10,-10,-10,-10,-10</GRP_CH_DC_OFFSET>
           <TRIGGER_THRESHOLD>2659</TRIGGER_THRESHOLD>
           <CHANNEL_TRIGGER>ACQUISITION_AND_TRGOUT</CHANNEL_TRIGGER>
@@ -183,6 +185,6 @@
                -->
           <GROUP_TRG_ENABLE_MASK>FF</GROUP_TRG_ENABLE_MASK>
         </CHANNEL>
-        
     </board>
+  </Hardware>
 </general>
