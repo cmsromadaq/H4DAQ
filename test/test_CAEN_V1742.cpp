@@ -53,7 +53,7 @@ int main(int argc, char**argv)
   bC.SetBoardNode (board_node) ;
 
   CAEN_V1742_instance->Config (&bC) ;
-//  CAEN_V1742_instance->Print () ;
+  CAEN_V1742_instance->Print () ;
    
   delete CAEN_V1742_instance ;
   return 0 ;

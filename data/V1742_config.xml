@@ -185,6 +185,24 @@
                -->
           <GROUP_TRG_ENABLE_MASK>FF</GROUP_TRG_ENABLE_MASK>
         </CHANNEL>
+
+        <!-- the following is for testing purposes only -->
+        <CHANNEL>
+          <ID>1</ID>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
+          <DC_OFFSET>0</DC_OFFSET>
+          <GRP_CH_DC_OFFSET>-11,-11,-11,-11,-11,-11,-11,-11</GRP_CH_DC_OFFSET>
+          <TRIGGER_THRESHOLD>9999</TRIGGER_THRESHOLD>
+          <CHANNEL_TRIGGER>ACQUISITION_AND_TRGOUT</CHANNEL_TRIGGER>
+              <!--
+               # GROUP_TRG_ENABLE_MASK: this option is used only for the Models x740. These models have the
+               # channels grouped 8 by 8; one group of 8 channels has a common trigger that is generated as
+               # the OR of the self trigger of the channels in the group that are enabled by this mask.
+               # options: 0 to FF
+               -->
+          <GROUP_TRG_ENABLE_MASK>FF</GROUP_TRG_ENABLE_MASK>
+        </CHANNEL>
+
     </board>
   </Hardware>
 </general>
