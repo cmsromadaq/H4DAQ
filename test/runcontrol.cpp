@@ -84,7 +84,7 @@ try
 //
 //Daemon *d=new Daemon();
 printf("RC\n");
-RunControllerFSM *d=new RunControllerFSM();
+RunControlFSM *d=new RunControlFSM();
 printf("INIT\n");
 //d->Init("data/configRC.xml");
 printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());

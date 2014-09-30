@@ -130,6 +130,10 @@ public:
 	static inline const int  GetCrateIdShift() {for (int i=0;i<32 ;i++) if ( (GetCrateIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
 	static inline const int  GetBoardIdShift() {for (int i=0;i<32 ;i++) if ( (GetBoardIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
 	static inline const int  GetBoardTypeShift() {for (int i=0;i<32 ;i++) if ( (GetBoardTypeIdBitMask() >> i )&1 ) { return i ; } ; return 0; }
+	// --- Method to get the BoardId from the masks
+	static WORD GetBoardTypeId( dataType&);
+	static WORD GetBoardBoardId( dataType&);
+	static WORD GetBoardCrateId( dataType&);
 	// ----- WORDS in event format
 	static inline const int SpillHeaderWords(){return 5;};	
 	static inline const int EventHeaderWords(){return 4;};	
@@ -141,6 +145,7 @@ public:
 	static inline const int SpillNeventPos(){return 4;};	
 	static inline const int EventSizePos(){return 2;};	
 	static inline const int BoardSizePos(){return 2;};
+	static inline const int BoardIdPos(){return 1;};
 	static inline const int EventNboardsPos(){return 3;};
 };
 

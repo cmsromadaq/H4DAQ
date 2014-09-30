@@ -67,6 +67,7 @@ public:
 	bool TriggerReceived();
 	void TriggerAck();
 	// --- RunControl Utility
+	bool HaveControlBoard(){ if (ioControlBoard_.boardIndex_ >=0 ) return true ; else return false; };
 	bool SignalReceived(CMD_t signal);
         void SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus); 
 

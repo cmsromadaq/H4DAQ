@@ -495,3 +495,21 @@ void EventBuilder::CloseEvent( dataType &R){
 	return;
 
 }
+
+WORD EventBuilder::GetBoardTypeId(dataType &R){
+	WORD myMergedId= *((WORD*)R.data() + BoardIdPos());
+	WORD myResult= ( myMergedId & GetBoardTypeIdBitMask())>>GetBoardTypeShift();
+	return myResult;
+}
+
+WORD EventBuilder::GetBoardBoardId(dataType &R){
+	WORD myMergedId= *((WORD*)R.data() + BoardIdPos());
+	WORD myResult= ( myMergedId & GetBoardIdBitMask())>>GetBoardIdShift();
+	return myResult;
+}
+
+WORD EventBuilder::GetBoardCrateId(dataType &R){
+	WORD myMergedId= *((WORD*)R.data() + BoardIdPos());
+	WORD myResult= ( myMergedId & GetCrateIdBitMask())>>GetCrateIdShift();
+	return myResult;
+}
