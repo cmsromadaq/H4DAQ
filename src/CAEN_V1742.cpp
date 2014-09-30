@@ -525,13 +525,9 @@ external triggers.
 */
 int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 {
-
-//  int tr = -1 ;
-//  int ch = -1 ;
-        
   // OPEN: read the details of physical path to the digitizer
   string content = bC->getElementContent ("OPEN") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
       {
         std::stringstream ststream (content) ; //PG FIXME se facessi ritornare un sstram direttamente?
         string linkType ;
@@ -550,6 +546,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       }
   else 
     {
+      cerr << "reading field " << content << endl ;
       cerr << "[V1742]::[ERROR]:: Field OPEN not found in board xml node config" << endl ;
       //PG FIXME abort run start?
     }
@@ -574,7 +571,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     
   // Acquisition Record Length (number of samples)
   content = bC->getElementContent ("RECORD_LENGTH") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       std::stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.RecordLength ;
@@ -587,7 +584,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Correction Level (mask)
   content = bC->getElementContent ("CORRECTION_LEVEL") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string isAuto ;
@@ -603,7 +600,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Test Pattern
   content = bC->getElementContent ("TEST_PATTERN") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -623,7 +620,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Trigger Edge
   content = bC->getElementContent ("TRIGGER_EDGE") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -643,7 +640,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // External Trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
   content = bC->getElementContent ("EXTERNAL_TRIGGER") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -665,7 +662,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Max. number of events for a block transfer (0 to 1023)
   content = bC->getElementContent ("MAX_NUM_EVENTS_BLT") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.NumEvents ;
@@ -685,7 +682,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Post Trigger (percent of the acquisition window)
   content = bC->getElementContent ("POST_TRIGGER") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.PostTrigger ;
@@ -698,7 +695,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // DesMode (Double sampling frequency for the Mod 731 and 751)
   content = bC->getElementContent ("ENABLE_DES_MODE") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -741,7 +738,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
   // Interrupt settings (request interrupt when there are at least N events to read ;
   // 0=disable interrupts (polling mode))
   content = bC->getElementContent ("USE_INTERRUPT") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.InterruptNumEvents ;
@@ -753,7 +750,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
 
   content = bC->getElementContent ("FAST_TRIGGER") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -773,7 +770,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
 
   content = bC->getElementContent ("ENABLED_FAST_TRIGGER_DIGITIZING") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -794,7 +791,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // DC offset (percent of the dynamic range, -50 to 50)
   content = bC->getElementContent ("DC_OFFSET") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       float dc ;
@@ -810,7 +807,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Threshold
   content = bC->getElementContent ("TRIGGER_THRESHOLD") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       int val ;
@@ -825,7 +822,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       
   // Channel Auto trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
   content = bC->getElementContent ("CHANNEL_TRIGGER") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       int ok = 1 ;
       stringstream ststream (content) ;
@@ -854,7 +851,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Front Panel LEMO I/O level (NIM, TTL)
   content = bC->getElementContent ("FPIO_LEVEL") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -874,7 +871,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Channel Enable (or Group enable for the V1740) (YES/NO)
   content = bC->getElementContent ("ENABLE_INPUT") ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -925,7 +922,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
   int tr = -1 ;
 
   string content = Configurable::getElementContent (*bC, "ID", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
       {
         std::stringstream ststream (content) ;
         ststream >> tr ;
@@ -944,7 +941,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       float dc ;
@@ -956,7 +953,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
 
   // Threshold
   content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       int val ;
@@ -978,7 +975,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
   int ch = -1 ;
 
   string content = Configurable::getElementContent (*bC, "ID", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
       {
         std::stringstream ststream (content) ;
         ststream >> ch ;
@@ -997,7 +994,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "ENABLE_INPUT", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -1012,7 +1009,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       float dc ;
@@ -1022,7 +1019,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "GRP_CH_DC_OFFSET", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
       {
         stringstream ststream (content) ;
         float dc[8] ;
@@ -1036,7 +1033,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
 
   // Threshold
   content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       stringstream ststream (content) ;
       int val ;
@@ -1045,7 +1042,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "CHANNEL_TRIGGER", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
     {
       int ok = 1 ;
       stringstream ststream (content) ;
@@ -1069,7 +1066,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
 
   // Group Trigger Enable Mask (hex 8 bit)
   content = Configurable::getElementContent (*bC, "GROUP_TRG_ENABLE_MASK", node) ;
-  if (content.find ("NULL") != string::npos)
+  if (content.length () > 0)
       {
         stringstream ststream (content) ;
         int val ; //PG FIXME is this integer or hexadecimal?
@@ -1124,7 +1121,7 @@ int CAEN_V1742::setDefaults ()
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-void CAEN_V1742::printConfiguration ()
+int CAEN_V1742::Print ()
 {
   cout << " BaseAddress        " << digitizerConfiguration_.BaseAddress        << "\n" ;                                                               
   cout << " LinkType           " << digitizerConfiguration_.LinkType           << "\n" ;                                                               

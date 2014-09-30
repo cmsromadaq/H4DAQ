@@ -25,7 +25,7 @@
         #OPEN PCI 0 0 0
         #OPEN PCI 0 0 32100000
         -->
-        <OPEN> USB 1 00500000</OPEN>
+        <OPEN>USB 1 00500000</OPEN>
 
         <CORRECTION_LEVEL>AUTO</CORRECTION_LEVEL>
 
