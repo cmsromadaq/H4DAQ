@@ -2,9 +2,10 @@
   <Network>
     <ListenPort>5556</ListenPort> <!-- DATA PORT -->
     <ListenPort>6000</ListenPort> <!-- STATUS PORT -->
-    <ConnectTo>gui.cern.ch:guiport</ConnectTo> 
-    <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo> <!--6000 is the status communication system -->
-    <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo> <!--6000 is the status communication system -->
+    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <!--<ConnectTo>pcethtb1.cern.ch:6000</ConnectTo> -->
+    <!--<ConnectTo>pcethtb2.cern.ch:6000</ConnectTo> -->
+    <ConnectTo>localhost:5555</ConnectTo>
   </Network>
   <Hardware>
     <crateID>1</crateID>
