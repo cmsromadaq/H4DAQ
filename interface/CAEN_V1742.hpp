@@ -85,7 +85,7 @@ public:
     
   } CAEN_V1742_Config_t ;
 
-  CAEN_V1742 ():digitizerHandle_ (-1), Board () { type_="CAEN_V1742" ; } ;
+  CAEN_V1742 ():Board () , digitizerHandle_ (-1) { type_="CAEN_V1742" ; } ;
 
   virtual int Init () ;
   virtual int Clear () ;
@@ -93,10 +93,11 @@ public:
   virtual int Config (BoardConfig *bC) ;
   // --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
   virtual int Read (vector<WORD> &v) ;
-  virtual int SetHandle (int digitizerHandle) { digitizerHandle_ = digitizerHandle ; } ;
+  virtual int SetHandle (int digitizerHandle) { digitizerHandle_ = digitizerHandle ; return 0 ;} ;
 
   inline CAEN_V1742_Config_t* GetConfiguration () { return &digitizerConfiguration_ ; } ;
-  void printConfiguration () ;
+  int Print () {Print (0) ; } ;
+  int Print (int full = 0) ;
 
 private:
 

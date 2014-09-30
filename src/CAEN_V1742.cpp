@@ -1121,8 +1121,9 @@ int CAEN_V1742::setDefaults ()
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-int CAEN_V1742::Print ()
+int CAEN_V1742::Print (int full)
 {
+  cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
   cout << " BaseAddress        " << digitizerConfiguration_.BaseAddress        << "\n" ;                                                               
   cout << " LinkType           " << digitizerConfiguration_.LinkType           << "\n" ;                                                               
   cout << " LinkNum            " << digitizerConfiguration_.LinkNum            << "\n" ;                                                               
@@ -1147,22 +1148,30 @@ int CAEN_V1742::Print ()
 
   for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
     {
-      cout << "ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
-      cout << "DCoffset[" << i << "]           : " << digitizerConfiguration_.DCoffset[i]           << "\n" ;  
-      cout << "Threshold[" << i << "]          : " << digitizerConfiguration_.Threshold[i]          << "\n" ;  
-      cout << "GroupTrgEnableMask[" << i << "] : " << digitizerConfiguration_.GroupTrgEnableMask[i] << "\n" ;  
-      cout << "FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
-      cout << "FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
+      cout << " ---- channel " << i << " ---- ---- ---- ---- ---- \n" ;
+      cout << " ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
+      cout << " DCoffset[" << i << "]           : " << digitizerConfiguration_.DCoffset[i]           << "\n" ;  
+      cout << " Threshold[" << i << "]          : " << digitizerConfiguration_.Threshold[i]          << "\n" ;  
+      cout << " GroupTrgEnableMask[" << i << "] : " << digitizerConfiguration_.GroupTrgEnableMask[i] << "\n" ;  
+      cout << " FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
+      cout << " FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
     }
 
-  for (int i = 0 ; i < CAEN_V1742_MAXGW ; ++i) 
-    {
-      cout << "GWaddr[" << i << "] : " << digitizerConfiguration_.GWaddr[i] << "\n" ;                                                           
-      cout << "GWdata[" << i << "] : " << digitizerConfiguration_.GWdata[i] << "\n" ;                                                           
-    }
-
+  cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
   for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
     for (int j = 0 ; j < CAEN_V1742_MAXSET ; ++j) 
-      cout << "DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
+      cout << " DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
+
+  if (full)
+    {
+      cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
+      for (int i = 0 ; i < CAEN_V1742_MAXGW ; ++i) 
+        {
+          cout << " GWaddr[" << i << "] : " << digitizerConfiguration_.GWaddr[i] << "\n" ;                                                           
+          cout << " GWdata[" << i << "] : " << digitizerConfiguration_.GWdata[i] << "\n" ;                                                           
+        }
+    }
+
+  cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
 
 }
