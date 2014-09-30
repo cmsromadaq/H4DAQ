@@ -29,18 +29,26 @@ define_handlers();
 
  int opt= 0;
 
+ int verbose=1;
  string configFileName="";
+ string logFileName="";
 
  static struct option long_options[] = {
    {"config",    required_argument, 0,  'c' },
+   {"log",    required_argument, 0,  'l' },
+   {"verbose",    required_argument, 0,  'v' },
    {0,           0,                 0,  0   }
  };
  
  int long_index =0;
- while ((opt = getopt_long(argc, argv,"c:", 
+ while ((opt = getopt_long(argc, argv,"c:l:v:", 
 			   long_options, &long_index )) != -1) {
    switch (opt) {
    case 'c' : configFileName=string(optarg);
+     break;
+   case 'l' : logFileName=string(optarg);
+     break;
+   case 'v' : verbose=atoi(optarg);
      break;
    case '?':
      /* getopt_long already printed an error message. */
@@ -57,12 +65,21 @@ define_handlers();
      exit(EXIT_FAILURE);
    }
 // -----------------
-string logFileName="/tmp/logRC.txt";
+//string logFileName="/tmp/logRC.txt";
 Logger l;
-l.SetLogLevel(3);
-printf("[RunControllerDaemon]::Init Logfile => %s\n",logFileName.c_str());
-l.SetFileName(logFileName);
-l.Init();
+
+try
+  {
+    printf("[RunControllerDaemon]::Init Logfile => %s\n",logFileName.c_str());
+    l.SetLogLevel(verbose);
+    l.SetFileName(logFileName);
+    l.Init();
+  }
+ catch (logfile_open_exception &l)
+   {
+     printf("Cannot Open Log File: %s\n",logFileName.c_str());
+     exit(EXIT_FAILURE);
+   }
 
 //
 //Daemon *d=new Daemon();
