@@ -894,9 +894,16 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
 
   //PG searching for nodes called "TRIGGER"
+  xmlNode * ch_node = NULL;	
+  for (ch_node = bC->GetBoardNodePtr ()->children; ch_node ; ch_node = ch_node->next)
+	{
+		if (ch_node->type == XML_ELEMENT_NODE &&
+				xmlStrEqual (ch_node->name, xmlCharStrdup ("TRIGGER"))  )
+          ParseConfigForTriggers (bC, ch_node) ;
+	}
   
   //PG searching for nodes called "CHANNEL"
-  xmlNode * ch_node = NULL;	
+  ch_node = NULL;	
   for (ch_node = bC->GetBoardNodePtr ()->children; ch_node ; ch_node = ch_node->next)
 	{
 		if (ch_node->type == XML_ELEMENT_NODE &&
@@ -907,6 +914,59 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
   return 0 ;
 
 } ;
+
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+
+int 
+CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
+{
+  int tr = -1 ;
+
+  string content = Configurable::getElementContent (*bC, "ID", node) ;
+  if (content.find ("NULL") != string::npos)
+      {
+        std::stringstream ststream (content) ;
+        ststream >> tr ;
+      }
+  else 
+    {
+      cerr << "[V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
+      return -1 ;
+      //PG FIXME abort run start?
+    }
+
+  if (tr < 0 || tr > 3)
+    {
+      cerr << "[V1742]::[ERROR]:: ID = " << tr << " out of range" << endl ;
+      return -1 ;
+    }
+
+  content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      float dc ;
+      ststream >> dc ;
+      // digitizerConfiguration_.FTDCoffset[tr] = dc ;
+      digitizerConfiguration_.FTDCoffset[tr*2] = (uint32_t)dc ;
+      digitizerConfiguration_.FTDCoffset[tr*2+1] = (uint32_t)dc ;
+    }
+
+  // Threshold
+  content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
+  if (content.find ("NULL") != string::npos)
+    {
+      stringstream ststream (content) ;
+      int val ;
+      ststream >> val ;
+      // digitizerConfiguration_.FTThreshold[tr] = val ;
+      digitizerConfiguration_.FTThreshold[tr*2] = val ;
+      digitizerConfiguration_.FTThreshold[tr*2+1] = val ;
+    }
+  return tr ;
+}
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -928,6 +988,12 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
       cerr << "[V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
       return -1 ;
       //PG FIXME abort run start?
+    }
+
+  if (ch < 0 || ch > 3)
+    {
+      cerr << "[V1742]::[ERROR]:: ID = " << ch << " out of range" << endl ;
+      return -1 ;
     }
 
   content = Configurable::getElementContent (*bC, "ENABLE_INPUT", node) ;
