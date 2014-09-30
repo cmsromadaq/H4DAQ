@@ -1,7 +1,9 @@
 #include "interface/CAEN_V1742.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <bitset>
 
 //PG settings for the board
 
@@ -1069,7 +1071,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
   if (content.length () > 0)
       {
         stringstream ststream (content) ;
-        int val ; //PG FIXME is this integer or hexadecimal?
+        int val ;
         ststream >> val ;
         digitizerConfiguration_.GroupTrgEnableMask[ch] = val & 0xFF ;
       }
@@ -1140,7 +1142,8 @@ int CAEN_V1742::Print (int full)
   cout << " TriggerEdge        " << digitizerConfiguration_.TriggerEdge        << "\n" ;                                                               
   cout << " FPIOtype           " << digitizerConfiguration_.FPIOtype           << "\n" ;                                                               
   cout << " ExtTriggerMode     " << digitizerConfiguration_.ExtTriggerMode     << "\n" ;                                                               
-  cout << " EnableMask         " << digitizerConfiguration_.EnableMask         << "\n" ;                                                               
+  cout << " EnableMask         " << bitset<8> (digitizerConfiguration_.EnableMask)  << "\n" ;  
+  cout << "    channel         " << "----3210"  << "\n" ;  
   cout << " FastTriggerMode    " << digitizerConfiguration_.FastTriggerMode    << "\n" ;                                                               
   cout << " FastTriggerEnabled " << digitizerConfiguration_.FastTriggerEnabled << "\n" ;                                                                 
   cout << " GWn                " << digitizerConfiguration_.GWn                << "\n" ;                                                               
@@ -1152,7 +1155,7 @@ int CAEN_V1742::Print (int full)
       cout << " ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
       cout << " DCoffset[" << i << "]           : " << digitizerConfiguration_.DCoffset[i]           << "\n" ;  
       cout << " Threshold[" << i << "]          : " << digitizerConfiguration_.Threshold[i]          << "\n" ;  
-      cout << " GroupTrgEnableMask[" << i << "] : " << digitizerConfiguration_.GroupTrgEnableMask[i] << "\n" ;  
+      cout << " GroupTrgEnableMask[" << i << "] : " << bitset<8> (digitizerConfiguration_.GroupTrgEnableMask[i]) << "\n" ;  
       cout << " FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
       cout << " FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
     }
