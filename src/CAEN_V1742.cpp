@@ -1,12 +1,14 @@
 #include "interface/CAEN_V1742.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
+#include <bitset>
 
 //PG settings for the board
 
 #define MAX_CH  32          /* max. number of channels */
-#define MAX_SET 4           /* max. number of independent settings */
+#define MAX_SET 8           /* max. number of independent settings */
 #define MAX_GW  1000        /* max. number of generic write commads */
 
 //#define VME_INTERRUPT_LEVEL      1
@@ -527,7 +529,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 {
   // OPEN: read the details of physical path to the digitizer
   string content = bC->getElementContent ("OPEN") ;
-  if (content.length () > 0)
+  if (content != "NULL")
       {
         std::stringstream ststream (content) ; //PG FIXME se facessi ritornare un sstram direttamente?
         string linkType ;
@@ -571,7 +573,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     
   // Acquisition Record Length (number of samples)
   content = bC->getElementContent ("RECORD_LENGTH") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       std::stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.RecordLength ;
@@ -584,7 +586,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Correction Level (mask)
   content = bC->getElementContent ("CORRECTION_LEVEL") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string isAuto ;
@@ -600,7 +602,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Test Pattern
   content = bC->getElementContent ("TEST_PATTERN") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -620,7 +622,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Trigger Edge
   content = bC->getElementContent ("TRIGGER_EDGE") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -640,7 +642,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // External Trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
   content = bC->getElementContent ("EXTERNAL_TRIGGER") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -662,7 +664,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Max. number of events for a block transfer (0 to 1023)
   content = bC->getElementContent ("MAX_NUM_EVENTS_BLT") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.NumEvents ;
@@ -682,7 +684,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Post Trigger (percent of the acquisition window)
   content = bC->getElementContent ("POST_TRIGGER") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.PostTrigger ;
@@ -695,7 +697,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // DesMode (Double sampling frequency for the Mod 731 and 751)
   content = bC->getElementContent ("ENABLE_DES_MODE") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -738,7 +740,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
   // Interrupt settings (request interrupt when there are at least N events to read ;
   // 0=disable interrupts (polling mode))
   content = bC->getElementContent ("USE_INTERRUPT") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       ststream >> digitizerConfiguration_.InterruptNumEvents ;
@@ -750,7 +752,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
 
   content = bC->getElementContent ("FAST_TRIGGER") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -770,7 +772,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
 
   content = bC->getElementContent ("ENABLED_FAST_TRIGGER_DIGITIZING") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -791,7 +793,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // DC offset (percent of the dynamic range, -50 to 50)
   content = bC->getElementContent ("DC_OFFSET") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       float dc ;
@@ -807,7 +809,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Threshold
   content = bC->getElementContent ("TRIGGER_THRESHOLD") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       int val ;
@@ -822,7 +824,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       
   // Channel Auto trigger (DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT)
   content = bC->getElementContent ("CHANNEL_TRIGGER") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       int ok = 1 ;
       stringstream ststream (content) ;
@@ -851,7 +853,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Front Panel LEMO I/O level (NIM, TTL)
   content = bC->getElementContent ("FPIO_LEVEL") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -871,7 +873,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 
   // Channel Enable (or Group enable for the V1740) (YES/NO)
   content = bC->getElementContent ("ENABLE_INPUT") ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -922,7 +924,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
   int tr = -1 ;
 
   string content = Configurable::getElementContent (*bC, "ID", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
       {
         std::stringstream ststream (content) ;
         ststream >> tr ;
@@ -941,7 +943,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       float dc ;
@@ -953,7 +955,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
 
   // Threshold
   content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       int val ;
@@ -975,7 +977,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
   int ch = -1 ;
 
   string content = Configurable::getElementContent (*bC, "ID", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
       {
         std::stringstream ststream (content) ;
         ststream >> ch ;
@@ -994,7 +996,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "ENABLE_INPUT", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       string dummy ;
@@ -1009,7 +1011,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       float dc ;
@@ -1019,7 +1021,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "GRP_CH_DC_OFFSET", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
       {
         stringstream ststream (content) ;
         float dc[8] ;
@@ -1033,7 +1035,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
 
   // Threshold
   content = Configurable::getElementContent (*bC, "TRIGGER_THRESHOLD", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       stringstream ststream (content) ;
       int val ;
@@ -1042,7 +1044,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
     }
 
   content = Configurable::getElementContent (*bC, "CHANNEL_TRIGGER", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
     {
       int ok = 1 ;
       stringstream ststream (content) ;
@@ -1066,10 +1068,10 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
 
   // Group Trigger Enable Mask (hex 8 bit)
   content = Configurable::getElementContent (*bC, "GROUP_TRG_ENABLE_MASK", node) ;
-  if (content.length () > 0)
+  if (content != "NULL")
       {
         stringstream ststream (content) ;
-        int val ; //PG FIXME is this integer or hexadecimal?
+        int val ;
         ststream >> val ;
         digitizerConfiguration_.GroupTrgEnableMask[ch] = val & 0xFF ;
       }
@@ -1140,27 +1142,26 @@ int CAEN_V1742::Print (int full)
   cout << " TriggerEdge        " << digitizerConfiguration_.TriggerEdge        << "\n" ;                                                               
   cout << " FPIOtype           " << digitizerConfiguration_.FPIOtype           << "\n" ;                                                               
   cout << " ExtTriggerMode     " << digitizerConfiguration_.ExtTriggerMode     << "\n" ;                                                               
-  cout << " EnableMask         " << digitizerConfiguration_.EnableMask         << "\n" ;                                                               
+  cout << " EnableMask         " << bitset<8> (digitizerConfiguration_.EnableMask)  << "\n" ;  
+  cout << "    channel         " << "----3210"  << "\n" ;  
   cout << " FastTriggerMode    " << digitizerConfiguration_.FastTriggerMode    << "\n" ;                                                               
   cout << " FastTriggerEnabled " << digitizerConfiguration_.FastTriggerEnabled << "\n" ;                                                                 
   cout << " GWn                " << digitizerConfiguration_.GWn                << "\n" ;                                                               
   cout << " useCorrections     " << digitizerConfiguration_.useCorrections     << "\n" ;                                                               
 
-  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
+  for (int i = 0 ; i < 4 ; ++i)  //PG NB the hardcoded limits instead of  CAEN_V1742_MAXSET
     {
       cout << " ---- channel " << i << " ---- ---- ---- ---- ---- \n" ;
       cout << " ChannelTriggerMode[" << i << "] : " << digitizerConfiguration_.ChannelTriggerMode[i] << "\n" ;  
       cout << " DCoffset[" << i << "]           : " << digitizerConfiguration_.DCoffset[i]           << "\n" ;  
       cout << " Threshold[" << i << "]          : " << digitizerConfiguration_.Threshold[i]          << "\n" ;  
-      cout << " GroupTrgEnableMask[" << i << "] : " << digitizerConfiguration_.GroupTrgEnableMask[i] << "\n" ;  
+      cout << " GroupTrgEnableMask[" << i << "] : " << bitset<8> (digitizerConfiguration_.GroupTrgEnableMask[i]) << "\n" ;  
       cout << " FTDCoffset[" << i << "]         : " << digitizerConfiguration_.FTDCoffset[i]         << "\n" ;  
       cout << " FTThreshold[" << i << "]        : " << digitizerConfiguration_.FTThreshold[i]        << "\n" ;  
+      cout << "   ---- ---- ---- ---- \n" ;
+      for (int j = 0 ; j < 8 ; ++j)  //PG NB the hardcoded limits instead of CAEN_V1742_MAXCH
+        cout << "   DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
     }
-
-  cout << " ---- ---- ---- ---- ---- ---- ---- \n" ;
-  for (int i = 0 ; i < CAEN_V1742_MAXSET ; ++i) 
-    for (int j = 0 ; j < CAEN_V1742_MAXSET ; ++j) 
-      cout << " DCoffsetGrpCh[" << i << "][" << j << "] : " << digitizerConfiguration_.DCoffsetGrpCh[i][j] << "\n" ; 
 
   if (full)
     {
