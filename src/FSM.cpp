@@ -615,6 +615,14 @@ while (true) {
 						   }
 				   else trgType_=UNK_TRIG; // LED_TRIG not impl
 
+			    	   dataType myFufMex;
+			    	   myFufMex.append((void*)"NOP\0",4);
+			    	   connectionManager_->Send(myFufMex,CmdSck);
+			    	   dataType myMex;
+			    	   myMex.append((void*)"STARTRUN\0",9);
+			    	   myMex.append((void*)&myRunNum,WORDSIZE);
+			    	   connectionManager_->Send(myMex,CmdSck);
+
 				   ostringstream s;
 				   s << "[RunControlFSM]::[INFO]::Starting a new run " <<  myRunNum;
 				   Log(s.str(),1);
