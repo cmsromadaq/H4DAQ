@@ -7,8 +7,8 @@
 
 int main(int argc,char**argv){
 
-string logFileName="/tmp/log.txt";
- int port=5566;
+string logFileName="/tmp/log_meridian.txt";
+int port=5566;
 string ConnectTo=argv[1];
 
  Logger l;

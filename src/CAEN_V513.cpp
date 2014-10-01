@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-//#define CAEN_V513_DEBUG
+#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -190,10 +190,15 @@ int CAEN_V513::ReadInput(WORD& data)
 
   int status=0;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_INPUT_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+  data=data&0xFFFF; //data is a 16bit word
   if (data != dataRegister_)
     {
       WORD writeData=0xFF;
       //Cleaning Input register after reading
+#ifdef CAEN_V513_DEBUG
+      ostringstream s; s << "[CAEN_V513]::[DEBUG]::CLEANING AFTER STATUS CHANGE 0x"<< std::hex << data << std::dec;
+      Log(s.str(),3);
+#endif
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
     }
   if (status)

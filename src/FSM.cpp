@@ -687,7 +687,7 @@ while (true) {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); //UNCOMMENT
+		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
 			    connectionManager_->Send(weMex,CmdSck);
 			    hwManager_->BufferClearAll();
 			    MoveToStatus(CLEARBUSY);
@@ -730,6 +730,9 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->TriggerAck();
 			MoveToStatus(READ);
+#ifdef RC_DEBUG
+			usleep(2000);
+#endif
                         }  
 
 		    break;
