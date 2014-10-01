@@ -1,21 +1,19 @@
 <general>
   <Network>
-    <ListenPort>6000</ListenPort> <!-- DATA PORT -->
-    <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
-    <ListenPort>6004</ListenPort> <!-- CMD PORT -->
-    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-    <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
-    <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
+    <ListenPort>6000</ListenPort> <!--send data: Port0-->
+    <ListenPort>6002</ListenPort> <!--send status: Port1 -->
+    <!-- <ConnectTo>localhost:5557</ConnectTo> -->
+    <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo> <!-- RUN CONTROL -->
   </Network>
   <Hardware>
-    <crateId>2</crateId>
+    <crateId>3</crateId>
     <board>
       <ID>1</ID>
       <type>TIME</type> <!-- Remember to put always TIME at the first location among boards -->
     </board>
     <board>
-      <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <ID>1</ID>
+      <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <boardType>1</boardType> <!-- ??? -->
       <LinkType>0</LinkType> <!--int32_t-->
       <LinkNum>0</LinkNum> <!--int32_t-->
@@ -67,24 +65,6 @@
       <PulserATimePulses>1</PulserATimePulses> <!--uint32_t-->
       <PulserAStartInput>0</PulserAStartInput> <!--CVIOSources-->
       <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
-    </board>
-    <board>
-      <type>CAEN_V513</type> <!-- I/O REGISTER -->
-      <ID>1</ID>
-      <baseAddress>0x22000000</baseAddress>
-      <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
-      <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
-      <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->
-      <channelsInputModeWord>0xFFF8</channelsInputModeWord><!-- normalInputMode (glitched for the first 3) --> 
-      <channelsTransferModeWord>0x0000</channelsTransferModeWord><!-- transparentTransferMode -->
-
-      <WWEReadBitMask>0x0001</WWEReadBitMask>
-      <WEReadBitMask>0x0002</WEReadBitMask>
-      <EEReadBitMask>0x0004</EEReadBitMask>
-
-      <beamTriggerVetoBitMask>0x0100</beamTriggerVetoBitMask>
-      <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
-      <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
     </board>
   </Hardware>
   <EventBuilder>

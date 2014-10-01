@@ -196,7 +196,7 @@ void Daemon::SendStatus(){
 	dataType myMex;
 	myMex.append((void*)"STATUS ",7);
 	char mybuffer[255];
-	int n = snprintf(mybuffer,255,"%d",myStatus_);
+	int n = snprintf(mybuffer,255,"%u",myStatus_);
 	myMex.append((void*)mybuffer,n);
 	connectionManager_->Send(myMex,StatusSck);
 	}
