@@ -1,6 +1,8 @@
 #include "interface/Daemon.hpp"
 #include "interface/Utility.hpp"
 
+//#define DAEMON_DEBUG
+
 // --- Constructor 
 Daemon::Daemon(){
 	// get the pid of the current process
@@ -122,26 +124,24 @@ Command Daemon::ParseData(dataType &mex)
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
 	// GUI CMD are not NULL Terminated
-	else 	{ // GUI
+	else 	{ // GUI --- I'M changing the mex
 
 		dataType mex2;
 		mex2.copy(mex.data(),mex.size()) ;
+		mex2.append((void*)"\0",1);
 		Utility::SpaceToNull(mex2.size(),mex2.data(),false); // true=only the first
-
-		ostringstream s; s<<"[Daemon]::[ParseCommand] GUI Mex: '"<< (char*)mex2.data()<<"'";
+#ifdef DAEMON_DEBUG
+		ostringstream s; s<<"[Daemon]::[ParseCommand]::[DEBUG] GUI Mex: '"<< (char*)mex2.data()<<"'";
 		Log(s.str(),3);
-
+#endif
 		if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_STARTRUN")  )
 		   {
-		   Log("[Daemon]::[ParseCommand] [DEBUG] Is GUI START RUN",3 );
-		   mex.erase(0,13);
-		   Log("[Daemon]::[ParseCommand] [DEBUG] Is GUI START RUN 2",3 );
+		   mex2.erase(0,13);
 		   myCmd.cmd=GUI_STARTRUN;
-		   Utility::SpaceToNull(mex.size(),mex.data() ) ;
-		   Log("[Daemon]::[ParseCommand] [DEBUG] Space To Null Done",3 );
-		   myCmd.data = mex.data();
-		   myCmd.N    = mex.size();
-		   mex.release();
+		   //Utility::SpaceToNull(mex2.size(),mex2.data() ) ;
+		   myCmd.data = mex2.data();
+		   myCmd.N    = mex2.size();
+		   mex2.release();
 		   }
 		else if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_PAUSERUN")  )
 		   {
@@ -159,6 +159,7 @@ Command Daemon::ParseData(dataType &mex)
 		   {
 		   myCmd.cmd=GUI_DIE;
 		   }
+		if (myCmd.data != NULL)mex2.release();
 		} // ENDGUI
 
 	if(myCmd.data !=NULL ) mex.release();

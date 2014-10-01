@@ -77,8 +77,21 @@ unsigned long Utility::timestamp(struct timeval *time, time_t *ref){
   return time_msec;
 }
 
+unsigned long Utility::now(){
+	time_t ref=0;
+	timeval tv;
+	gettimeofday(&tv,NULL);
+	return timestamp(&tv,&ref);
+}
+
 int Utility::hibit(WORD n) {
   return (n & 0x80000000) ? 31 : hibit((n << 1) | 1) - 1;
+}
+
+int Utility::lowbit(WORD n) {
+	for (int i=0;i<32 ;i++) 
+		if ( ( n >> i )&1 ) { return i ; } ; 
+	return 0; 
 }
 
 void Utility::SpaceToNull(int N,void*data,bool first)
@@ -86,7 +99,7 @@ void Utility::SpaceToNull(int N,void*data,bool first)
 	for(int i=0;i<N ;i++) 
 		if( ((char*)data)[i] ==' ') 
 		{
-			((char*)data)[i] =='\0';
+			((char*)data)[i] ='\0';
 			if (first) break;
 		}
 	return ;

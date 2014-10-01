@@ -2,6 +2,8 @@
 #include "interface/FSM.hpp"
 #include "interface/Utility.hpp"
 
+//#define FSM_DEBUG
+
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
 
@@ -592,7 +594,9 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  GUI_STARTRUN ) 
 			   	 {
-				   Log("[RunControlFSM]::[Loop] Is GUI START RUN 2",3);
+#ifdef FSM_DEBUG
+				   Log("[RunControlFSM]::[Loop]::[DEBUG] Is GUI START RUN 2",3);
+#endif
 				   hwManager_->BufferClearAll();
 				   eventBuilder_->ResetSpillNumber();
 
@@ -601,8 +605,10 @@ while (true) {
 				   sscanf( (char*)myCmd.data,"%u",&myRunNum);
 				   // find out the type of RUN and the Trigger rate (if exists)
 				   int shift=Utility::FindNull(myCmd.N,myCmd.data,1);
+#ifdef FSM_DEBUG
 				   ostringstream s2; s2<<"[RunControlFSM]::[Loop] Enter GUI_STARTRUN Routine. shift1="<<shift ;
 				   Log(s2.str(),3);
+#endif
 				   if (shift<0) {
 					   Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored",1);
 					   break;

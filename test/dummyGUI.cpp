@@ -8,7 +8,8 @@
 int main(int argc,char**argv){
 
 string logFileName="/tmp/log.txt";
- int port=5566;
+ int portPub=5566;
+ int portSub=6002;
 string ConnectTo=argv[1];
 
  Logger l;
@@ -27,9 +28,9 @@ string ConnectTo=argv[1];
  	pub.LogInit(&l);
  	sub.LogInit(&l);
  printf("-> Setting port\n");
- 	pub.SetPort(port);
+ 	pub.SetPort(portPub);
  printf("-> Setting Addr\n");
- 	sub.SetAddress(ConnectTo,port);
+ 	sub.SetAddress(ConnectTo,portSub);
 
  printf("-> Init Publisher\n");
  	pub.Init();
