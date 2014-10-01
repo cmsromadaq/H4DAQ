@@ -764,7 +764,6 @@ while (true) {
 	case ENDSPILL: 
 		    {
 			    // received EE
-		        hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
@@ -773,6 +772,8 @@ while (true) {
 				// TODO check if myCmd slhould destruct data/N or not
 				connectionManager_->Send(myMex,DataSck);
 			}
+			usleep(1000);
+		        hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			MoveToStatus(SENTBUFFER);
 		    break;
 		    }
