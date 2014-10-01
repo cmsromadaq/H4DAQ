@@ -190,6 +190,7 @@ int CAEN_V513::ReadInput(WORD& data)
 
   int status=0;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_INPUT_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+<<<<<<< HEAD
   data=data&0xFFFF; //data is a 16bit word
   if (data != dataRegister_)
     {
@@ -201,6 +202,14 @@ int CAEN_V513::ReadInput(WORD& data)
 #endif
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
     }
+=======
+  //   if (data != dataRegister_)
+  //     {
+  //       WORD writeData=0xFF;
+  //       //Cleaning Input register after reading
+  //       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+  //     }
+>>>>>>> 27acf800645e8eb4ffa128232e97f1ea52f6cddd
   if (status)
     {
       ostringstream s; s << "[CAEN_V513]::[ERROR]::Cannot read I/O register " << status; 
