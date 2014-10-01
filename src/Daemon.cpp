@@ -14,6 +14,7 @@ Daemon::Daemon(){
 	connectionManager_=new ConnectionManager();
 	myStatus_=START;
 	gettimeofday(&start_time,NULL);
+	iLoop=0;
 }
 
 
@@ -99,14 +100,14 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=WBE;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "EBT")  )
 		myCmd.cmd=EBT;
-	else if (N >=7  and !strcmp( (char*) mex.data(), "STATUS")  )
-		{
-		mex.erase(0,7);
-		myCmd.cmd=STATUS;
-		myCmd.data = mex.data();
-		myCmd.N    = mex.size();
-		mex.release();
-		}
+	//	else if (N >=7  and !strcmp( (char*) mex.data(), "STATUS")  ) // move in the not null terminated part TODO
+	//		{
+	//		mex.erase(0,7);
+	//		myCmd.cmd=STATUS;
+	//		myCmd.data = mex.data();
+	//		myCmd.N    = mex.size();
+	//		mex.release();
+	//		}
 	else if (N >=9  and !strcmp( (char*) mex.data(), "STARTRUN")  )
 		{
 		mex.erase(0,9);
@@ -159,6 +160,14 @@ Command Daemon::ParseData(dataType &mex)
 		   {
 		   myCmd.cmd=GUI_DIE;
 		   }
+		else if (N >=7  and !strcmp( (char*) mex2.data(), "STATUS")  ) // here because this is spaced and not null/null terminated
+			{
+			mex2.erase(0,7);
+			myCmd.cmd=STATUS;
+			myCmd.data = mex2.data();
+			myCmd.N    = mex2.size();
+			mex2.release();
+			}
 		if (myCmd.data != NULL)mex2.release();
 		} // ENDGUI
 
@@ -170,7 +179,7 @@ Command Daemon::ParseData(dataType &mex)
 
 void Daemon::MoveToStatus(STATUS_t newStatus){
 	dataType myMex;
-	myMex.append((void*)"STATUS\0",7);
+	myMex.append((void*)"STATUS ",7);
 	WORD myStatus=(WORD)newStatus;
 	myMex.append((void*)&myStatus,WORDSIZE);
 	connectionManager_->Send(myMex,StatusSck);
@@ -179,6 +188,18 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
 	myStatus_=newStatus;
+}
+
+void Daemon::SendStatus(){
+	if (iLoop > 10000) {
+	iLoop=0;
+	dataType myMex;
+	myMex.append((void*)"STATUS ",7);
+	myMex.append((void*)&myStatus_,WORDSIZE);
+	connectionManager_->Send(myMex,StatusSck);
+	}
+	++iLoop;
+	return;
 }
 
 bool Daemon::IsOk(){return true;}

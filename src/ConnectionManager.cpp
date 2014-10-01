@@ -252,6 +252,7 @@ void ConnectionManager::Init(){
 }
 
 void ConnectionManager::Config(Configurator &c){
+#ifndef NO_XML
 	xmlNode *net_node = NULL; 		
         for (net_node = c.root_element->children; net_node ; net_node = net_node->next)
         {
@@ -263,6 +264,10 @@ void ConnectionManager::Config(Configurator &c){
 
 	sendPorts=getElementVector(c, "ListenPort" , net_node) ;
 	recvAddresses=getElementVector(c, "ConnectTo" , net_node) ;
+#else 
+	printf("[ConnectionManager]::[Config] NO_XML Action forbid\n");
+	throw config_exception();
+#endif
 }
 
 

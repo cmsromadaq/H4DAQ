@@ -43,7 +43,8 @@ enum STATUS_t { START 		= 0,
 		RECVBUFFER	= 9,
 		SENTBUFFER	= 10,
 		SPILLCOMPLETED	= 11,
-		BYE		= 12
+		BYE		= 12,
+		ERROR		= 13
 		};
 
 /* Command description:

@@ -3,8 +3,8 @@
 
 #include "interface/StandardIncludes.hpp"
 #include "interface/DataType.hpp"
-#include "interface/HwManager.hpp"
 #include "interface/Logger.hpp"
+
 using namespace std;
 
 //class Command; // Command is now in an ad hoc hpp

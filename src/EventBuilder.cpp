@@ -283,6 +283,7 @@ WORD 	EventBuilder::ReadSpillNevents(dataType &x)
 
 // ---- EVENT BUILDER NON STATIC -----
 void EventBuilder::Config(Configurator &c){
+#ifndef NO_XML
         xmlNode *eb_node = NULL;
         //locate EventBuilder Node
         for (eb_node = c.root_element->children; eb_node ; eb_node = eb_node->next)
@@ -310,6 +311,11 @@ void EventBuilder::Config(Configurator &c){
 	s.str("");
 	s<<"[EventBuilder]::[Config]::[INFO] SendEvent="<<sendEvent_;
 	Log(s.str(),1);
+#else
+	printf("[EventBuilder]::[Config] NO_XML Action Forbid\n");
+	throw config_exception();
+
+#endif
 }
 
 void EventBuilder::Init(){

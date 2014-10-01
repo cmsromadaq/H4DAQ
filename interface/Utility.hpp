@@ -23,7 +23,7 @@ namespace Utility{
 
 
   int hibit(unsigned int n);
-  int lowbit(WORD n);
+  int lowbit(uint32_t n);
 };
 
 

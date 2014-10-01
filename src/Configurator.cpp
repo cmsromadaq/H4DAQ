@@ -7,7 +7,9 @@ Configurator::Configurator(){
 	xmlFileName="";
 	doc=NULL;
 	root_element=NULL;
+#ifndef NO_XML
 	LIBXML_TEST_VERSION
+#endif
 	}
 
 Configurator::~Configurator(){
@@ -21,15 +23,22 @@ void Configurator::Clear(){
 	if(root_element!=NULL)delete root_element;
 	root_element=NULL;
 	xmlFileName="";
+#ifndef NO_XML
     	xmlCleanupParser () ;
+#endif
 }
 
 void Configurator::Init(){
+#ifndef NO_XML
 	if(xmlFileName!="") {
 		doc = xmlReadFile(xmlFileName.c_str(), NULL, 0);
 		if (doc==NULL) throw configfile_exception(); 
 		root_element = xmlDocGetRootElement(doc);
 	}
+#else
+	printf("[Configurator]::[Init] NO_XML: action Forbid\n");
+	throw config_exception();
+#endif
 	return; 
 }
 
@@ -44,72 +53,6 @@ void Configurator::ReadFromStream(string stream){
 	delete name;
 	Init();
 }
-
-// --- Read from a dat file
-//    void Configurator::ReadFromDat(string fileName){
-//    	// read one lines per times
-//    	FILE *fr=fopen(fileName.c_str(),"r");
-//    	char buffer[1024]; // max line length
-//    
-//    	while ( fgets ( buffer, 1024, fr ) != NULL )
-//    	{
-//    		string line=buffer;
-//    		ReadLine(line);
-//    	}
-//    
-//    	fclose(fr);
-//    	return;
-//    
-//    }
-
-// --- Read from a strem
-//   void Configurator::Read(string stream){
-//   	// split in lines
-//   	while( !stream.empty() ){
-//   		size_t pos=stream.find('\n');
-//   		string line=stream.substr(0,pos+1);
-//   		stream.erase(0,pos+1);
-//   		ReadLine(line);
-//   	}
-//   	return;
-//   }
-//   
-//   // -- Read a Single line
-//   void Configurator::ReadLine(string line){
-//   	if ( line.empty() ) return; // return on empty lines
-//   	if ( line.c_str()[0] == '\n' ) return;
-//   	if ( line.c_str()[0] == '#' ) return; //return on lines that start with #
-//   	size_t pos = line.find('\n') ;
-//   	line.erase(pos,string::npos); // erase everything from \n -> 
-//   	if (line.c_str()[0] == '[' )
-//   		{
-//   		pos=line.find(']');
-//   		context_=line.substr(1,pos);
-//   		if (context_=="_" ) context_="";
-//   		}
-//   
-//   	pos=line.find('=');
-//   	string key=line.substr(0,pos);
-//   	string value=line.substr(pos+1,string::npos);
-//   	if ( key == "include" ) ReadFromDat(value);
-//   	else if (context_ == "") config[key]=value;
-//   	else config[ context_ + "_" + key ] =value;
-//   	//log->Log("Configurator: key "+ key + " set to value: "+ value,1); // log is also configured. I'll write it with the getDat
-//   }
-
-
-// --- Write to a file/stream
-//   string Configurator::GetDatConfiguration()
-//   {
-//   	string datStr="## Automatic Dat configuration dump##\n";
-//   	map<string,string>::iterator it;
-//   	for(it=config.begin();it!=config.end();it++)
-//   	{
-//   		datStr=it->first + "=" + it->second + "\n";
-//   	}
-//   	datStr += "## End of automatic configuration dump ##\n";
-//   	return datStr;
-//   }
 
 
 void   Configurator::GetVecInt(string value,vector<int> &v) {
@@ -135,6 +78,7 @@ void   Configurator::GetVecInt(string value,vector<int> &v) {
 /* assuming there's no sub-structure in the searched note */
 string Configurable::getElementContent (xmlDocPtr doc, const char * key, const xmlNode * node)
   {
+#ifndef NO_XML
     char * content = "NULL" ;
     xmlNode *cur_node = NULL;
     for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
@@ -146,6 +90,11 @@ string Configurable::getElementContent (xmlDocPtr doc, const char * key, const x
           }
        }
     return string (content) ;
+#else
+	printf("[Configurator]::[getElementContent] NO_XML: action Forbid\n");
+	throw config_exception();
+	return string("");
+#endif
   }
 
 string Configurable::getElementContent(Configurator&c, const char * key, const xmlNode * node)
@@ -156,6 +105,7 @@ string Configurable::getElementContent(Configurator&c, const char * key, const x
 vector<string> Configurable::getElementVector (xmlDocPtr doc, const char * key, const xmlNode * node)
   {
     vector<string> R;
+#ifndef NO_XML
     char * content ;
     xmlNode *cur_node = NULL;
     for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
@@ -166,6 +116,10 @@ vector<string> Configurable::getElementVector (xmlDocPtr doc, const char * key, 
 	    R.push_back(content);
           }
        }
+#else
+	printf("[Configurator]::[getElementVector] NO_XML: action Forbid\n");
+	throw config_exception();
+#endif
     return R ;
   }
 
@@ -192,6 +146,7 @@ Configurable::getNodeContentList (xmlDocPtr doc, const xmlNode * node)
     string name ;
     string content ;
     vector<pair<string, string> > output ;
+#ifndef NO_XML
     xmlNode *cur_node = NULL;
     for (cur_node = node->children; cur_node ; cur_node = cur_node->next)
       {
@@ -199,6 +154,10 @@ Configurable::getNodeContentList (xmlDocPtr doc, const xmlNode * node)
         content = (char *) xmlNodeListGetString (doc, cur_node->xmlChildrenNode, 1) ;
         output.push_back (pair<string, string> (name, content)) ;
        }
+#else
+	printf("[Configurator]::[getNodeContentList] NO_XML: action Forbid\n");
+	throw config_exception();
+#endif
     return output ;
   }
 
