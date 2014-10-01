@@ -195,7 +195,9 @@ void Daemon::SendStatus(){
 	iLoop=0;
 	dataType myMex;
 	myMex.append((void*)"STATUS ",7);
-	myMex.append((void*)&myStatus_,WORDSIZE);
+	char mybuffer[255];
+	int n = snprintf(mybuffer,255,"%d",myStatus_);
+	myMex.append((void*)mybuffer,n);
 	connectionManager_->Send(myMex,StatusSck);
 	}
 	++iLoop;
