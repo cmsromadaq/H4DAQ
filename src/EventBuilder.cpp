@@ -300,6 +300,16 @@ void EventBuilder::Config(Configurator &c){
 	bool dumpCompress=Configurator::GetInt(getElementContent(c, "dumpCompress" , eb_node) );
 	dump_->SetCompress(dumpCompress);
 	dump_->SetBinary();
+
+	ostringstream s;
+	s<<"[EventBuilder]::[Config]::[INFO] DumpEvent="<<dumpEvent_;
+	Log(s.str(),1);
+	s.str("");
+	s<<"[EventBuilder]::[Config]::[INFO] RecvEvent="<<recvEvent_;
+	Log(s.str(),1);
+	s.str("");
+	s<<"[EventBuilder]::[Config]::[INFO] SendEvent="<<sendEvent_;
+	Log(s.str(),1);
 }
 
 void EventBuilder::Init(){

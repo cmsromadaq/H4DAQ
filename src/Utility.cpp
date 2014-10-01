@@ -77,11 +77,12 @@ unsigned long Utility::timestamp(struct timeval *time, time_t *ref){
   return time_msec;
 }
 
-unsigned long Utility::now(){
-	time_t ref=0;
+string Utility::now(){
 	timeval tv;
 	gettimeofday(&tv,NULL);
-	return timestamp(&tv,&ref);
+	char buf[1023];
+	sprintf(buf,"%lu.%lu",tv.tv_sec,tv.tv_usec);
+	return string(buf);
 }
 
 int Utility::hibit(WORD n) {

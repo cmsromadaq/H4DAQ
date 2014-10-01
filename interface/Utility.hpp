@@ -17,7 +17,7 @@ namespace Utility{
 	long timevaldiff(struct timeval *starttime, struct timeval *finishtime) ;
 	
 	unsigned long timestamp(struct timeval *time, time_t *ref);
-	unsigned long now();
+	string now();
 	void SpaceToNull(int N,void*data,bool first=false);
 	int  FindNull(int N,void*data,int iPos=1);
 
