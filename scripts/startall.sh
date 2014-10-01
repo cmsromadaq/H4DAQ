@@ -1,7 +1,7 @@
 #!/bin/bash
 
 dryrun=0
-start_dr=0
+start_dr=1
 start_rc=1
 verbosity=3
 mycommand=" mkdir -p DAQ ; cd DAQ ; [ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; cd H4DAQ ; git pull ; python configure.py --noroot ; make -j 4;  "
