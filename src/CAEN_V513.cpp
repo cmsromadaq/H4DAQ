@@ -101,6 +101,7 @@ int CAEN_V513::Init()
 	  //usleep(1000);
 	  ++nt;
 	}
+      BufferClear();
       s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR WE "<< nt << " TIMES";
       Log(s.str(),3);
       nt=0;
@@ -109,6 +110,7 @@ int CAEN_V513::Init()
 	  //usleep(1000);
 	  ++nt;
 	}
+      BufferClear();
       s.str(""); s << "[CAEN_V513]::[INFO]::WAITED FOR EE "<< nt << " TIMES";
       Log(s.str(),3);
       ++ncycle;
@@ -139,7 +141,17 @@ int CAEN_V513::Clear()
 
 int CAEN_V513::BufferClear()
 {
+  int status=0;
   //Do nothing we do not want to change the I/O register bit values
+  WORD writeData=0xFF;
+  //Cleaning Input register 
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+  if (status)
+    {
+      ostringstream s; s << "[CAEN_V513]::[ERROR]::Cannot Reset Input regisetr " << status; 
+      Log(s.str(),1);
+      return ERR_RESET;
+    }
   return 0;
 }      
 
@@ -189,27 +201,19 @@ int CAEN_V513::ReadInput(WORD& data)
     return ERR_CONF_NOT_FOUND;
 
   int status=0;
+  data=dataRegister_;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_INPUT_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
-<<<<<<< HEAD
-  data=data&0xFFFF; //data is a 16bit word
-  if (data != dataRegister_)
-    {
-      WORD writeData=0xFF;
-      //Cleaning Input register after reading
-#ifdef CAEN_V513_DEBUG
-      ostringstream s; s << "[CAEN_V513]::[DEBUG]::CLEANING AFTER STATUS CHANGE 0x"<< std::hex << data << std::dec;
-      Log(s.str(),3);
-#endif
-      status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
-    }
-=======
-  //   if (data != dataRegister_)
-  //     {
-  //       WORD writeData=0xFF;
-  //       //Cleaning Input register after reading
-  //       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
-  //     }
->>>>>>> 27acf800645e8eb4ffa128232e97f1ea52f6cddd
+  data=data&0xFFFF; //data is a 16bit word!
+//   if (data != dataRegister_)
+//     {
+//       WORD writeData=0xFF;
+//       //Cleaning Input register after reading
+// #ifdef CAEN_V513_DEBUG
+//       ostringstream s; s << "[CAEN_V513]::[DEBUG]::CLEANING AFTER STATUS CHANGE 0x"<< std::hex << data << std::dec;
+//       Log(s.str(),3);
+// #endif
+//       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V513_CLEAR_INPUT_REGISTER,&writeData,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
+//     }
   if (status)
     {
       ostringstream s; s << "[CAEN_V513]::[ERROR]::Cannot read I/O register " << status; 

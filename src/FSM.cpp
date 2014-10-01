@@ -665,6 +665,7 @@ while (true) {
 #endif
 					 )
 			 {
+			   hwManager_->ClearSignalStatus();
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
 			    eventBuilder_->OpenSpill();
@@ -693,6 +694,7 @@ while (true) {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
+			   hwManager_->ClearSignalStatus();
 		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
 			    connectionManager_->Send(weMex,CmdSck);
 			    hwManager_->BufferClearAll();
@@ -716,6 +718,7 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
+				hwManager_->ClearSignalStatus();
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
@@ -736,9 +739,6 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->TriggerAck();
 			MoveToStatus(READ);
-#ifdef RC_DEBUG
-			usleep(2000);
-#endif
                         }  
 
 		    break;

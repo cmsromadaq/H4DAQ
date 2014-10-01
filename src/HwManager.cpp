@@ -234,7 +234,7 @@ int HwManager::CrateInit()
       throw config_exception();
     }
 
-  usleep(10000); 
+  sleep(1); 
 
   return 0;
 
@@ -365,6 +365,26 @@ void HwManager::SetTriggerStatus(TRG_t triggerType,TRG_STATUS_t triggerStatus)
 	  {
 	    ostringstream s;
 	    s << "[HwManager]::[ERROR]::SetTriggerStatus failed " << status;
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+}
+
+void HwManager::ClearSignalStatus()
+{
+	if (ioControlBoard_.boardIndex_<0 ) 
+	  {	    
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::IOControl Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+
+	int status=dynamic_cast<IOControlBoard*>(hw_[ioControlBoard_.boardIndex_])->BufferClear();
+	if ( status )
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Cannot Reset Signal Status (I/O input register clear)" << status;
 	    Log(s.str(),1);
 	    throw hw_exception();
 	  }
