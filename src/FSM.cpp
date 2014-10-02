@@ -71,9 +71,10 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 eventBuilder_->OpenSpill();
-					 MoveToStatus(CLEARED);
+				   hwManager_->BufferClearAll();
+				   hwManager_->ClearBusy(); //just for "safety"
+				   eventBuilder_->OpenSpill();
+				   MoveToStatus(CLEARED);
 				 }
 			    }
 		    break;
@@ -87,7 +88,8 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
+
+				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
 			    }
@@ -357,6 +359,9 @@ return;
 }//end LOOP
 
 // ------------------- EVENT BUILDER
+EventBuilderFSM::EventBuilderFSM(): Daemon() {
+
+}
 bool EventBuilderFSM::IsOk(){
 	if( eventBuilder_->GetRecvEvent() <= 0) {
 		Log("[EventBuilderFSM]::[IsOk] Machine is not configured to receive events",1);
@@ -416,6 +421,7 @@ while (true) {
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
 					 hwManager_->BufferClearAll();
+					 hwManager_->ClearBusy(); //just for "safety"
 					 eventBuilder_->OpenSpill();
 					 MoveToStatus(CLEARED);
 				 }
@@ -431,7 +437,7 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
+				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
 			    }
@@ -643,6 +649,7 @@ while (true) {
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
+			    hwManager_->ClearBusy(); //just for "safety"
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }

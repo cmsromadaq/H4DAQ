@@ -6,6 +6,7 @@
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
+    <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
   <Hardware>
     <crateId>2</crateId>
