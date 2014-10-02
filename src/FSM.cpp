@@ -696,7 +696,7 @@ while (true) {
 		      usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-		      MoveToStatus(CLEARBUSY);
+		      MoveToStatus(WAITFORREADY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
@@ -717,6 +717,8 @@ while (true) {
 		    }
 	case WAITFORREADY:
 		    {
+			printf("[FSM]::[DEBUG] readyDR=%d\n",readyDR_);
+			usleep(1000);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
