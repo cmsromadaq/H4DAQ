@@ -28,6 +28,7 @@ int Daemon::Init(string configFileName){
 		waitForDR_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"waitForDR",configurator_->root_element) ); // move to Config
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_;
 		Log(s.str(),1);
+		printf("%s\n",s.str().c_str());
 
 		// Configure Everything else
 		eventBuilder_		->Config(*configurator_);
@@ -125,6 +126,8 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=SPILLCOMPL;
 	else if (N >=14  and !strcmp( (char*) mex.data(), "EB_SPILLCOMPL")  )
 		myCmd.cmd=EB_SPILLCOMPLETED;
+	else if (N >=9  and !strcmp( (char*) mex.data(), "DR_READY")  )
+		myCmd.cmd=DR_READY;
 	else if (N >=7  and !strcmp( (char*) mex.data(), "ENDRUN")  )
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
@@ -219,10 +222,12 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 }
 
 void Daemon::SendStatus(){
+	return; // TODO
 	static STATUS_t myLastSentStatus=(STATUS_t)0;
 	if (myStatus_== myLastSentStatus ) return;
-	else { iLoop=0; }
-	if (iLoop > 10000) {
+	//if (myStatus_== WAITFORTRIG ) return;
+	//if (myStatus_== READY ) return;
+	if (iLoop > 1000000) {
 		iLoop=0;
 		dataType myMex;
 		myMex.append((void*)"STATUS ",7);
