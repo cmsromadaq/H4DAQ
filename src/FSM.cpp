@@ -139,6 +139,10 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
+#ifdef SYNC_DEBUG
+			usleep(200);
+#endif
+
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
@@ -683,22 +687,24 @@ while (true) {
 		    weMex.append((void*)"WE\0",3);
 		    if (trgType_==PED_TRIG ) 
 		    {
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-			    connectionManager_->Send(weMex,CmdSck);
-			    trgRead_=0;
-			    hwManager_->BufferClearAll();
-			    MoveToStatus(CLEARBUSY);
+		      connectionManager_->Send(weMex,CmdSck);
+		      trgRead_=0;
+		      usleep(100000); //Wait acknowledge from DR
+		      hwManager_->BufferClearAll();
+		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		      MoveToStatus(CLEARBUSY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
-			   hwManager_->ClearSignalStatus();
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
-			    connectionManager_->Send(weMex,CmdSck);
-			    hwManager_->BufferClearAll();
-			    MoveToStatus(CLEARBUSY);
+			   connectionManager_->Send(weMex,CmdSck);
+			   usleep(100000); //Wait acknowledge from DR
+			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
+			   hwManager_->BufferClearAll();
+			   hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
+			   MoveToStatus(CLEARBUSY);
 			 }
 
 		    }
@@ -718,9 +724,11 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
-				  //				  sleep(0.5);  
-				hwManager_->ClearSignalStatus();
+				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  usleep(10000);
 				connectionManager_->Send(eeMex,CmdSck);
+				hwManager_->ClearSignalStatus();
+				
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -729,9 +737,9 @@ while (true) {
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
-				// send EE
-				//usleep(10000);
-				connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  usleep(10000);
+				  connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -766,7 +774,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			//			usleep(2000);
+			usleep(200);
 #endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
@@ -776,7 +784,6 @@ while (true) {
 		    }
 	case ENDSPILL: 
 		    {
-		      hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			    // received EE
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
