@@ -695,7 +695,7 @@ while (true) {
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
-		      usleep(100000); //Wait acknowledge from DR
+		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
@@ -706,7 +706,7 @@ while (true) {
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
-			   usleep(100000); //Wait acknowledge from DR
+			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
 			   readyDR_=0;
@@ -719,7 +719,7 @@ while (true) {
 	case WAITFORREADY:
 		    {
 		    dataType myMex;
-		    usleep(1000);
+		    //usleep(1000);
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
