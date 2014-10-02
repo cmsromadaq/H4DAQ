@@ -145,7 +145,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
 #ifdef SYNC_DEBUG
-			int sleeptime=rand()%400 +100;
+			int sleeptime=rand()%5000 +1000;
 			usleep(sleeptime);
 #endif
 
@@ -803,7 +803,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			int sleeptime=rand()%400 +100;
+			int sleeptime=rand()%5000 +1000;
 			usleep(sleeptime);
 #endif
 			eventBuilder_->CloseEvent(event);
