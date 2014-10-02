@@ -698,6 +698,7 @@ while (true) {
 		      usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
