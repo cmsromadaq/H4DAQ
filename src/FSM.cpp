@@ -711,7 +711,7 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
-				  sleep(0.5);  
+				  //				  sleep(0.5);  
 				hwManager_->ClearSignalStatus();
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
@@ -723,7 +723,7 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				// send EE
-				  usleep(10000);
+				//usleep(10000);
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
