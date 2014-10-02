@@ -695,7 +695,7 @@ while (true) {
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
-		      //usleep(100000); //Wait acknowledge from DR
+		      usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      MoveToStatus(WAITFORREADY);
@@ -706,7 +706,7 @@ while (true) {
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
-			   //usleep(100000); //Wait acknowledge from DR
+			   usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
 			   hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
@@ -749,6 +749,7 @@ while (true) {
 			if (hwManager_->SignalReceived(EE) )
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  usleep(10000);
 				connectionManager_->Send(eeMex,CmdSck);
 				hwManager_->ClearSignalStatus();
 				
@@ -761,6 +762,7 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
