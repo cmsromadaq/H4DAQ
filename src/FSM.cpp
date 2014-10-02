@@ -3,6 +3,7 @@
 #include "interface/Utility.hpp"
 
 //#define FSM_DEBUG
+#define SYNC_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -757,6 +758,9 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
+#ifdef SYNC_DEBUG
+			usleep(2000);
+#endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
