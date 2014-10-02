@@ -139,6 +139,10 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
+#ifdef SYNC_DEBUG
+			usleep(200);
+#endif
+
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
@@ -766,7 +770,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			//			usleep(2000);
+			usleep(200);
 #endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
