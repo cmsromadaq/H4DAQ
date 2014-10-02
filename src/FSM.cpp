@@ -406,7 +406,7 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  STARTRUN ) 
 			   	 {
-				   hwManager_->BufferClearAll();
+				   //hwManager_->BufferClearAll();
 				   eventBuilder_->ResetSpillNumber();
 				   WORD myRunNum=*(WORD*)myCmd.data;
 				   ostringstream s;
@@ -428,8 +428,8 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 hwManager_->ClearBusy(); //just for "safety"
+					 //hwManager_->BufferClearAll();
+					 //hwManager_->ClearBusy(); //just for "safety"
 					 eventBuilder_->OpenSpill();
 					 MoveToStatus(CLEARED);
 				 }
@@ -452,7 +452,7 @@ while (true) {
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->ClearBusy();
+		        //hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -496,6 +496,7 @@ while (true) {
 				    myNewCmd.release();
 				    //Merge Spills
 				    eventBuilder_->MergeSpills(myData);
+
 			    }
 		    }
 		    if ( eventBuilder_->AreSpillsMerged() ) 		   	 {
@@ -518,7 +519,7 @@ while (true) {
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
-			    Command myNewCmd = ParseData( myMex); 
+			    Command myNewCmd = ParseData( myMex ); 
 			    if (myNewCmd.cmd == SPILLCOMPL )  {
 			            MoveToStatus(BEGINSPILL);
 			    }
@@ -717,6 +718,8 @@ while (true) {
 		    }
 	case WAITFORREADY:
 		    {
+			printf("[FSM]::[DEBUG] readDR=%d",readyDR_);
+			usleep(1000);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
