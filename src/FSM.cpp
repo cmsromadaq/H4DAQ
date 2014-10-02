@@ -111,6 +111,7 @@ while (true) {
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
+			      hwManager_->ClearBusy();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -752,10 +753,10 @@ while (true) {
 			if (hwManager_->SignalReceived(EE) )
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
-				connectionManager_->Send(eeMex,CmdSck);
-				hwManager_->ClearSignalStatus();
-				
+				  //				  usleep(10000);
+				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearSignalStatus();
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -765,8 +766,9 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
+				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
