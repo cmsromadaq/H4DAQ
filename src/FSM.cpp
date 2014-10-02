@@ -94,7 +94,7 @@ while (true) {
 					dataType myMex;
 					myMex.append((void*)"DR_READY\0",9);
 					connectionManager_->Send(myMex,CmdSck);
-					MoveToStatus(CLEARBUSY);
+					MoveToStatus(WAITTRIG);
 				 }
 			    }
 		    break;
@@ -697,6 +697,7 @@ while (true) {
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
+		      hwManager_->ClearBusy();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -709,6 +710,7 @@ while (true) {
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
+		           hwManager_->ClearBusy();
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
@@ -731,7 +733,7 @@ while (true) {
 		    if (readyDR_ >= waitForDR_)
 		    {
 		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-		   	 MoveToStatus(CLEARBUSY);
+		   	 MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
