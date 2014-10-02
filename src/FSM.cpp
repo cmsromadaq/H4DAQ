@@ -711,7 +711,6 @@ while (true) {
 			if (hwManager_->SignalReceived(EE) )
 				{
 				hwManager_->ClearSignalStatus();
-				sleep(1);
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
