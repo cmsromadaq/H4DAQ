@@ -8,6 +8,7 @@
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
     <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo>  <!-- DR Data -->
     <ConnectTo>cms-h4-03.cern.ch:6000</ConnectTo>  <!-- DR Data -->
+    <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
   </Network>
   <Hardware>
     <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
