@@ -26,7 +26,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	// SendStatus();
+	 SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -210,7 +210,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	// SendStatus();
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -376,7 +376,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	// SendStatus();
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -563,7 +563,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	// SendStatus();
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something

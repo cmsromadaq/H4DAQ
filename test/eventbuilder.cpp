@@ -43,7 +43,7 @@ define_handlers();
  };
  
  int long_index =0;
- while ((opt = getopt_long(argc, argv,"c:l:v:", 
+ while ((opt = getopt_long(argc, argv,"c:l:v:d", 
 			   long_options, &long_index )) != -1) {
    switch (opt) {
    case 'v' : verbosity = atoi(optarg);
@@ -72,17 +72,17 @@ define_handlers();
 if(daemon){
 	pid_t pid=fork();
 	if (pid >0 ){ // parent
-		printf("[DataReadoutDaemon] Detaching process %d\n",pid);
+		printf("[EventBuilderDaemon] Detaching process %d\n",pid);
 		_exit(0);
 		} 
 	else if (pid== 0 ) { // child
 		}
-	else printf("[DataReadoutDaemon] Cannot Daemonize");
+	else printf("[EventBuilderDaemon] Cannot Daemonize");
 	}
 
 Logger l;
 l.SetLogLevel(verbosity);
-printf("[DataReadoutDaemon]::Init Logfile => %s\n",logFileName.c_str());
+printf("[EventBuilderDaemon]::Init Logfile => %s\n",logFileName.c_str());
 l.SetFileName(logFileName);
 try
   {
@@ -96,11 +96,11 @@ try
 //
 //Daemon *d=new Daemon();
 //printf("Construct\n");
-DataReadoutFSM *d=new DataReadoutFSM();
+EventBuilderFSM *d=new EventBuilderFSM();
 //printf("LogInit\n");
 d->LogInit(&l);
 //printf("Init\n");
-printf("[DataReadoutDaemon]::Init Configfile => %s\n",configFileName.c_str());
+printf("[EventBuilderDaemon]::Init Configfile => %s\n",configFileName.c_str());
 d->Init(configFileName);
 try{
   //	printf("Loop\n");

@@ -242,30 +242,34 @@ Command Daemon::ParseData(dataType &mex)
 
 
 void Daemon::MoveToStatus(STATUS_t newStatus){
-	dataType myMex;
-	myMex.append((void*)"STATUS ",7);
-	WORD myStatus=(WORD)newStatus;
-	myMex.append((void*)&myStatus,WORDSIZE);
-	connectionManager_->Send(myMex,StatusSck);
+	// -- dataType myMex;
+	// -- myMex.append((void*)"STATUS ",7);
+	// -- WORD myStatus=(WORD)newStatus;
+	// -- myMex.append((void*)&myStatus,WORDSIZE);
+	// -- connectionManager_->Send(myMex,StatusSck);
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
 	myStatus_=newStatus;
-	SendStatus(); //Send status to GUI (formatted correctly)
+	//SendStatus(); //Send status to GUI (formatted correctly)
 }
 
 void Daemon::SendStatus(){
-	// if (iLoop > 10000) {
-	// iLoop=0;
-	dataType myMex;
-	myMex.append((void*)"STATUS ",7);
-	char mybuffer[255];
-	int n = snprintf(mybuffer,255,"%u",myStatus_);
-	myMex.append((void*)mybuffer,n);
-	connectionManager_->Send(myMex,StatusSck);
-	// }
-	// ++iLoop;
+	static STATUS_t myLastSentStatus=(STATUS_t)0;
+	if (myStatus_== myLastSentStatus ) return;
+	else { iLoop=0; }
+	if (iLoop > 10000) {
+		iLoop=0;
+		dataType myMex;
+		myMex.append((void*)"STATUS ",7);
+		char mybuffer[255];
+		int n = snprintf(mybuffer,255,"%u",myStatus_);
+		myMex.append((void*)mybuffer,n);
+		connectionManager_->Send(myMex,StatusSck);
+		myLastSentStatus = myStatus_ ;
+	}
+	++iLoop;
 	return;
 }
 
