@@ -697,7 +697,7 @@ while (true) {
 		      trgRead_=0;
 		      usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
-		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
@@ -709,7 +709,6 @@ while (true) {
 			   usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
-			   hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
@@ -731,6 +730,7 @@ while (true) {
 			    }
 		    if (readyDR_ >= waitForDR_)
 		    {
+		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		   	 MoveToStatus(CLEARBUSY);
 		    }
 		    break;
