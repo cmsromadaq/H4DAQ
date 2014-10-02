@@ -252,19 +252,20 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
 	myStatus_=newStatus;
+	SendStatus(); //Send status to GUI (formatted correctly)
 }
 
 void Daemon::SendStatus(){
-	if (iLoop > 10000) {
-	iLoop=0;
+	// if (iLoop > 10000) {
+	// iLoop=0;
 	dataType myMex;
 	myMex.append((void*)"STATUS ",7);
 	char mybuffer[255];
 	int n = snprintf(mybuffer,255,"%u",myStatus_);
 	myMex.append((void*)mybuffer,n);
 	connectionManager_->Send(myMex,StatusSck);
-	}
-	++iLoop;
+	// }
+	// ++iLoop;
 	return;
 }
 
