@@ -720,6 +720,7 @@ while (true) {
 	case WAITFORREADY:
 		    {
 		    dataType myMex;
+		    usleep(1000);
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
