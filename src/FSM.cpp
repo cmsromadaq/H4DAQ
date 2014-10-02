@@ -144,7 +144,8 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
 #ifdef SYNC_DEBUG
-			usleep(200);
+			int sleeptime=rand()%400 +100;
+			usleep(sleeptime);
 #endif
 
 			eventBuilder_->CloseEvent(event);
@@ -694,7 +695,7 @@ while (true) {
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
-		      usleep(100000); //Wait acknowledge from DR
+		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      MoveToStatus(WAITFORREADY);
@@ -705,7 +706,7 @@ while (true) {
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
-			   usleep(100000); //Wait acknowledge from DR
+			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
 			   hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
@@ -748,7 +749,6 @@ while (true) {
 			if (hwManager_->SignalReceived(EE) )
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
 				connectionManager_->Send(eeMex,CmdSck);
 				hwManager_->ClearSignalStatus();
 				
@@ -761,7 +761,6 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
 				break;
@@ -797,7 +796,8 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			usleep(200);
+			int sleeptime=rand()%400 +100;
+			usleep(sleeptime);
 #endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill

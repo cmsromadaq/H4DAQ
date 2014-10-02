@@ -16,6 +16,7 @@ Daemon::Daemon(){
 	gettimeofday(&start_time,NULL);
 	iLoop=0;
 	waitForDR_=0;
+	srand((unsigned)time(NULL));
 }
 
 
