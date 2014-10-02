@@ -28,6 +28,7 @@ int Daemon::Init(string configFileName){
 		waitForDR_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"waitForDR",configurator_->root_element) ); // move to Config
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_;
 		Log(s.str(),1);
+		printf("%s\n",s.str().c_str());
 
 		// Configure Everything else
 		eventBuilder_		->Config(*configurator_);
