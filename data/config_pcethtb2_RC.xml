@@ -1,4 +1,5 @@
 <general>
+  <waitForDR>2</waitForDR>
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->

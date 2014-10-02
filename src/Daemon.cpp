@@ -15,6 +15,7 @@ Daemon::Daemon(){
 	myStatus_=START;
 	gettimeofday(&start_time,NULL);
 	iLoop=0;
+	waitForDR_=0;
 }
 
 
@@ -23,6 +24,10 @@ int Daemon::Init(string configFileName){
 		// Set Configurator ; and Init it
 		configurator_->xmlFileName=configFileName;
 		configurator_->Init();
+
+		waitForDR_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"waitForDR",configurator_->root_element) ); // move to Config
+		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_;
+		Log(s.str(),1);
 
 		// Configure Everything else
 		eventBuilder_		->Config(*configurator_);
@@ -202,6 +207,8 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=SPILLCOMPL;
 	else if (N >=13  and !strcmp( (char*) mex.data(), "EB_SPILLCOMPL")  )
 		myCmd.cmd=EB_SPILLCOMPLETED;
+	else if (N >=9  and !strcmp( (char*) mex.data(), "DR_READY")  )
+		myCmd.cmd=DR_READY;
 	else if (N >=6  and !strcmp( (char*) mex.data(), "ENDRUN")  )
 		myCmd.cmd=ENDRUN;
 	else if (N >=3  and !strcmp( (char*) mex.data(), "DIE")  )

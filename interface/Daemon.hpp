@@ -42,6 +42,7 @@ const static int StatusSck = 1;
 const static int CmdSck = 2;
 
 int iLoop;
+int waitForDR_;
 
 public:
 	// --- Constructor

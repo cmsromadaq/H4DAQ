@@ -90,7 +90,11 @@ while (true) {
 			   	 {
 
 				   //					 hwManager_->BufferClearAll();
-					 MoveToStatus(CLEARBUSY);
+				         // Send Ready to the RC
+					dataType myMex;
+					myMex.append((void*)"DR_READY\0",9);
+					connectionManager_->Send(myMex,CmdSck);
+					MoveToStatus(CLEARBUSY);
 				 }
 			    }
 		    break;
@@ -704,9 +708,27 @@ while (true) {
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
 			   hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
-			   MoveToStatus(CLEARBUSY);
+			   readyDR_=0;
+			   MoveToStatus(WAITFORREADY);
 			 }
 
+		    }
+		    break;
+		    }
+	case WAITFORREADY:
+		    {
+		    dataType myMex;
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  DR_READY ) 
+			   	 {
+				 ++readyDR_;
+				 }
+			    }
+		    if (readyDR_ >= waitForDR_)
+		    {
+		   	 MoveToStatus(CLEARBUSY);
 		    }
 		    break;
 		    }

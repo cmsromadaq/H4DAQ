@@ -41,6 +41,7 @@ protected:
 	TRG_STATUS_t trgStatus_;
 	long trgNevents_;
 	long trgRead_;
+	int readyDR_; // DR ready to take data
 
 public:
 	RunControlFSM();
