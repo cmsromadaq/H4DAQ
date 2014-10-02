@@ -711,7 +711,7 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
-				  usleep(10000);  
+				  sleep(0.5);  
 				hwManager_->ClearSignalStatus();
 				connectionManager_->Send(eeMex,CmdSck);
 				MoveToStatus(ENDSPILL);
@@ -759,7 +759,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			usleep(2000);
+			//			usleep(2000);
 #endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
