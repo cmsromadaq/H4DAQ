@@ -68,7 +68,7 @@ void dataType::shrink(dataTypeSize_t N){
 void dataType::append(void* data, dataTypeSize_t N){
 	dataTypeSize_t tot=N+size_;
 	if(tot>0 && reserved_==0) reserve(tot);
-	if(tot == 0 ) cout<<"TOT IS 0 "<<endl; // TODO something
+	if(tot == 0 ) cout<<"[DataType]::[append] TOT IS 0 "<<endl; // TODO something
 	while (reserved_<tot){
 		reserve(2*reserved_); // this avoids the +1, +1 ...
 		}

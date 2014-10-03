@@ -39,6 +39,7 @@ void BoardConfig::Init(Configurator&c){
 vector<pair<string, string> > 
 BoardConfig::getNodeContentList (const char * key)
 {
+#ifndef NO_XML
   xmlNode * cur_node = NULL;
   for (cur_node = board_node->children; cur_node ; cur_node = cur_node->next)
     {
@@ -47,5 +48,9 @@ BoardConfig::getNodeContentList (const char * key)
           return Configurable::getNodeContentList (*this, cur_node) ;
         }
      }
+#else
+	printf("[BoardConfig]::[getNodeContentList] NO_XML: action Forbid\n");
+	throw config_exception();
+#endif
   return vector<pair<string, string> > () ;
 }

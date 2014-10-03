@@ -16,7 +16,7 @@ class Daemon;
 #include <getopt.h>
 
 void print_usage() {
-  printf("Usage: runcontroller -c config_file -l log_file -v verbosity\n");
+  printf("Usage: runcontroller -c config_file -l log_file -v verbosity [-d]\n");
 }
 
 int main(int argc, char**argv)
@@ -32,11 +32,13 @@ define_handlers();
  int verbose=1;
  string configFileName="";
  string logFileName="";
+ bool daemon=false;
 
  static struct option long_options[] = {
    {"config",    required_argument, 0,  'c' },
    {"log",    required_argument, 0,  'l' },
    {"verbose",    required_argument, 0,  'v' },
+   {"daemon",    optional_argument, 0,  'd' },
    {0,           0,                 0,  0   }
  };
  
@@ -49,6 +51,8 @@ define_handlers();
    case 'l' : logFileName=string(optarg);
      break;
    case 'v' : verbose=atoi(optarg);
+     break;
+   case 'd' : daemon=true;;
      break;
    case '?':
      /* getopt_long already printed an error message. */
@@ -64,8 +68,18 @@ define_handlers();
      print_usage(); 
      exit(EXIT_FAILURE);
    }
+// Daemon detach
+if(daemon){
+	pid_t pid=fork();
+	if (pid >0 ){ // parent
+		printf("[RunControlDaemon] Detaching process %d\n",pid);
+		_exit(0);
+		} 
+	else if (pid== 0 ) { // child
+		}
+	else printf("[EventBuilderDaemon] Cannot Daemonize");
+	}
 // -----------------
-//string logFileName="/tmp/logRC.txt";
 Logger l;
 
 try
@@ -88,7 +102,7 @@ RunControlFSM *d=new RunControlFSM();
 printf("INIT\n");
 //d->Init("data/configRC.xml");
 d->LogInit(&l);
-printf("]RunControllerDaemon]::Init LogLevel=%d\n",d->GetLogLevel() ) ;
+printf("[RunControllerDaemon]::Init LogLevel=%d\n",d->GetLogLevel() ) ;
 printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());
 d->Init(configFileName);
 try{

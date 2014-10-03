@@ -36,12 +36,16 @@ HDIR = $(BASEDIR)/interface
 
 ### Main Target, first
 .PHONY: all
-all: info $(Packages) | $(BINDIR)
+all: all2
 
-include make/Makefile.ROOT
+include make/Makefile.NOROOT
 include make/Makefile.ZMQ
 include make/Makefile.CAEN
 include make/Makefile.XML
+
+#wait to update Packages in NO_xxx
+.PHONY: all2
+all2: info $(Packages) | $(BINDIR)
 
 BINOBJ	=$(patsubst %,$(BINDIR)/%.$(ObjSuf),$(Objects) )
 SRCFILES=$(patsubst %,$(SRCDIR)/%.$(SrcSuf),$(Objects) )
@@ -92,9 +96,11 @@ $(addprefix $(BINDIR)/,$(Packages)): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $
 
 .PHONY: clean
 clean:
-	-rm -v bin/controller
 	-rm -v bin/*.$(ObjSuf)
-	-rm -v bin/*.$(DllSef)
+	-rm -v bin/*.$(DllSuf)
+	-rm -v bin/*.$(DepSuf)
+	-rm -v bin/*.$(StatSuf)
+	-rm -v $(addprefix $(BINDIR)/,$(Packages))
 
 
 ############### IMPLICIT RULES ###############

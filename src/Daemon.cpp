@@ -14,6 +14,9 @@ Daemon::Daemon(){
 	connectionManager_=new ConnectionManager();
 	myStatus_=START;
 	gettimeofday(&start_time,NULL);
+	iLoop=0;
+	waitForDR_=0;
+	srand((unsigned)time(NULL));
 }
 
 
@@ -22,6 +25,11 @@ int Daemon::Init(string configFileName){
 		// Set Configurator ; and Init it
 		configurator_->xmlFileName=configFileName;
 		configurator_->Init();
+
+		waitForDR_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"waitForDR",configurator_->root_element) ); // move to Config
+		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_;
+		Log(s.str(),1);
+		printf("%s\n",s.str().c_str());
 
 		// Configure Everything else
 		eventBuilder_		->Config(*configurator_);
@@ -99,14 +107,14 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=WBE;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "EBT")  )
 		myCmd.cmd=EBT;
-	else if (N >=7  and !strcmp( (char*) mex.data(), "STATUS")  )
-		{
-		mex.erase(0,7);
-		myCmd.cmd=STATUS;
-		myCmd.data = mex.data();
-		myCmd.N    = mex.size();
-		mex.release();
-		}
+	//	else if (N >=7  and !strcmp( (char*) mex.data(), "STATUS")  ) // move in the not null terminated part TODO
+	//		{
+	//		mex.erase(0,7);
+	//		myCmd.cmd=STATUS;
+	//		myCmd.data = mex.data();
+	//		myCmd.N    = mex.size();
+	//		mex.release();
+	//		}
 	else if (N >=9  and !strcmp( (char*) mex.data(), "STARTRUN")  )
 		{
 		mex.erase(0,9);
@@ -119,6 +127,8 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=SPILLCOMPL;
 	else if (N >=14  and !strcmp( (char*) mex.data(), "EB_SPILLCOMPL")  )
 		myCmd.cmd=EB_SPILLCOMPLETED;
+	else if (N >=9  and !strcmp( (char*) mex.data(), "DR_READY")  )
+		myCmd.cmd=DR_READY;
 	else if (N >=7  and !strcmp( (char*) mex.data(), "ENDRUN")  )
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
@@ -134,7 +144,37 @@ Command Daemon::ParseData(dataType &mex)
 		ostringstream s; s<<"[Daemon]::[ParseCommand]::[DEBUG] GUI Mex: '"<< (char*)mex2.data()<<"'";
 		Log(s.str(),3);
 #endif
-		if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_STARTRUN")  )
+		ostringstream s; s<<"[Daemon]::[ParseCommand]::[DEBUG] GUI Mex: '"<< (char*)mex2.data()<<"'";
+		Log(s.str(),3);
+
+		if (N >=4  and !strcmp( (char*) mex2.data(), "NOP")  )
+			myCmd.cmd=NOP;
+		else if (N >=4  and !strcmp( (char*) mex2.data(), "WWE")  )
+			myCmd.cmd=WWE;
+		else if (N >=3  and !strcmp( (char*) mex2.data(), "WE")  )
+			myCmd.cmd=WE;
+		else if (N >=3  and !strcmp( (char*) mex2.data(), "EE")  )
+			myCmd.cmd=EE;
+		else if (N >=9  and !strcmp( (char*) mex2.data(), "STARTRUN")  )
+			{
+			mex2.erase(0,9);
+			myCmd.cmd=STARTRUN;
+			myCmd.data = mex.data();
+			myCmd.N    = mex.size();
+			mex2.release();
+			}
+		else if (N >=11  and !strcmp( (char*) mex2.data(), "SPILLCOMPL")  )
+			myCmd.cmd=SPILLCOMPL;
+		else if (N >=14  and !strcmp( (char*) mex2.data(), "EB_SPILLCOMPL")  )
+			myCmd.cmd=EB_SPILLCOMPLETED;
+		else if (N >=10  and !strcmp( (char*) mex2.data(), "DR_READY")  )
+			myCmd.cmd=DR_READY;
+		else if (N >=7  and !strcmp( (char*) mex2.data(), "ENDRUN")  )
+			myCmd.cmd=ENDRUN;
+		else if (N >=4  and !strcmp( (char*) mex2.data(), "DIE")  )
+			myCmd.cmd=DIE;
+		// GUI CMD are not NULL Terminated
+		else if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_STARTRUN")  )
 		   {
 		   mex2.erase(0,13);
 		   myCmd.cmd=GUI_STARTRUN;
@@ -155,7 +195,7 @@ Command Daemon::ParseData(dataType &mex)
 		   {
 		   myCmd.cmd=GUI_RESTARTRUN;
 		   }
-		else if (N >=8  and !strcmp( (char*) mex2.data(), "GUI_DIE")  )
+		else if (N >=7  and !strcmp( (char*) mex2.data(), "GUI_DIE")  )
 		   {
 		   myCmd.cmd=GUI_DIE;
 		   }
@@ -169,16 +209,37 @@ Command Daemon::ParseData(dataType &mex)
 
 
 void Daemon::MoveToStatus(STATUS_t newStatus){
-	dataType myMex;
-	myMex.append((void*)"STATUS\0",7);
-	WORD myStatus=(WORD)newStatus;
-	myMex.append((void*)&myStatus,WORDSIZE);
-	connectionManager_->Send(myMex,StatusSck);
+	// -- dataType myMex;
+	// -- myMex.append((void*)"STATUS ",7);
+	// -- WORD myStatus=(WORD)newStatus;
+	// -- myMex.append((void*)&myStatus,WORDSIZE);
+	// -- connectionManager_->Send(myMex,StatusSck);
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
 	myStatus_=newStatus;
+	//SendStatus(); //Send status to GUI (formatted correctly)
+}
+
+void Daemon::SendStatus(){
+	return; // TODO
+	static STATUS_t myLastSentStatus=(STATUS_t)0;
+	if (myStatus_== myLastSentStatus ) return;
+	//if (myStatus_== WAITFORTRIG ) return;
+	//if (myStatus_== READY ) return;
+	if (iLoop > 1000000) {
+		iLoop=0;
+		dataType myMex;
+		myMex.append((void*)"STATUS ",7);
+		char mybuffer[255];
+		int n = snprintf(mybuffer,255,"%u",myStatus_);
+		myMex.append((void*)mybuffer,n);
+		connectionManager_->Send(myMex,StatusSck);
+		myLastSentStatus = myStatus_ ;
+	}
+	++iLoop;
+	return;
 }
 
 bool Daemon::IsOk(){return true;}

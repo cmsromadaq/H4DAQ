@@ -3,6 +3,7 @@
 #include "interface/Utility.hpp"
 
 //#define FSM_DEBUG
+//#define SYNC_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -25,6 +26,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
+	 SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -69,9 +71,10 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 eventBuilder_->OpenSpill();
-					 MoveToStatus(CLEARED);
+				   hwManager_->BufferClearAll();
+				   hwManager_->ClearBusy(); //just for "safety"
+				   eventBuilder_->OpenSpill();
+				   MoveToStatus(CLEARED);
 				 }
 			    }
 		    break;
@@ -85,8 +88,13 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 MoveToStatus(CLEARBUSY);
+
+				   //					 hwManager_->BufferClearAll();
+				         // Send Ready to the RC
+					dataType myMex;
+					myMex.append((void*)"DR_READY\0",9);
+					connectionManager_->Send(myMex,CmdSck);
+					MoveToStatus(WAITTRIG);
 				 }
 			    }
 		    break;
@@ -103,6 +111,7 @@ while (true) {
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
+			      hwManager_->ClearBusy();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -135,6 +144,11 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
+#ifdef SYNC_DEBUG
+			int sleeptime=rand()%5000 +1000;
+			usleep(sleeptime);
+#endif
+
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
@@ -173,6 +187,10 @@ while (true) {
 			
 		    break;
 		    }
+	case ERROR: {
+		    ErrorStatus();
+		    break;
+		    }
 	case BYE:
 		    {
 		    exit(0); // return is not working correctly
@@ -202,6 +220,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -350,8 +369,11 @@ return;
 }//end LOOP
 
 // ------------------- EVENT BUILDER
+EventBuilderFSM::EventBuilderFSM(): Daemon() {
+
+}
 bool EventBuilderFSM::IsOk(){
-	if( eventBuilder_->GetRecvEvent() != true) {
+	if( eventBuilder_->GetRecvEvent() <= 0) {
 		Log("[EventBuilderFSM]::[IsOk] Machine is not configured to receive events",1);
 		return false;
 		}
@@ -364,6 +386,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -385,7 +408,7 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  STARTRUN ) 
 			   	 {
-				   hwManager_->BufferClearAll();
+				   //hwManager_->BufferClearAll();
 				   eventBuilder_->ResetSpillNumber();
 				   WORD myRunNum=*(WORD*)myCmd.data;
 				   ostringstream s;
@@ -407,8 +430,10 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
-					 eventBuilder_->OpenSpill();
+					 //hwManager_->BufferClearAll();
+					 //hwManager_->ClearBusy(); //just for "safety"
+					 //eventBuilder_->OpenSpill();
+					 if (! eventBuilder_->AreSpillsMerged() ) Log("[EventBuilder]::[FSM] ERROR, Unmerged spill in new run",3); // TODO Exception
 					 MoveToStatus(CLEARED);
 				 }
 			    }
@@ -423,19 +448,19 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WE ) 
 			   	 {
-					 hwManager_->BufferClearAll();
+				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
 			    }
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->ClearBusy();
+		        //hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
 		    {
-		     // check network
+		     // check network  -- wait for EE
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
@@ -445,50 +470,20 @@ while (true) {
 				    break;
 			    }
 		    }
-		     /// check trigger
-		    if( hwManager_->TriggerReceived() ){ 
-			cout<<"TRIGGER RECEIVED"<<endl;
-			hwManager_->TriggerAck();
-			MoveToStatus(READ);
-                        }  
+		
 
 		    break;
 		    }
 	case READ:
 		    {
-			static int READED=0;
-			cout<<"Counter "<<std::dec<<++READED<<endl;
-			static int Counter=0; 
-			if (Counter==0 )  gettimeofday(&stopwatch_start_time,NULL);
-			++Counter;
-			if (Counter >= 500) {
-				gettimeofday(&stopwatch_stop_time,NULL);
-				long elapsed=  Utility::timevaldiff(&stopwatch_start_time,&stopwatch_stop_time);
-				ostringstream s; s <<"[DataReadOutFSM]::[READ] "<<"Triggers in spill "<< READED<<" Rate "<< double(Counter)/elapsed* 1e6 <<" Hz";
-				cout <<s.str()<<endl;
-				Log(s.str(),1);
-				Counter=0;
-			}
-			//----- Costruct Events
-                        dataType event;
-			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
-			hwManager_->ReadAll(event);                                 /// DEBUG ME
-			eventBuilder_->CloseEvent(event);
-			// ----- Add Event To Spill
-                        eventBuilder_->AddEventToSpill(event);                                
+			// Do Nothing for the EventBuilder FSm
 			MoveToStatus(CLEARBUSY);
 		    break;
 		    }
 	case ENDSPILL:
 		    {
-			    // received EE TODO NOT Open Close Spill
-			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
-			if (myCmd.cmd == SEND)
-			{
-				dataType myMex;
-				myMex.append(myCmd.data,myCmd.N);
-				connectionManager_->Send(myMex,DataSck);
-			}
+			    // received EE NOT Open Close Spill
+			eventStarted=false;
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
@@ -504,18 +499,23 @@ while (true) {
 				    // release the destruction from Command
 				    myNewCmd.release();
 				    //Merge Spills
+				    eventStarted= true;
 				    eventBuilder_->MergeSpills(myData);
+
 			    }
 		    }
-		    if ( eventBuilder_->AreSpillsMerged() ) // RUN CONTROL SEND COMMOND EB_SPILLCOMPL TODO
-		   	 {
+		    if ( eventBuilder_->AreSpillsMerged() && eventStarted) { // enter here only if you merged something
 			// SENT STATUS BUFFER COMPLETED
 			 dataType myMex;
-			 //inform run controller that spill has been completed
-			 myMex.append((void*)"STATUS\0SPILLCOMPL\0\0\0",18);
+			 myMex.append((void*)"STATUS SPILLCOMPL\0\0\0",18);
 			 connectionManager_->Send(myMex,StatusSck);
-			 MoveToStatus(SENTBUFFER);
+			 myMex.clear();
+
+			 //inform run controller that spill has been completed
+			 myMex.append((void*)"EB_SPILLCOMPL\0\0\0",14);
+			 connectionManager_->Send(myMex,CmdSck);
 		    
+			 MoveToStatus(SENTBUFFER);
 		   	 }
 		    break;
 		    }
@@ -524,7 +524,7 @@ while (true) {
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
-			    Command myNewCmd = ParseData( myMex); 
+			    Command myNewCmd = ParseData( myMex ); 
 			    if (myNewCmd.cmd == SPILLCOMPL )  {
 			            MoveToStatus(BEGINSPILL);
 			    }
@@ -535,6 +535,10 @@ while (true) {
 				    MoveToStatus(BYE);
 			    }
 		    }
+		    break;
+		    }
+	case ERROR: {
+		    ErrorStatus();
 		    break;
 		    }
 	case BYE:
@@ -573,6 +577,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
+	SendStatus();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -631,6 +636,14 @@ while (true) {
 						   }
 				   else trgType_=UNK_TRIG; // LED_TRIG not impl
 
+			    	   dataType myFufMex;
+			    	   myFufMex.append((void*)"NOP\0",4);
+			    	   connectionManager_->Send(myFufMex,CmdSck);
+			    	   dataType myMex;
+			    	   myMex.append((void*)"STARTRUN\0",9);
+			    	   myMex.append((void*)&myRunNum,WORDSIZE);
+			    	   connectionManager_->Send(myMex,CmdSck);
+
 				   ostringstream s;
 				   s << "[RunControlFSM]::[INFO]::Starting a new run " <<  myRunNum;
 				   Log(s.str(),1);
@@ -650,6 +663,7 @@ while (true) {
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
+			    hwManager_->ClearBusy(); //just for "safety"
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
@@ -683,24 +697,47 @@ while (true) {
 		    weMex.append((void*)"WE\0",3);
 		    if (trgType_==PED_TRIG ) 
 		    {
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-			    connectionManager_->Send(weMex,CmdSck);
-			    trgRead_=0;
-			    hwManager_->BufferClearAll();
-			    MoveToStatus(CLEARBUSY);
+		      connectionManager_->Send(weMex,CmdSck);
+		      trgRead_=0;
+		      //usleep(100000); //Wait acknowledge from DR
+		      hwManager_->BufferClearAll();
+		      hwManager_->ClearBusy();
+		      readyDR_=0;
+		      MoveToStatus(WAITFORREADY);
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
 		   	 // read the boards for WWE
 			 if (hwManager_->SignalReceived(WE))
 			 {
-			   hwManager_->ClearSignalStatus();
-		            hwManager_->SetTriggerStatus(trgType_,TRIG_ON ); 
-			    connectionManager_->Send(weMex,CmdSck);
-			    hwManager_->BufferClearAll();
-			    MoveToStatus(CLEARBUSY);
+			   connectionManager_->Send(weMex,CmdSck);
+			   //usleep(100000); //Wait acknowledge from DR
+			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
+			   hwManager_->BufferClearAll();
+		           hwManager_->ClearBusy();
+			   readyDR_=0;
+			   MoveToStatus(WAITFORREADY);
 			 }
 
+		    }
+		    break;
+		    }
+	case WAITFORREADY:
+		    {
+		    dataType myMex;
+		    //usleep(1000);
+		    if (connectionManager_->Recv(myMex) ==0 )
+			    {
+			    Command myCmd=ParseData(myMex);
+			    if( myCmd.cmd ==  DR_READY ) 
+			   	 {
+				 ++readyDR_;
+				 }
+			    }
+		    if (readyDR_ >= waitForDR_)
+		    {
+		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		   	 MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
@@ -718,8 +755,11 @@ while (true) {
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 				{
-				hwManager_->ClearSignalStatus();
-				connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  //				  usleep(10000);
+				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearSignalStatus();
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -728,8 +768,10 @@ while (true) {
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
-				// send EE
-				connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  //usleep(10000);
+				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -763,6 +805,10 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
+#ifdef SYNC_DEBUG
+			int sleeptime=rand()%5000 +1000;
+			usleep(sleeptime);
+#endif
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
@@ -772,7 +818,6 @@ while (true) {
 	case ENDSPILL: 
 		    {
 			    // received EE
-		        hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
@@ -781,6 +826,7 @@ while (true) {
 				// TODO check if myCmd slhould destruct data/N or not
 				connectionManager_->Send(myMex,DataSck);
 			}
+
 			MoveToStatus(SENTBUFFER);
 		    break;
 		    }
@@ -843,6 +889,10 @@ while (true) {
 				MoveToStatus(BEGINSPILL);
 			    }
 			    
+		    break;
+		    }
+	case ERROR: {
+		    ErrorStatus();
 		    break;
 		    }
 	case BYE:

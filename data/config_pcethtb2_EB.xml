@@ -1,0 +1,23 @@
+<general>
+  <Network>
+    <ListenPort>6500</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
+    <ListenPort>6504</ListenPort> <!-- CMD PORT -->
+    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data  -->
+    <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
+    <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo>  <!-- DR Data -->
+    <ConnectTo>cms-h4-03.cern.ch:6000</ConnectTo>  <!-- DR Data -->
+    <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
+  </Network>
+  <Hardware>
+    <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
+  </Hardware>
+  <EventBuilder>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpDirName>/tmp/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
+	  <sendEvent>0</sendEvent>
+	  <recvEvent>3</recvEvent> <!-- Number of machine to wait for -->
+  </EventBuilder>
+</general>

@@ -28,7 +28,8 @@ enum CMD_t {	NOP=0,
 		GUI_PAUSERUN,
 		GUI_DIE,
 		// EB Commands
-		EB_SPILLCOMPLETED= 200
+		EB_SPILLCOMPLETED= 200,
+		DR_READY // DR are ready to take data
 		};
 // this are the status of the finate state machines
 enum STATUS_t { START 		= 0, 
@@ -36,14 +37,16 @@ enum STATUS_t { START 		= 0,
 		INITIALIZED	= 2 ,  
 		BEGINSPILL 	= 3, 
 		CLEARED 	= 4,
-		CLEARBUSY 	= 5,
-		WAITTRIG 	= 6, 
-		READ     	= 7, 
-		ENDSPILL	= 8, 
-		RECVBUFFER	= 9,
-		SENTBUFFER	= 10,
-		SPILLCOMPLETED	= 11,
-		BYE		= 12
+		WAITFORREADY 	= 5,
+		CLEARBUSY 	= 6,
+		WAITTRIG 	= 7, 
+		READ     	= 8, 
+		ENDSPILL	= 9, 
+		RECVBUFFER	= 10,
+		SENTBUFFER	= 11,
+		SPILLCOMPLETED	= 12,
+		BYE		= 13,
+		ERROR		= 14,
 		};
 
 /* Command description:

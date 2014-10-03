@@ -2,19 +2,19 @@
   <Network>
     <ListenPort>6000</ListenPort> <!--send data: Port0-->
     <ListenPort>6002</ListenPort> <!--send status: Port1 -->
-    <ListenPort>6004</ListenPort> <!--send Cmds -->
+    <ListenPort>6004</ListenPort> <!--send Cmd -->
     <!-- <ConnectTo>localhost:5557</ConnectTo> -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo> <!-- RUN CONTROL -->
   </Network>
   <Hardware>
-    <crateId>1</crateId>
+    <crateId>3</crateId>
     <board>
       <ID>1</ID>
       <type>TIME</type> <!-- Remember to put always TIME at the first location among boards -->
     </board>
     <board>
-      <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <ID>1</ID>
+      <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <boardType>1</boardType> <!-- ??? -->
       <LinkType>0</LinkType> <!--int32_t-->
       <LinkNum>0</LinkNum> <!--int32_t-->

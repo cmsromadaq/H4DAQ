@@ -3,8 +3,8 @@
 
 #include "interface/StandardIncludes.hpp"
 #include "interface/DataType.hpp"
-#include "interface/HwManager.hpp"
 #include "interface/Logger.hpp"
+
 using namespace std;
 
 //class Command; // Command is now in an ad hoc hpp
@@ -56,7 +56,7 @@ EventId lastEvent_;
 
 map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 
-	void MergeSpills(dataType &spill1,dataType &spill2 ); 
+	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
 public:
 	/* this class contains the raw event.

@@ -7,6 +7,13 @@
 #include <string>
 #include <utility>
 
+#ifdef NO_XML
+	typedef void* xmlDocPtr;
+	typedef void  xmlDoc;
+	typedef void* xmlNode;
+#define xmlFreeDoc delete
+#endif
+
 using namespace std ;
  
 

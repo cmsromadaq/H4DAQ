@@ -7,10 +7,20 @@
 
 int main(int argc,char**argv){
 
-string logFileName="/tmp/log.txt";
+string logFileName="/dev/stdout";
  int portPub=5566;
  int portSub=6002;
-string ConnectTo=argv[1];
+string ConnectTo="pcethtb2";
+
+printf("usage: PubPort SubAddress SubPort");
+
+if(argc>1)
+	portPub=atoi(argv[1]);
+if(argc>2)
+	ConnectTo=argv[2];
+if(argc>3)
+	portSub=atoi(argv[3]);
+
 
  Logger l;
 
@@ -25,8 +35,10 @@ string ConnectTo=argv[1];
  	l.SetFileName(logFileName);
  	l.Init();
  printf("-> Activate Logs\n");
- 	pub.LogInit(&l);
+try{
+	pub.LogInit(&l);
  	sub.LogInit(&l);
+} catch ( std::exception &e) { printf("%s\n Trying to continue\n",e.what());};
  printf("-> Setting port\n");
  	pub.SetPort(portPub);
  printf("-> Setting Addr\n");

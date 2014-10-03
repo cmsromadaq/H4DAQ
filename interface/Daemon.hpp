@@ -41,6 +41,9 @@ const static int DataSck = 0;
 const static int StatusSck = 1;
 const static int CmdSck = 2;
 
+int iLoop;
+int waitForDR_;
+
 public:
 	// --- Constructor
 	Daemon();
@@ -62,6 +65,9 @@ public:
 	virtual bool IsOk();//{return true;};
 	//
 	void LogInit(Logger*l);
+	//
+	virtual void ErrorStatus(){};
+	virtual void SendStatus();
 			
 };
 

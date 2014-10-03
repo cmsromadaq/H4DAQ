@@ -16,6 +16,7 @@ class config_exception ;
 class configfile_exception;
 class hw_exception;
 class logic_exception;
+class building_exception;
 //std::bad_alloc = almost sure memory is full
 
 //handle of the sigint signal
@@ -104,6 +105,14 @@ public:
   virtual const char* what() const throw()
   {
     return "Error in the logic";
+  }
+} ;
+class building_exception: public exception
+{
+public:
+  virtual const char* what() const throw()
+  {
+    return "Spill is not OK";
   }
 } ;
 

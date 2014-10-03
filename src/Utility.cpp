@@ -71,17 +71,18 @@ long Utility::timevaldiff(struct timeval *starttime, struct timeval *finishtime)
 unsigned long Utility::timestamp(struct timeval *time, time_t *ref){
 		
   unsigned long time_msec;
-  time_msec=(time->tv_sec-*ref)*1000;
-  time_msec+=time->tv_usec/1000;
+  time_msec=(time->tv_sec-*ref)*100000;
+  time_msec+=time->tv_usec/10;
   //printf("Utility::temstamp %lu %lu \n",time->tv_sec,*ref);
   return time_msec;
 }
 
-unsigned long Utility::now(){
-	time_t ref=0;
+string Utility::now(){
 	timeval tv;
 	gettimeofday(&tv,NULL);
-	return timestamp(&tv,&ref);
+	char buf[1023];
+	sprintf(buf,"%lu.%lu",tv.tv_sec,tv.tv_usec);
+	return string(buf);
 }
 
 int Utility::hibit(WORD n) {

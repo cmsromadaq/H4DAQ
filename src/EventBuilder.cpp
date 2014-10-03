@@ -3,7 +3,7 @@
 #include "interface/Utility.hpp"
 #include <sstream>
 
-//#define EB_DEBUG
+#define EB_DEBUG
 
 
 
@@ -82,11 +82,15 @@ void EventBuilder::BoardTrailer(dataType&R)
 void EventBuilder::BoardToStream(dataType &R ,BoardId id,vector<WORD> &v)
 {
 	//R.reserve(v.size()*4+12);// not important the reserve, just to avoid N malloc operations
+	dataTypeSize_t oldSize=R.size();
 	BoardHeader(R, id );
 	WORD N= (v.size() + BoardHeaderWords() + BoardTrailerWords() )*WORDSIZE  ;
 	WordToStream(R,N)  ; 
 	for(unsigned long long i=0;i<v.size();i++) WordToStream(R,v[i])  ;
 	BoardTrailer(R) ;
+	dataTypeSize_t newSize=R.size();
+	if(newSize-oldSize != (dataTypeSize_t)N ) 
+		printf("[EventBuilder]::[BoardToStream] Size is inconsistent\n");
 
 	return ;
 }
@@ -120,10 +124,14 @@ void EventBuilder::SpillTrailer(dataType &R)
 }
 
 void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){ 
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[MergeEvents]::[DEBUG] MergeEventStream\n");
+#endif
 	// takes two streams and merge them independently from the content
 	// R should be empty
 	if (R.size() >0 ) {
 			//Log("[EventBuilder]::[MergeEventStream] Return Size is more than 0", 1); // cannot Log, private
+			printf("[EventBuilder]::[MergeEventStream] Return Size is more than 0\n");
 			throw logic_exception();
 			}
 	//dataType R;
@@ -134,6 +142,10 @@ void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){
 		
 	WORD eventNum1=ReadEventNumber(x);
 	WORD eventNum2=ReadEventNumber(y);
+
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[MergeEvents]::[DEBUG] nBoard: %u;%u evenNum: %u==%u\n",nboards1,nboards2,eventNum1,eventNum2);
+#endif
 		
 	if(eventNum1 != eventNum2) {
 		R.clear();
@@ -146,7 +158,13 @@ void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){
 	WORD *ptrNboards=(WORD*)R.data() + EventNboardsPos();
 	*ptrNboards=nboards1+nboards2;
 	R.reserve(size1+size2); // minus hedrs but it is just a reserve
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[MergeEvents]::[DEBUG] Merge Events erase");
+#endif
 	R.erase(size1-WORDSIZE*EventTrailerWords(), size1); // delete trailer
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[MergeEvents]::[DEBUG] Merge Events erase Done");
+#endif
 
 	WORD*ptr2= (WORD*)y.data() + EventHeaderWords() ; // content
 
@@ -154,6 +172,9 @@ void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){
 	// update size
 	WORD *sizepos=(WORD*)R.data() + EventSizePos();
 	*sizepos= (WORD)R.size();
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[MergeEvents]::[DEBUG] MergeEventStream. Done\n");
+#endif
 	return ;
 }
 
@@ -166,21 +187,24 @@ vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 }
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
-	for(unsigned long long int n=0; n< x.size() ; n++)
-		{
-		R.push_back( *(WORD*)(  ((char*)x.data()) + n*WORDSIZE) );
-		}
-	// check rounding
 	if( x.size() % WORDSIZE  != 0 ) 
 		{
-		//Log("[2] EventBuilder::StreamToWord: Error in rounding, last bytes ignored",2); -- i'm in a static member function, can't call it
+		printf("[EventBuilder]::[StreamToWord] Error in rounding last byte\n",2);
 		}
-
+	dataTypeSize_t nWord=x.size() /WORDSIZE ;
+	for(unsigned long long int n=0; n<nWord ; n++)
+		{
+		R.push_back( *( (WORD*)x.data() + n) );
+		}
+	// check rounding
 	return R;
 }
 
 dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] START\n");
+#endif
 	BoardId empty;
 	dataType H;BoardHeader(H,empty);
 	dataType T;BoardTrailer(T);
@@ -188,24 +212,53 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	// Look in the Header for the 
 	vector<WORD> Header  = StreamToWord( H );
 	vector<WORD> Trailer = StreamToWord( T );
-	if(x.size() < 4*WORDSIZE ) return 0;
-	vector<WORD> myHead  = StreamToWord( x.data(), 4*WORDSIZE ); // read the first three
+	if(x.size() < BoardHeaderWords()*WORDSIZE ){
+		printf("[EventBuilder]::[IsBoardOk] Header size is wrong\n");
+		 return 0;
+		}
+	vector<WORD> myHead  = StreamToWord( x.data(), BoardHeaderWords()*WORDSIZE ); // read the first three
 	
-	if (myHead[0]  != Header[0] ) return 0;
+	if (myHead[0]  != Header[0] ) {
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] Header is wrong\n");
+#endif
+		return 0;
+		}
 
 
 	// the the N of bytes of the stream
-	if (myHead.size() <4) return 0;
+	if (myHead.size() < BoardHeaderWords()*WORDSIZE) 
+			{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] Header is size wrong\n");
+#endif
+			return 0;
+			}
 	WORD NBytes = myHead[3];
 	WORD NWords  = NBytes / WORDSIZE;
 
-	if ( x.size() < (NWords+4+1)*WORDSIZE )  return 0;
-	vector<WORD> myWords = StreamToWord( x.data(), (NWords+4+1)*WORDSIZE  ); //
-	// ------------------|TRAILER POS| +1 
-	if (myWords.size() < NWords + 4 + 1 ) return 0; // useless now
+	if ( x.size() < NBytes) {
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] Size is inconsistent\n");
+#endif
+			return 0;
+			}
+	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
-	if (myWords[NWords+4] != Trailer[0] ) return 0;
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
+#endif
+	if (myWords[NWords-1] != Trailer[0] ) 
+		{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] Trailer is inconsistent\n");
+#endif
+		return 0;
+		}
 
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] BoardOK DONE\n");
+#endif
 	return (NWords+4+1)*WORDSIZE; // interesting size
 
 }
@@ -221,8 +274,11 @@ dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN)
 	}
 
 dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] START\n");
+#endif
 	char *ptr=(char*)x.data();
-	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*4); // read the first two WORDS
+	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*EventHeaderWords()); // read the first two WORDS
 	dataType H;EventHeader(H);
 	dataType T;EventTrailer(T);
 	
@@ -230,8 +286,19 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	vector<WORD> Trailer=StreamToWord( T );
 
 	// check header
-	if( myHead.size() <4 ) return 0;
-	if( myHead[0] != Header[0] ) return 0;
+	if( myHead.size() <EventHeaderWords() ) 
+		{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] Head size is Wrong: %u == %u\n",myHead.size(), EventHeaderWords());
+#endif
+		return 0;
+		}
+	if( myHead[0] != Header[0] ) {
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] Head is Wrong\n");
+#endif
+		return 0;
+		}
 	// header is fine
 	WORD nBoard   = myHead[3];
 	WORD eventSize= myHead[2];
@@ -242,16 +309,35 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
 		{
 		dataTypeSize_t readByte=IsBoardOk(ptr, leftsize);
-		if (readByte==0) return 0;
+		if (readByte==0) {
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] A Board is not Ok\n");
+#endif
+			return 0;
+			}
 		leftsize -= readByte;
 		ptr += readByte;
 		}
 	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
 	ptr += WORDSIZE;
-	if ( myTrail[0] != Trailer[0] )  return 0;
+	if ( myTrail[0] != Trailer[0] )  {
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
+#endif
+		return 0;
+		}
 	//mismatch in size
-	if (eventSize != (WORD)(ptr -(char*)x.data()) ) return 0;
+	if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
+		{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
+#endif
+		return 0;
+		}
 	return ptr - (char*)x.data();
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] DONE");
+#endif
 } 
 
 WORD 	EventBuilder::ReadRunNumFromSpill(dataType &x)
@@ -283,6 +369,7 @@ WORD 	EventBuilder::ReadSpillNevents(dataType &x)
 
 // ---- EVENT BUILDER NON STATIC -----
 void EventBuilder::Config(Configurator &c){
+#ifndef NO_XML
         xmlNode *eb_node = NULL;
         //locate EventBuilder Node
         for (eb_node = c.root_element->children; eb_node ; eb_node = eb_node->next)
@@ -300,6 +387,21 @@ void EventBuilder::Config(Configurator &c){
 	bool dumpCompress=Configurator::GetInt(getElementContent(c, "dumpCompress" , eb_node) );
 	dump_->SetCompress(dumpCompress);
 	dump_->SetBinary();
+
+	ostringstream s;
+	s<<"[EventBuilder]::[Config]::[INFO] DumpEvent="<<dumpEvent_;
+	Log(s.str(),1);
+	s.str("");
+	s<<"[EventBuilder]::[Config]::[INFO] RecvEvent="<<recvEvent_;
+	Log(s.str(),1);
+	s.str("");
+	s<<"[EventBuilder]::[Config]::[INFO] SendEvent="<<sendEvent_;
+	Log(s.str(),1);
+#else
+	printf("[EventBuilder]::[Config] NO_XML Action Forbid\n");
+	throw config_exception();
+
+#endif
 }
 
 void EventBuilder::Init(){
@@ -313,6 +415,9 @@ void EventBuilder::Clear(){
 // SPILL 
 void EventBuilder::OpenSpill()
 {
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] OpenSpill",3);
+#endif
 	if (isSpillOpen_) CloseSpill(); 
 	lastEvent_.spillNum_ ++;
 	lastEvent_.eventInSpill_=1;
@@ -333,11 +438,17 @@ void EventBuilder::OpenSpill()
 	WORD zero=0;
 	mySpill_.append( (void*)&zero, WORDSIZE);
 	mySpill_.append( (void*)&zero, WORDSIZE);
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] OpenSpill Done",3);
+#endif
 	
 }
 
 Command EventBuilder::CloseSpill()
 {
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Close Spill",3);
+#endif
 	Command myCmd; myCmd.cmd=NOP;
 	isSpillOpen_=false;	
 	dataType  spillT;  SpillTrailer(spillT);
@@ -358,9 +469,9 @@ Command EventBuilder::CloseSpill()
 	if (recvEvent_) { 
 		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",2) ;
 		WORD spillNum=ReadSpillNum(mySpill_);
-		if ( spills_.find(spillNum) != spills_.end() ) 
+		if ( spills_.find(spillNum) == spills_.end() ) 
 			{
-			spills_[spillNum] = pair<int,dataType>(1,dataType( mySpill_.size(),mySpill_.data())   ); // spills_[] take ownership of the structuer
+			spills_[spillNum] = pair<int,dataType>(1, mySpill_ ); // spills_[] take ownership of the structuer -- copy constructor + release
 			mySpill_.release();
 			}
 		else MergeSpills(spills_[spillNum].second,mySpill_);
@@ -377,6 +488,9 @@ Command EventBuilder::CloseSpill()
 		myMex.release();
 		} 
 	mySpill_.clear();
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Close Spill - Done",3);
+#endif
 	return myCmd;
 }
 
@@ -395,8 +509,28 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	mySpill_.append(event);
 	return;
 }
-void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){ 
-	// TODO: update to the new dataformat
+int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static",3);
+	{
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: size1"<<spill1.size()<<";"<<spill2.size() <<" ; "<<spill1.data() <<"!=NULL ;" << spill2.data() <<" !=NULL" ;
+	Log(s.str(),3);
+	}
+#endif
+
+	// check header	
+#ifdef EB_DEBUG
+	{
+	WORD H1= *((WORD*) spill1.data() );
+	WORD H2= *((WORD*) spill2.data() );
+	dataType H1d,H2d;
+	WordToStream(H1d,H1); H1d.append( (void*)"\0",1);
+	WordToStream(H2d,H2); H2d.append( (void*)"\0",1);
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers"<< (char*)H1d.data() <<";"<< (char*) H2d.data() ;
+	Log(s.str(),3);
+	}
+#endif
+		
 	// --- can't merge inplace two events
 	WORD runNum1 = ReadRunNumFromSpill(spill1);
 	WORD runNum2 = ReadRunNumFromSpill(spill2);
@@ -409,9 +543,20 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 
 	WORD zero=0; //spillSize
 
-	if (runNum1 != runNum2) return ; // TODO throw exception
-	if (spillNum1 != spillNum2) return ; // TODO throw exception
-	if (spillNevents1 != spillNevents2) return ; // TODO throw exception
+#ifdef EB_DEBUG
+	{
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging runs"<<runNum1<<"=="<<runNum2;
+	Log(s.str(),3);
+	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spillN"<<spillNum1<<"=="<<spillNum2;
+	Log(s.str(),3);
+	 s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spill Nevents="<<spillNevents1<<"=="<<spillNevents2;
+	Log(s.str(),3);
+	}
+#endif
+
+	if (runNum1 != runNum2) { Log("[EventBuilder]::[MergeSpills]::[ERROR] RunNumber does not match",1); return 1; } // 
+	if (spillNum1 != spillNum2){ Log("[EventBuilder]::[MergeSpills]::[ERROR] Spill numbers does not match",1);return 1;} 
+	if (spillNevents1 != spillNevents2){Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Ignoring spill.",1); return 1; }
 	dataType oldSpill(spill1.size(),spill1.data());	
 	spill1.release();spill1.clear();
 
@@ -424,6 +569,10 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	spill1.append( (void*)&zero, WORDSIZE); // spillSize
 	spill1.append((void*)&spillNevents1,WORDSIZE);
 
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers Added",3);
+#endif
+
 	char* ptr1=(char*)oldSpill.data();
 	char* ptr2=(char*)spill2  .data();
 	long left1=oldSpill.size() - WORDSIZE*SpillHeaderWords();
@@ -432,8 +581,17 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	ptr2+= WORDSIZE*SpillHeaderWords();
 	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
+#ifdef EB_DEBUG
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge Event"<<iEvent;
+	Log(s.str(),3);
+#endif
 		long eventSize1= IsEventOk(ptr1,left1);
 		long eventSize2= IsEventOk(ptr2,left2);
+#ifdef EB_DEBUG
+	s.str()="";
+	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: EventSize1"<<eventSize1<<"!=0  eventSize2="<<eventSize2<<"!=0";
+	Log(s.str(),3);
+#endif
 		//---- Unire i due eventi
 		dataType event1(eventSize1,ptr1);
 		dataType event2(eventSize2,ptr2);
@@ -452,17 +610,51 @@ void EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){
 	// update Spill Size
 	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
 	(*spillSizePtr)=(WORD)spill1.size();
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
+#endif
+	return 0;
 }
 
 void EventBuilder::MergeSpills(dataType &spill2 ) {
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1",3);
+#endif
 	WORD spillNum=ReadSpillNum(spill2); 
-	MergeSpills(spills_[spillNum].second,spill2); 
-	spills_[spillNum].first++; 
+
+		if ( spills_.find(spillNum) == spills_.end() ) 
+			{
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: COPY",3);
+#endif
+			dataType newSpill; newSpill.copy(spill2);
+			spills_[spillNum] = pair<int,dataType>(1, newSpill ); // spills_[] take ownership of the structuer -- copy constructor + release
+			newSpill.release();
+			}
+		else 
+			{
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: Merge",3);
+#endif
+			int badSpill=MergeSpills(spills_[spillNum].second,spill2);
+			spills_[spillNum].first++; 
+			if(badSpill){
+					// erase spill structure -- W/O dumping
+					spills_.erase(spillNum);
+					if(!spills_.empty() ) 
+						{ // more than one spill per time ?
+						Log("[EventBuilder]::[MergeSpills] Loosing arbitrary events",1);
+						spills_.clear();
+						}
+					}
+			}
 	if (!recvEvent_ ) return ;
 
 	if ( spills_[spillNum].first > recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
+		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
+		system( ("mkdir -p " + myDir ) .c_str() );
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
 		if (dump_->GetCompress() )  newFileName += ".raw.gz";
 		else newFileName +=".raw";
@@ -470,8 +662,17 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		dump_->Init();
 		Dump(spills_[spillNum].second);
 		dump_->Close();
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Going To Clear",3);
+		usleep(1000);
+#endif
+		spills_[spillNum].second.clear();
+		spills_[spillNum].second.~dataType();
 		spills_.erase(spillNum);
 		}
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Done",3);
+#endif
 	return;
 } 
 

@@ -17,13 +17,13 @@ namespace Utility{
 	long timevaldiff(struct timeval *starttime, struct timeval *finishtime) ;
 	
 	unsigned long timestamp(struct timeval *time, time_t *ref);
-	unsigned long now();
+	string now();
 	void SpaceToNull(int N,void*data,bool first=false);
 	int  FindNull(int N,void*data,int iPos=1);
 
 
   int hibit(unsigned int n);
-  int lowbit(WORD n);
+  int lowbit(uint32_t n);
 };
 
 
