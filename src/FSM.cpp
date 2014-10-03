@@ -3,7 +3,7 @@
 #include "interface/Utility.hpp"
 
 //#define FSM_DEBUG
-#define SYNC_DEBUG
+//#define SYNC_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -94,7 +94,7 @@ while (true) {
 					dataType myMex;
 					myMex.append((void*)"DR_READY\0",9);
 					connectionManager_->Send(myMex,CmdSck);
-					MoveToStatus(CLEARBUSY);
+					MoveToStatus(WAITTRIG);
 				 }
 			    }
 		    break;
@@ -111,6 +111,7 @@ while (true) {
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
+			      hwManager_->ClearBusy();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -144,7 +145,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
 #ifdef SYNC_DEBUG
-			int sleeptime=rand()%400 +100;
+			int sleeptime=rand()%5000 +1000;
 			usleep(sleeptime);
 #endif
 
@@ -700,6 +701,7 @@ while (true) {
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
+		      hwManager_->ClearBusy();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -712,6 +714,7 @@ while (true) {
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
+		           hwManager_->ClearBusy();
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
@@ -734,7 +737,7 @@ while (true) {
 		    if (readyDR_ >= waitForDR_)
 		    {
 		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-		   	 MoveToStatus(CLEARBUSY);
+		   	 MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
@@ -753,10 +756,10 @@ while (true) {
 			if (hwManager_->SignalReceived(EE) )
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
-				connectionManager_->Send(eeMex,CmdSck);
-				hwManager_->ClearSignalStatus();
-				
+				  //				  usleep(10000);
+				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearSignalStatus();
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -766,8 +769,9 @@ while (true) {
 				if (trgRead_ >= trgNevents_)
 				{
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  usleep(10000);
+				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearBusy();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -802,7 +806,7 @@ while (true) {
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event); 
 #ifdef SYNC_DEBUG
-			int sleeptime=rand()%400 +100;
+			int sleeptime=rand()%5000 +1000;
 			usleep(sleeptime);
 #endif
 			eventBuilder_->CloseEvent(event);
