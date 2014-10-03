@@ -106,7 +106,6 @@ void HwManager::Config(Configurator &c){
 		bC.Init(c);
 		bC.SetBoardNode(board_node);
 		hw_[bIdx]->Config(&bC);
-
 		}
 	}
 

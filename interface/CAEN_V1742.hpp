@@ -22,6 +22,7 @@ public:
   typedef enum  {
     ERR_NONE= 0,
     ERR_CONF_NOT_FOUND,
+    ERR_CONF_INVALID,
     ERR_DGZ_OPEN,
     ERR_BOARD_INFO_READ,
     ERR_INVALID_BOARD_TYPE,

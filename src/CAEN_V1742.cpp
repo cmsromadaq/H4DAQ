@@ -527,7 +527,9 @@ external triggers.
 */
 int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
 {
-  // OPEN: read the details of physical path to the digitizer
+  // OPEN is handled in the controller configuration (removing)
+
+  // // OPEN: read the details of physical path to the digitizer
   string content = bC->getElementContent ("OPEN") ;
   if (content != "NULL")
       {
@@ -539,18 +541,19 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
         else 
           {
             cerr << "[V1742]::[ERROR]::Invalid connection type: " << linkType << endl ;
-            return -1 ; 
+            return ERR_CONF_INVALID ; 
           }
         ststream >> digitizerConfiguration_.LinkNum ;
         if (digitizerConfiguration_.LinkType == CAEN_DGTZ_USB) digitizerConfiguration_.ConetNode = 0 ;
         else ststream >> digitizerConfiguration_.ConetNode ;
-        ststream >> digitizerConfiguration_.BaseAddress ;
+	string baseAddress;
+	ststream >> baseAddress;
+	digitizerConfiguration_.BaseAddress = Configurator::GetInt(baseAddress);
       }
   else 
     {
-      cerr << "reading field " << content << endl ;
       cerr << "[V1742]::[ERROR]:: Field OPEN not found in board xml node config" << endl ;
-      //PG FIXME abort run start?
+      return ERR_CONF_INVALID;
     }
 
   // Generic VME Write (address offset + data, both exadecimal)
@@ -932,14 +935,14 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
   else 
     {
       cerr << "[V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
-      return -1 ;
+      return ERR_CONF_INVALID ;
       //PG FIXME abort run start?
     }
 
   if (tr < 0 || tr > 3)
     {
       cerr << "[V1742]::[ERROR]:: ID = " << tr << " out of range" << endl ;
-      return -1 ;
+      return ERR_CONF_INVALID ;
     }
 
   content = Configurable::getElementContent (*bC, "DC_OFFSET", node) ;
@@ -985,14 +988,14 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
   else 
     {
       cerr << "[V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
-      return -1 ;
+      return ERR_CONF_INVALID ;
       //PG FIXME abort run start?
     }
 
   if (ch < 0 || ch > 3)
     {
       cerr << "[V1742]::[ERROR]:: ID = " << ch << " out of range" << endl ;
-      return -1 ;
+      return ERR_CONF_INVALID ;
     }
 
   content = Configurable::getElementContent (*bC, "ENABLE_INPUT", node) ;
@@ -1072,8 +1075,9 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
       {
         stringstream ststream (content) ;
         int val ;
-        ststream >> val ;
-        digitizerConfiguration_.GroupTrgEnableMask[ch] = val & 0xFF ;
+	string groupTrigEnableMask;
+        ststream >> groupTrigEnableMask ;
+        digitizerConfiguration_.GroupTrgEnableMask[ch] = Configurator::GetInt(groupTrigEnableMask) & 0xFF ;
       }
 
   return ch ;
