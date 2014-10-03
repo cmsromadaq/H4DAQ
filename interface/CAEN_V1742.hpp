@@ -31,7 +31,7 @@ public:
     ERR_INTERRUPT,
     ERR_READOUT,
     ERR_EVENT_BUILD,
-    ERR_HISTO_MALLOC,
+    ERR_CLEARBUFFER,
     ERR_UNHANDLED_BOARD,
     ERR_MISMATCH_EVENTS,
     ERR_FREE_BUFFER,
@@ -85,7 +85,7 @@ public:
     
   } CAEN_V1742_Config_t ;
 
-  CAEN_V1742 ():Board () , digitizerHandle_ (-1) { type_="CAEN_V1742" ; } ;
+  CAEN_V1742 ():Board () , digitizerHandle_ (-1) { buffer_= NULL; eventPtr_=NULL, event_=NULL; type_="CAEN_V1742" ; } ;
 
   virtual int Init () ;
   virtual int Clear () ;
@@ -120,7 +120,12 @@ private:
   uint32_t              digitizerHandle_ ;
   CAEN_V1742_Config_t   digitizerConfiguration_ ;
   CAEN_DGTZ_BoardInfo_t boardInfo_ ;  
-  
+
+  //Memory buffers for DR
+  char *buffer_;
+  char *eventPtr_;
+  CAEN_DGTZ_X742_EVENT_t * event_;  
+
 } ;
 
 #endif
