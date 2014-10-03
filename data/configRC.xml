@@ -1,6 +1,6 @@
 <general>
   <Network>
-    <ListenPort>6002</ListenPort>
+    <ListenPort>6004</ListenPort>
     <!--<ConnectTo>localhost:5558</ConnectTo> -->
     <ConnectTo>pcethtb1:5558</ConnectTo>  <!-- DATA -->
     <ConnectTo>pcethtb1:6000</ConnectTo> <!--STATUS MESSAGES-->

@@ -16,7 +16,7 @@ class Daemon;
 #include <getopt.h>
 
 void print_usage() {
-  printf("Usage: runcontroller -c config_file\n");
+  printf("Usage: runcontroller -c config_file -l log_file -v verbosity\n");
 }
 
 int main(int argc, char**argv)
