@@ -52,6 +52,8 @@ int CAEN_V1742::Init ()
       return ErrCode ;
     }
   
+  //Wait for "initialization of the board"
+  sleep(3);
   // get num of channels, num of bit, num of group of the board */
   ret = (CAEN_DGTZ_ErrorCode) getMoreBoardInfo () ;
   if (ret) 
@@ -60,17 +62,18 @@ int CAEN_V1742::Init ()
       return ErrCode ;
     }
   
-  // if ( digitizerConfiguration_.useCorrections == -1 ) { // only automatic corrections supported for the moment
-  ret = CAEN_DGTZ_LoadDRS4CorrectionData (digitizerHandle_,CAEN_DGTZ_DRS4_5GHz) ;
-  ret = CAEN_DGTZ_EnableDRS4Correction (digitizerHandle_) ;
+  sleep(3);
 
+  /* *************************************************************************************** */
+  /* program the digitizer                                                                   */
+  /* *************************************************************************************** */
   // mask the channels not available for this model
   if ( (boardInfo_.FamilyCode != CAEN_DGTZ_XX740_FAMILY_CODE) && 
        (boardInfo_.FamilyCode != CAEN_DGTZ_XX742_FAMILY_CODE))
     {
       digitizerConfiguration_.EnableMask &= (1<<digitizerConfiguration_.Nch)-1 ;
     } else {
-      digitizerConfiguration_.EnableMask &= (1<< (digitizerConfiguration_.Nch/8))-1 ;
+      digitizerConfiguration_.EnableMask &= (1<< (digitizerConfiguration_.Nch/9))-1 ;
     }
   if ( (boardInfo_.FamilyCode == CAEN_DGTZ_XX751_FAMILY_CODE) && 
        digitizerConfiguration_.DesMode) 
@@ -82,11 +85,6 @@ int CAEN_V1742::Init ()
     {
       digitizerConfiguration_.EnableMask &= 0x55 ;
     }
-  
-  /* *************************************************************************************** */
-  /* program the digitizer                                                                   */
-  /* *************************************************************************************** */
-
   ret = (CAEN_DGTZ_ErrorCode) programDigitizer () ;
   if (ret) 
     {
@@ -107,6 +105,33 @@ int CAEN_V1742::Init ()
       ErrCode = ERR_INVALID_BOARD_TYPE ;
       return ErrCode ;
     }
+  
+  // if ( digitizerConfiguration_.useCorrections == -1 ) { // only automatic corrections supported for the moment
+
+  ret |= CAEN_DGTZ_LoadDRS4CorrectionData (digitizerHandle_,CAEN_DGTZ_DRS4_5GHz) ;
+  ret |= CAEN_DGTZ_EnableDRS4Correction (digitizerHandle_) ;
+  if (ret) 
+    {
+      ErrCode = ERR_DGZ_PROGRAM ;
+      return ErrCode ;
+    }
+
+  //now allocate the eventBuffers
+  uint32_t AllocatedSize=0;
+  
+  ret = CAEN_DGTZ_AllocateEvent(digitizerHandle_, (void**)&event_);
+
+  if (ret != CAEN_DGTZ_Success) {
+    ErrCode = ERR_MALLOC;
+    return ErrCode;
+  }
+
+  ret = CAEN_DGTZ_MallocReadoutBuffer(digitizerHandle_, &buffer_, &AllocatedSize); /* WARNING: This malloc must be done after the digitizer programming */
+
+  if (ret || AllocatedSize==0) {
+    ErrCode = ERR_MALLOC;
+    return ErrCode;
+  }
   
   CAEN_DGTZ_SWStartAcquisition (digitizerHandle_) ;
   cout << "[V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++" << endl ;
@@ -137,7 +162,21 @@ int CAEN_V1742::Clear (){
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-int CAEN_V1742::BufferClear (){ return -1 ; } ;
+int CAEN_V1742::BufferClear (){ 
+  int ret = 0 ;
+  
+  /* clear the digitizer buffers */
+
+  ret |= CAEN_DGTZ_ClearData(digitizerHandle_); 
+
+  if (ret != 0) {
+    cout << "[V1742]::[ERROR]::Unable to clear buffers\n" << endl ;
+    return ERR_CLEARBUFFER ;
+  }
+  
+  return 0;
+} ;
+
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -165,47 +204,24 @@ int CAEN_V1742::Read (vector<WORD> &v)
   uint32_t BufferSize, NumEvents;
   CAEN_DGTZ_EventInfo_t       EventInfo ;
 
-  char *v1742_buffer ;
-  char *v1742_eventPtr ;
-  
-  v1742_buffer=NULL ;
-
-  uint32_t AllocatedSize ;
-
-  CAEN_DGTZ_X742_EVENT_t       *Event742=NULL ;  /* custom event struct */
-  
-  ret = CAEN_DGTZ_AllocateEvent (digitizerHandle_, (void**)&Event742) ;
-  if (ret != CAEN_DGTZ_Success) {
-    ErrCode = ERR_MALLOC ;
-    return ErrCode ;
-  }
-
-  /* printf ("allocated event %d\n",ret) ; */
-  ret = CAEN_DGTZ_MallocReadoutBuffer (digitizerHandle_, &v1742_buffer, &AllocatedSize) ; /* WARNING: This malloc must be done after the digitizer programming */
-  /* printf ("malloc %d %d\n",AllocatedSize,ret) ; */
-  if (ret) {
-    ErrCode = ERR_MALLOC ;
-    return ErrCode ;
-  }
-
   BufferSize = 0 ;
   NumEvents = 0 ;
 
-  while (NumEvents==0)
+  while (1 > NumEvents)
     {
-      ret = CAEN_DGTZ_ReadData (digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, v1742_buffer, &BufferSize) ;
+      ret = CAEN_DGTZ_ReadData (digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, buffer_, &BufferSize) ;
       
       if (ret) {
-    ErrCode = ERR_READOUT ;
-    return ErrCode ;
+	ErrCode = ERR_READOUT ;
+	return ErrCode ;
       }
       
       if (BufferSize != 0) {
-    ret = CAEN_DGTZ_GetNumEvents (digitizerHandle_, v1742_buffer, BufferSize, &NumEvents) ;
-    if (ret) {
-      ErrCode = ERR_READOUT ;
-      return ErrCode ;
-    }
+	ret = CAEN_DGTZ_GetNumEvents (digitizerHandle_, buffer_, BufferSize, &NumEvents) ;
+	if (ret) {
+	  ErrCode = ERR_READOUT ;
+	  return ErrCode ;
+	}
       }
     }
   
@@ -216,46 +232,30 @@ int CAEN_V1742::Read (vector<WORD> &v)
       return ErrCode ;
     }
   
-  /* Analyze data */
-  for (i = 0 ; i < (int)NumEvents ; i++) {
+  // /* Analyze data */
+  // for (i = 0 ; i < (int)NumEvents ; i++) {
     /* Get one event from the readout buffer */
-    ret = CAEN_DGTZ_GetEventInfo (digitizerHandle_, v1742_buffer, BufferSize, i, &EventInfo, &v1742_eventPtr) ;
-    if (ret) {
-      ErrCode = ERR_EVENT_BUILD ;
-      return ErrCode ;
-    }
-    ret = CAEN_DGTZ_DecodeEvent (digitizerHandle_, v1742_eventPtr, (void**)&Event742) ;
-    if (ret) {
-      ErrCode = ERR_EVENT_BUILD ;
-      return ErrCode ;
-    }    
-    // if (digitizerConfiguration_.useCorrections != -1) { // if manual corrections
-    //     ApplyDataCorrection ( 0, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (Event742->DataGroup[0]), &Table_gr0) ;
-    //     ApplyDataCorrection ( 1, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (Event742->DataGroup[1]), &Table_gr1) ;
-    //       }
-    ret = (CAEN_DGTZ_ErrorCode) writeEventToOutputBuffer (v,&EventInfo,Event742) ;
-    if (ret) {
-      ErrCode = ERR_EVENT_BUILD ;
-      return ErrCode ;
-    }    
+  ret = CAEN_DGTZ_GetEventInfo (digitizerHandle_, buffer_, BufferSize, 0, &EventInfo, &eventPtr_) ;
+  if (ret) {
+    ErrCode = ERR_EVENT_BUILD ;
+    return ErrCode ;
   }
+  ret = CAEN_DGTZ_DecodeEvent (digitizerHandle_, eventPtr_, (void**)&event_) ;
+  if (ret) {
+    ErrCode = ERR_EVENT_BUILD ;
+    return ErrCode ;
+  }    
+  // if (digitizerConfiguration_.useCorrections != -1) { // if manual corrections
+  //     ApplyDataCorrection ( 0, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (event_->DataGroup[0]), &Table_gr0) ;
+  //     ApplyDataCorrection ( 1, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (event_->DataGroup[1]), &Table_gr1) ;
+  //       }
+  ret = (CAEN_DGTZ_ErrorCode) writeEventToOutputBuffer (v,&EventInfo,event_) ;
+  if (ret) {
+    ErrCode = ERR_EVENT_BUILD ;
+    return ErrCode ;
+  }    
+  // } //close cycle over events
     
-
-      //      printf ("%d %d\n",Nb,Ne) ;
-      //      sleep (1) ;
-  
-  /* //Freeing V1742 memory  after read */
-  free (v1742_buffer) ;
-  //  free (v1742_eventPtr) ;
-  delete (Event742) ;
-
-  // Test what happens when enable this. Do we need to malloc again? To be checked
-  /* ret = CAEN_DGTZ_FreeReadoutBuffer (&v1742_buffer) ; */
-  /* if (ret) { */
-  /*   ErrCode = ERR_FREE_BUFFER ; */
-  /*   return ErrCode ; */
-  /* } */
-  
   return 0 ;
 
 } ;
@@ -395,7 +395,7 @@ int CAEN_V1742::programDigitizer ()
 
   if ( (boardInfo_.FamilyCode == CAEN_DGTZ_XX740_FAMILY_CODE) || (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE)){
     ret |= CAEN_DGTZ_SetGroupEnableMask (digitizerHandle_, digitizerConfiguration_.EnableMask) ;
-    for (i=0 ; i< (digitizerConfiguration_.Nch/8) ; i++) {
+    for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
       if (digitizerConfiguration_.EnableMask & (1<<i)) {
     if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
       for (j=0 ; j<8 ; j++) {
@@ -427,7 +427,7 @@ int CAEN_V1742::programDigitizer ()
     }
   }
   if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
-    for (i=0 ; i< (digitizerConfiguration_.Nch/8) ; i++) {
+    for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
       ret |= CAEN_DGTZ_SetGroupFastTriggerDCOffset (digitizerHandle_,i,digitizerConfiguration_.FTDCoffset[i]) ;
       ret |= CAEN_DGTZ_SetGroupFastTriggerThreshold (digitizerHandle_,i,digitizerConfiguration_.FTThreshold[i]) ;
     }
@@ -478,7 +478,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
   (CAEN_V1742_eventBuffer)[4]=eventInfo->TriggerTimeTag ;
 
   //  printf ("EVENT 1742 %d %d\n",eventInfo->EventCounter,eventInfo->TriggerTimeTag) ;
-  for (gr=0 ;gr< (digitizerConfiguration_.Nch/8) ;gr++) {
+  for (gr=0 ;gr< (digitizerConfiguration_.Nch/9) ;gr++) {
     if (event->GrPresent[gr]) {
       for (ch=0 ; ch<9 ; ch++) {
     int Size = event->DataGroup[gr].ChSize[ch] ;
