@@ -217,8 +217,36 @@ int HwManager::CrateInit()
     }
   else
     {
-      //have digitizer
-      // TODO
+      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
+      CAEN_V1742::CAEN_V1742_Config_t* digiConfig=((CAEN_V1742*)hw_[digiBoard_.boardIndex_])->GetConfiguration();
+
+      CAEN_DGTZ_ConnectionType linkType=CAEN_DGTZ_USB;
+      if (controllerBoard_.boardIndex_ != cvV1718 )
+	linkType=CAEN_DGTZ_OpticalLink;
+
+      status |= CAEN_DGTZ_OpenDigitizer(linkType, controllerConfig->LinkNum, 0, digiConfig->BaseAddress, &digiBoard_.boardHandle_);
+      //hack to get VME Handle (normally this handle is 0, can be also hardcoded...)
+      CAEN_DGTZ_BoardInfo_t myBoardInfo;
+      status |= CAEN_DGTZ_GetInfo(digiBoard_.boardHandle_, &myBoardInfo);  
+      status |= CAENComm_Info(myBoardInfo.CommHandle, CAENComm_VMELIB_handle ,&controllerBoard_.boardHandle_);
+
+      ostringstream s;
+      s << "[HwManager]::[ERROR]::Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " & VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum ;
+
+      if (status)
+	{
+	  s << " cannot be initialized"  ;
+	  Log(s.str(),1);
+	  throw config_exception();
+	}
+      s << " initialized"  ;
+      Log(s.str(),1);
+      if (digiBoard_.boardHandle_<0)
+	{
+	  Log("[HwManager]::[ERROR]::VME Crate Controller Handle is wrong",1);
+	  throw config_exception();
+	}
+
     }
 
   if (controllerBoard_.boardHandle_<0)
@@ -234,7 +262,7 @@ int HwManager::CrateInit()
       throw config_exception();
     }
 
-  sleep(1); 
+  sleep(2); 
 
   return 0;
 

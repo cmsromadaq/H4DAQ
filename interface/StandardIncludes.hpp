@@ -32,7 +32,7 @@ using namespace std;
 	#include "CAENVMElib.h"
 	#include "CAENVMEtypes.h" 
 	#include "CAENVMEoslib.h"
-	
+	#include "CAENComm.h"
 	#include <CAENDigitizer.h>
 #endif
 
