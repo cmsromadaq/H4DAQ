@@ -73,7 +73,7 @@ if(daemon){
 	pid_t pid=fork();
 	if (pid >0 ){ // parent
 		printf("[EventBuilderDaemon] Detaching process %d\n",pid);
-		_exit(0);
+		exit(0); // not _exit(
 		} 
 	else if (pid== 0 ) { // child
 		}

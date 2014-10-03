@@ -15,6 +15,7 @@ public:
 };
 
 class EventBuilderFSM : public Daemon{
+bool eventStarted;
 public:
 	// constructor
 	EventBuilderFSM();

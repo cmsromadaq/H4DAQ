@@ -431,7 +431,8 @@ while (true) {
 			   	 {
 					 //hwManager_->BufferClearAll();
 					 //hwManager_->ClearBusy(); //just for "safety"
-					 eventBuilder_->OpenSpill();
+					 //eventBuilder_->OpenSpill();
+					 if (! eventBuilder_->AreSpillsMerged() ) Log("[EventBuilder]::[FSM] ERROR, Unmerged spill in new run",3); // TODO Exception
 					 MoveToStatus(CLEARED);
 				 }
 			    }
@@ -481,6 +482,7 @@ while (true) {
 	case ENDSPILL:
 		    {
 			    // received EE NOT Open Close Spill
+			eventStarted=false;
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
@@ -496,11 +498,12 @@ while (true) {
 				    // release the destruction from Command
 				    myNewCmd.release();
 				    //Merge Spills
+				    eventStarted= true;
 				    eventBuilder_->MergeSpills(myData);
 
 			    }
 		    }
-		    if ( eventBuilder_->AreSpillsMerged() ) 		   	 {
+		    if ( eventBuilder_->AreSpillsMerged() && eventStarted) { // enter here only if you merged something
 			// SENT STATUS BUFFER COMPLETED
 			 dataType myMex;
 			 myMex.append((void*)"STATUS SPILLCOMPL\0\0\0",18);

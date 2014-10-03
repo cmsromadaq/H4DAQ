@@ -45,6 +45,7 @@ public:
 	void clear();
 	// --- copy
 	void copy(void * data, dataTypeSize_t N);
+	inline void copy(dataType &A){ copy (A.data(),A.size() ); };
 	// --- release ownership of data. This will lost control of data and location
 	void release();
 	//--- Operators
