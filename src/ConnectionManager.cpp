@@ -2,6 +2,11 @@
 
 // ---------------- PUBLISHER ------------------
 //
+void my_free(void *data,void *hint)
+{
+	free(data);
+}
+
 Publisher::Publisher(){
 	socket=NULL;
 	Port="";
@@ -49,8 +54,12 @@ int  Publisher::SendMessage(dataType &mex) //  return 0 if correct
 	//	}
 	//create the message and put it in the send
 	//zmq::message_t message( mex.data() ,mex.size() ,myzmq_nofree) ;
-	zmq::message_t message( mex.data() ,mex.size() , NULL ) ;
-	mex.release(); // ???
+	//zmq::message_t message( mex.data() ,mex.size() , NULL ) ;
+	void *data=mex.data();
+	int N= mex.size(); // I do it before so it is completely asyncr.
+	mex.release();
+	zmq::message_t message( data , N , my_free ) ;
+	//mex.release(); // ???
 	//   void*myMsg=mex.data();
 	//   int mySize=mex.size();
 	//   mex.release();

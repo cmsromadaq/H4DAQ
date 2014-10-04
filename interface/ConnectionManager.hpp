@@ -13,6 +13,7 @@
 // 0MQ Implementation
 class Configurator;
 
+void my_free(void *data, void* hint);
 
 //create a class that contains the context, keep track of the SetContext and destroy them in the right order: context last
 class HasContext{
