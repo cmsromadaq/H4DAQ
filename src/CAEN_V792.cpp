@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAENV792_DEBUG 
+//#define CAENV792_DEBUG 
 
 int CAEN_V792::Init()
 {
@@ -198,15 +198,38 @@ int CAEN_V792::Read(vector<WORD> &v)
   int nWordsRead=nbytes_tran/sizeof(WORD);
   for (int i=0;i<nWordsRead;++i)
     {
-      int wordType=dataV[i] & CAEN_V792_EVENT_WORDTYPE_BITMASK;
+      int wordType=(dataV[i] & CAEN_V792_EVENT_WORDTYPE_BITMASK)>>24;
       if (wordType == CAEN_V792_EVENT_DATA ||
 	  wordType == CAEN_V792_EVENT_BOE ||
 	  wordType == CAEN_V792_EVENT_EOE 
 	  )
-	v.push_back(dataV[i]); //Filling event buffer
+	{
+	  v.push_back(dataV[i]); //Filling event buffer
+#ifdef CAENV792_DEBUG
+	  if (i==0 && wordType != CAEN_V792_EVENT_BOE)
+	    {
+	      ostringstream s; s << "[CAEN_V792]::[WARNING]::First Word Not BOE " << wordType; 
+	      Log(s.str(),1);
+	    }
+	  if (i==nWordsRead-1 && wordType != CAEN_V792_EVENT_EOE)
+	    {
+	      ostringstream s; s << "[CAEN_V792]::[WARNING]::Last Word Not EOE " << wordType; 
+	      Log(s.str(),1);
+	    }
+	  if (wordType == CAEN_V792_EVENT_DATA)
+	    {
+	      short adc_chan = dataV[i]>>16 & 0x1F; //For 792 [bit 16-20]
+	      unsigned int adc_value = dataV[i] & 0xFFF; // adc data [bit 0-11]
+	      bool adc_overflow = (dataV[i]>>12) & 0x1; // overflow bit [bit 12]
+	      bool adc_underthreshold = (dataV[i]>>13) & 0x1; // under threshold bit [bit 13]
+	      ostringstream s; s << "[CAEN_V792]::[INFO]::Read Channel " << "\tchannel " << adc_chan << "\tvalue " << adc_value << "\toverflow " << adc_overflow << "\tunderthreshold " << adc_underthreshold; 
+	      Log(s.str(),1);
+	    }
+#endif
+	}
       else
 	{
-	  ostringstream s; s << "[CAEN_V792]::[ERROR]::Invalid data read from V792 board " << wordType; 
+	  ostringstream s; s << "[CAEN_V792]::[WARNING]::Invalid data read from V792 board " << wordType; 
 	  Log(s.str(),1);
 	}
     }
