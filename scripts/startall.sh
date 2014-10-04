@@ -35,9 +35,9 @@ while true; do
 done
 
 echo "========================================"
-[ "${dr}" == "" ] || echo "DR MACHINES:${dr}"
-[ "${rc}" == "" ] || echo "RC MACHINES:${rc}"
-[ "${eb}" == "" ] || echo "EB MACHINES:${eb}"
+[ "${dr}" == "" ] || echo "DR MACHINES: ${dr}"
+[ "${rc}" == "" ] || echo "RC MACHINES: ${rc}"
+[ "${eb}" == "" ] || echo "EB MACHINES: ${eb}"
 echo "========================================"
 
 ## create repository if does not exists, otherwise update and compile
