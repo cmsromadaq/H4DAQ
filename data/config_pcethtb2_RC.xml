@@ -10,11 +10,14 @@
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
   <Hardware>
+
     <crateId>2</crateId>
-    <board>
+
+    <board><!-- Time Board --> 
       <ID>1</ID>
-      <type>TIME</type> <!-- Remember to put always TIME at the first location among boards -->
+      <type>TIME</type> <!-- Remember to put always TIMEBOARD at the first location among boards -->
     </board>
+
     <board>
       <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <ID>1</ID>
@@ -70,6 +73,7 @@
       <PulserAStartInput>0</PulserAStartInput> <!--CVIOSources-->
       <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
     </board>
+
     <board>
       <type>CAEN_V513</type> <!-- I/O REGISTER -->
       <ID>1</ID>
@@ -88,6 +92,13 @@
       <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
       <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
     </board>
+
+    <board>
+      <type>CAEN_V560</type> <!-- SCALER -->
+      <ID>1</ID>
+      <baseAddress>0x33000000</baseAddress>
+    </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>

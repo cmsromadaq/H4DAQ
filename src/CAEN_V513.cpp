@@ -26,7 +26,7 @@ int CAEN_V513::Init()
       return ERR_OPEN;
     }    
 
-  int version = data&0xF000;
+  int version = (data&0xF000)>>12;
   int serial = data&0x0FFF;
   s.str(""); s << "[CAEN_V513]::[INFO]::Open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec << " Version " << version << " S/N " << serial; 
   Log(s.str(),1);

@@ -3,8 +3,9 @@
 //Boards
 #include "interface/CAEN_VX718.hpp"
 #include "interface/CAEN_V1742.hpp"
-#include "interface/CAEN_V513.hpp"
 #include "interface/CAEN_V792.hpp"
+#include "interface/CAEN_V560.hpp"
+#include "interface/CAEN_V513.hpp"
 #include "interface/TimeBoard.hpp"
 
 #include "interface/EventBuilder.hpp" // boardId
@@ -76,6 +77,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a CAEN_V513 board
 			  hw_.push_back( new CAEN_V513() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V560")
+			{
+			  //constructing a CAEN_V792 board
+			  hw_.push_back( new CAEN_V560() );
 			}
 		else if( getElementContent(c,"type",board_node) == "CAEN_V792")
 			{
