@@ -8,6 +8,7 @@ class Daemon;
 #include "interface/FSM.hpp"
 #include "interface/Handler.hpp"
 #include "interface/EventBuilder.hpp"
+#include "interface/Daemonize.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -71,28 +72,7 @@ define_handlers();
 
 /// --- 
 
-/* Why set PGID as current PID ? */
-// Daemon detach
-if(daemon){
-	pid_t pid=fork();
-	if (pid >0 ){ // parent
-		printf("[EventBuilderDaemon] Detaching process %d\n",pid);
-		exit(0); //
-		} 
-	else if (pid== 0 ) { // child
-		setsid(); // obtain a new group process
-		//int fd = open("/dev/tty", O_RDWR);
-		//ioctl(fd, TIOCNOTTY, NULL);
-		// close all descriptors
-		fflush(NULL);
-		int i;
-		for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
-		i=open("/dev/null",O_RDWR); /* open stdin */
-		dup(i); /* stdout */
-		dup(i); /* stderr */
-		}
-	else printf("[EventBuilderDaemon] Cannot Daemonize");
-	}
+if (daemon) Daemonize();
 
 Logger l;
 l.SetLogLevel(verbosity);

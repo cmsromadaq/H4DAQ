@@ -9,6 +9,7 @@ class Daemon;
 #include "interface/Handler.hpp"
 #include "interface/EventBuilder.hpp"
 #include "interface/Logger.hpp"
+#include "interface/Daemonize.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -69,16 +70,7 @@ define_handlers();
      exit(EXIT_FAILURE);
    }
 // Daemon detach
-if(daemon){
-	pid_t pid=fork();
-	if (pid >0 ){ // parent
-		printf("[RunControlDaemon] Detaching process %d\n",pid);
-		_exit(0);
-		} 
-	else if (pid== 0 ) { // child
-		}
-	else printf("[EventBuilderDaemon] Cannot Daemonize");
-	}
+if (daemon) Daemonize();
 // -----------------
 Logger l;
 

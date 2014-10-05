@@ -60,7 +60,7 @@ IFS=','
 
 for machine in $dr ; do 
 	
-	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nohup nice -n +${nice} ./bin/datareadout  -c data/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
+	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
 
 	
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
@@ -77,7 +77,7 @@ done
 
 for machine in $rc ; do 
 
-	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nohup nice -n +${nice} ./bin/runcontrol  -c data/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
+	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_rc}" == "0" ] && continue;
 	## compile
@@ -92,7 +92,7 @@ done
 
 for machine in $eb ; do 
 
-	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nohup nice -n +${nice} ./bin/eventbuilder   -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
+	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
