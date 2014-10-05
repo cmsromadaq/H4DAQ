@@ -215,7 +215,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> Header  = StreamToWord( H );
 	vector<WORD> Trailer = StreamToWord( T );
 	if(x.size() < BoardHeaderWords()*WORDSIZE ){
-		printf("[EventBuilder]::[IsBoardOk] Header size is wrong\n");
+		printf("[EventBuilder]::[IsBoardOk] Header size is wrong: x.size()=%u >= BHW *WS %u\n",x.size(),BoardHeaderWords()*WORDSIZE);
 		 return 0;
 		}
 	vector<WORD> myHead  = StreamToWord( x.data(), BoardHeaderWords()*WORDSIZE ); // read the first three
@@ -223,20 +223,24 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	if (myHead[0]  != Header[0] ) {
 #ifdef EB_DEBUG
 	printf("[EventBuilder]::[IsBoardOk] Header is wrong\n");
+	printf("[EventBuilder]::[IsBoardOk] Header = %u==%u\n",myHead[0],Header[0]);
+	printf("[EventBuilder]::[IsBoardOk] Header = %c%c%c%c==%c%c%c%c\n",((char*) &myHead[0])[0],((char*) &myHead[0])[1],((char*) &myHead[0])[2],((char*) &myHead[0])[3],
+		((char*)&Header[0])[0],((char*)&Header[0])[1],((char*)&Header[0])[2],((char*)&Header[0])[3]
+		);
 #endif
 		return 0;
 		}
 
 
 	// the the N of bytes of the stream
-	if (myHead.size() < BoardHeaderWords()*WORDSIZE) 
+	if (myHead.size() < BoardHeaderWords()) 
 			{
 #ifdef EB_DEBUG
-	printf("[EventBuilder]::[IsBoardOk] Header is size wrong\n");
+	printf("[EventBuilder]::[IsBoardOk] Header is size wrong,second check\n");
 #endif
 			return 0;
 			}
-	WORD NBytes = myHead[3];
+	WORD NBytes = myHead[BoardSizePos()]; // Start Counting from 0
 	WORD NWords  = NBytes / WORDSIZE;
 
 	if ( x.size() < NBytes) {
@@ -248,12 +252,13 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
 #ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bites");
 	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
 #endif
 	if (myWords[NWords-1] != Trailer[0] ) 
 		{
 #ifdef EB_DEBUG
-	printf("[EventBuilder]::[IsBoardOk] Trailer is inconsistent\n");
+	printf("[EventBuilder]::[IsBoardOk] Trailer is inconsistent: %u == %u\n",myWords[NWords-1] ,Trailer[0]);
 #endif
 		return 0;
 		}
@@ -261,7 +266,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 #ifdef EB_DEBUG
 	printf("[EventBuilder]::[IsBoardOk] BoardOK DONE\n");
 #endif
-	return (NWords+4+1)*WORDSIZE; // interesting size
+	return (NBytes); // all size of the board
 
 }
 
@@ -302,14 +307,17 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 		return 0;
 		}
 	// header is fine
-	WORD nBoard   = myHead[3];
-	WORD eventSize= myHead[2];
-	WORD eventNum = myHead[1];
+	WORD nBoard   = myHead[EventNboardsPos()];
+	WORD eventSize= myHead[EventSizePos()];
+	WORD eventNum = myHead[EventEnumPos()];
 
-	dataTypeSize_t leftsize=x.size() - WORDSIZE*4;
-	ptr += WORDSIZE*4 ;
+	dataTypeSize_t leftsize=x.size() - WORDSIZE*EventHeaderWords();
+	ptr += WORDSIZE*EventHeaderWords() ;
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
 		{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] Checking Board %u/%u\n",iBoard,nBoard);
+#endif
 		dataTypeSize_t readByte=IsBoardOk(ptr, leftsize);
 		if (readByte==0) {
 #ifdef EB_DEBUG
@@ -459,7 +467,7 @@ Command EventBuilder::CloseSpill()
 	WORD *nEvents=((WORD*)mySpill_.data()) + SpillNeventPos();
 	WORD *spillSize=((WORD*)mySpill_.data()) + SpillSizePos();
 	(*spillSize)= (WORD)mySpill_.size();
-	(*nEvents)  = (WORD)lastEvent_.eventInSpill_; // TODO chekc offset by 1
+	(*nEvents)  = (WORD)lastEvent_.eventInSpill_-1; // 
 
 
 	if( dumpEvent_ && !recvEvent_) 
