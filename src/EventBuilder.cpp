@@ -4,6 +4,7 @@
 #include <sstream>
 
 //#define EB_DEBUG
+#define TIME_DEBUG
 
 
 
@@ -612,6 +613,14 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 #endif
 		if (eventSize1 == 0 || eventSize2 == 0 ) return 2;
 		//---- Unire i due eventi
+		//check Time here;
+#ifdef TIME_DEBUG
+		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		ostringstream s2;
+			s2<<"[EventBuilder]::[TIMEINFO] "<<spillNum1<<" "<<iEvent<<" "<< time1<<" "<<time2;
+		Log(s2.str(),2);	
+#endif
 		dataType event1(eventSize1,ptr1);
 		dataType event2(eventSize2,ptr2);
 		dataType myEvent;MergeEventStream(myEvent,event1,event2);
