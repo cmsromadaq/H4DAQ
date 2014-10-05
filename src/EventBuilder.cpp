@@ -23,6 +23,8 @@ EventBuilder::EventBuilder()
 	dump_->SetCompress();
 	dump_->SetBinary();
 	dump_->SetAsync(); // asyncronous dumping
+	merged_=0;
+	lastBadSpill_=0;  // spill n. starts from 1
 }
 EventBuilder::~EventBuilder()
 {
@@ -432,12 +434,12 @@ void EventBuilder::OpenSpill()
 		Log("[EventBuilder]::[OpenSpill] Open file name:" + newFileName,1) ;
 	}
 	isSpillOpen_=true;
-	SpillHeader(mySpill_);
-	mySpill_.append( (void *)& lastEvent_.runNum_,WORDSIZE);
-	mySpill_.append( (void *)& lastEvent_.eventInSpill_,WORDSIZE);
+	SpillHeader(mySpill_);  // add Header SPLH
+	mySpill_.append( (void *)& lastEvent_.runNum_,WORDSIZE); // RUN Num
+	mySpill_.append( (void *)& lastEvent_.spillNum_,WORDSIZE); // Spill Num
 	WORD zero=0;
-	mySpill_.append( (void*)&zero, WORDSIZE);
-	mySpill_.append( (void*)&zero, WORDSIZE);
+	mySpill_.append( (void*)&zero, WORDSIZE); // spill Size
+	mySpill_.append( (void*)&zero, WORDSIZE); // n.event in Spill
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] OpenSpill Done",3);
 #endif
@@ -468,13 +470,17 @@ Command EventBuilder::CloseSpill()
 	}
 	if (recvEvent_) { 
 		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",2) ;
-		WORD spillNum=ReadSpillNum(mySpill_);
-		if ( spills_.find(spillNum) == spills_.end() ) 
-			{
-			spills_[spillNum] = pair<int,dataType>(1, mySpill_ ); // spills_[] take ownership of the structuer -- copy constructor + release
-			mySpill_.release();
-			}
-		else MergeSpills(spills_[spillNum].second,mySpill_);
+		// For recv event, Close Spill should do nothing.
+		// MergeSpills will dump in case
+		//
+
+		//WORD spillNum=ReadSpillNum(mySpill_);
+		// --- if ( spills_.find(spillNum) == spills_.end() ) 
+		// --- 	{
+		// --- 	spills_[spillNum] = pair<int,dataType>(1, mySpill_ ); // spills_[] take ownership of the structuer -- copy constructor + release
+		// --- 	mySpill_.release();
+		// --- 	}
+		// --- else MergeSpills(spills_[spillNum].second,mySpill_);
 	} 
 	if (sendEvent_) {//TODO -- also do the merging if recv
 		// --- Instruct Daemon to send them through the connection manager
@@ -549,6 +555,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	Log(s.str(),3);
 	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spillN"<<spillNum1<<"=="<<spillNum2;
 	Log(s.str(),3);
+	s.str() ="";
 	 s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spill Nevents="<<spillNevents1<<"=="<<spillNevents2;
 	Log(s.str(),3);
 	}
@@ -582,16 +589,20 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
 #ifdef EB_DEBUG
-	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge Event"<<iEvent;
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge iEvent="<<iEvent;
+	Log(s.str(),3);
+	s.str()="";
+	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Event Headers: "<< ptr1 << " : "<<ptr2 ;
 	Log(s.str(),3);
 #endif
 		long eventSize1= IsEventOk(ptr1,left1);
 		long eventSize2= IsEventOk(ptr2,left2);
 #ifdef EB_DEBUG
 	s.str()="";
-	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: EventSize1"<<eventSize1<<"!=0  eventSize2="<<eventSize2<<"!=0";
+	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: EventSize1"<<eventSize1<<"!=0  eventSize2="<<eventSize2<<"!=0"<< " Left="<< left1 <<" : "<<left2;
 	Log(s.str(),3);
 #endif
+		if (eventSize1 == 0 || eventSize2 == 0 ) return 2;
 		//---- Unire i due eventi
 		dataType event1(eventSize1,ptr1);
 		dataType event2(eventSize2,ptr2);
@@ -619,38 +630,43 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 void EventBuilder::MergeSpills(dataType &spill2 ) {
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1",3);
+	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill: Event Already merged="<<merged_<<" lastBadSpill Was "<<lastBadSpill_ <<" SpillN is "<<ReadSpillNum(spill2);
+	Log(s.str(),3);
 #endif
 	WORD spillNum=ReadSpillNum(spill2); 
 
-		if ( spills_.find(spillNum) == spills_.end() ) 
+		if ( merged_ == 0 )  // spill structure is empty
 			{
+#ifdef EB_DEBUG
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: NO MERGED EVENTS: CHECK IF SPILL IS MARKED AS BAD",3);
+#endif
+			// TODO -- check spill consistencies to call this function. Check if spill2 is better
+			if (lastBadSpill_ == ReadSpillNum(spill2) ) return;
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: COPY",3);
 #endif
-			dataType newSpill; newSpill.copy(spill2);
-			spills_[spillNum] = pair<int,dataType>(1, newSpill ); // spills_[] take ownership of the structuer -- copy constructor + release
-			newSpill.release();
+			mySpill_.copy(spill2);
+			++merged_;
 			}
 		else 
 			{
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: Merge",3);
 #endif
-			int badSpill=MergeSpills(spills_[spillNum].second,spill2);
-			spills_[spillNum].first++; 
+			int badSpill=MergeSpills(mySpill_,spill2);
+			++merged_;
 			if(badSpill){
 					// erase spill structure -- W/O dumping
-					spills_.erase(spillNum);
-					if(!spills_.empty() ) 
-						{ // more than one spill per time ?
-						Log("[EventBuilder]::[MergeSpills] Loosing arbitrary events",1);
-						spills_.clear();
-						}
+					// TODO -- check spill consistencies to call this function. Check if spill2 is better
+					int sn1=ReadSpillNum(mySpill_);
+					lastBadSpill_=sn1;
+					merged_=0;
+					mySpill_.clear();
 					}
 			}
 	if (!recvEvent_ ) return ;
 
-	if ( spills_[spillNum].first > recvEvent_)  // dump for recvEvent
+	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
@@ -660,15 +676,15 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
 		dump_->Init();
-		Dump(spills_[spillNum].second);
+		Log("[EventBuilder]::[MergeSpill] Open file name:" + newFileName,1) ;
+		Dump(mySpill_);
 		dump_->Close();
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Going To Clear",3);
 		usleep(1000);
 #endif
-		spills_[spillNum].second.clear();
-		spills_[spillNum].second.~dataType();
-		spills_.erase(spillNum);
+		mySpill_.clear();
+		merged_=0;
 		}
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Done",3);

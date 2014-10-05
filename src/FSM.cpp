@@ -500,6 +500,12 @@ while (true) {
 				    myNewCmd.release();
 				    //Merge Spills
 				    eventStarted= true;
+				    // 
+				    //DEBUG
+				    string buf=Utility::AsciiDataReadable( myData.data(), myData.size());
+				    if (buf.size() >100)
+					buf.erase(101,string::npos);
+				    Log(buf,3);
 				    eventBuilder_->MergeSpills(myData);
 
 			    }

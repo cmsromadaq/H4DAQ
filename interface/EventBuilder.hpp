@@ -54,7 +54,9 @@ bool isSpillOpen_;
 EventId lastEvent_;
 
 
-map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
+//map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
+int merged_;
+WORD lastBadSpill_;
 
 	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
@@ -73,7 +75,7 @@ public:
 	inline int 	GetRecvEvent() { return recvEvent_;};
 	inline void*	GetStream(){ return mySpill_.data();};
 	inline int  	GetSize(){return mySpill_.size();};
-	inline bool 	AreSpillsMerged(){ return spills_.empty() ; };
+	inline bool 	AreSpillsMerged(){ return mySpill_.size() == 0 ; };
 	inline string 	GetDirName()const {return dirName_;}
 	inline EventId  GetEventId() const { return lastEvent_;}
 	// --- Set  Info
