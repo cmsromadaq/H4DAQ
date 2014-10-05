@@ -510,6 +510,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
   //               ...   = [          .....             ]
 
   //CAEN_V1742_eventBuffer.clear () ;
+  CAEN_V1742_eventBuffer.reserve(5 + digitizerConfiguration_.Nch*(digitizerConfiguration_.RecordLength+2)) ; //allocate once for all channels in a board
   CAEN_V1742_eventBuffer.resize (5) ;
   (CAEN_V1742_eventBuffer)[0]=0xA0000005 ; 
   (CAEN_V1742_eventBuffer)[1]= ( (eventInfo->BoardId)<<26)+eventInfo->Pattern ;
@@ -535,7 +536,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
     int start_ptr=CAEN_V1742_eventBuffer.size () ;
 
     //Allocating necessary space for this channel
-    CAEN_V1742_eventBuffer.resize (CAEN_V1742_eventBuffer.size () + 2 + Size) ;
+    CAEN_V1742_eventBuffer.resize (start_ptr + 2 + Size) ;
     memcpy (& ( (CAEN_V1742_eventBuffer)[start_ptr]), &ChHeader[0], 2 * sizeof (unsigned int)) ;
 
     //Beware the datas are float (because they are corrected...) but copying them here bit by bit. Should remember this for reading them out
