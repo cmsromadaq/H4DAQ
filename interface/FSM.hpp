@@ -16,6 +16,9 @@ public:
 
 class EventBuilderFSM : public Daemon{
 bool eventStarted;
+timeval transrate_stopwatch_start;
+timeval transrate_stopwatch_stop;
+dataTypeSize_t transrate_size;
 public:
 	// constructor
 	EventBuilderFSM();

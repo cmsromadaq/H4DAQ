@@ -152,6 +152,8 @@ public:
 	static inline const int BoardIdPos(){return 1;};
 	static inline const int EventNboardsPos(){return 3;};
 	static inline const int EventEnumPos(){return 1;};	
+	static inline const int EventTimePos(){return 7;};	
+
 };
 
 //#include "interface/Daemon.hpp" // Command -- fwd decl
