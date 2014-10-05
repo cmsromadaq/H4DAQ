@@ -44,7 +44,7 @@ define_handlers();
  };
  
  int long_index =0;
- while ((opt = getopt_long(argc, argv,"c:l:v:", 
+ while ((opt = getopt_long(argc, argv,"c:l:v:d", 
 			   long_options, &long_index )) != -1) {
    switch (opt) {
    case 'c' : configFileName=string(optarg);
