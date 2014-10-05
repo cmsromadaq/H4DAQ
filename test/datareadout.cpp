@@ -8,6 +8,7 @@ class Daemon;
 #include "interface/FSM.hpp"
 #include "interface/Handler.hpp"
 #include "interface/EventBuilder.hpp"
+#include "interface/Daemonize.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -43,7 +44,7 @@ define_handlers();
  };
  
  int long_index =0;
- while ((opt = getopt_long(argc, argv,"c:l:v:", 
+ while ((opt = getopt_long(argc, argv,"c:l:v:d", 
 			   long_options, &long_index )) != -1) {
    switch (opt) {
    case 'v' : verbosity = atoi(optarg);
@@ -69,16 +70,7 @@ define_handlers();
      exit(EXIT_FAILURE);
    }
 // Daemon detach
-if(daemon){
-	pid_t pid=fork();
-	if (pid >0 ){ // parent
-		printf("[DataReadoutDaemon] Detaching process %d\n",pid);
-		_exit(0);
-		} 
-	else if (pid== 0 ) { // child
-		}
-	else printf("[DataReadoutDaemon] Cannot Daemonize");
-	}
+if (daemon) Daemonize();
 
 Logger l;
 l.SetLogLevel(verbosity);

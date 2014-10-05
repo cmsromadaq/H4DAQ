@@ -13,6 +13,8 @@ Daemon::Daemon(){
 	hwManager_=new HwManager();
 	connectionManager_=new ConnectionManager();
 	myStatus_=START;
+	myPausedFlag_=false;
+	gettimeofday(&lastSentStatusMessageTime_,NULL);
 	gettimeofday(&start_time,NULL);
 	iLoop=0;
 	waitForDR_=0;
@@ -218,28 +220,47 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
 	Log(s.str(),3);
 	std::cout << s.str() << std::endl;
+	STATUS_t oldStatus = myStatus_;
 	myStatus_=newStatus;
-	//SendStatus(); //Send status to GUI (formatted correctly)
+	myPausedFlag_=false;
+	if (!((oldStatus==CLEARBUSY && newStatus==WAITTRIG) ||	\
+	      (oldStatus==WAITTRIG && newStatus==READ) ||	\
+	      (oldStatus==READ && newStatus==CLEARBUSY) )) {
+	  SendStatus(oldStatus,newStatus); //Send status to GUI (formatted correctly)
+	  }
 }
 
-void Daemon::SendStatus(){
-	return; // TODO
-	static STATUS_t myLastSentStatus=(STATUS_t)0;
-	if (myStatus_== myLastSentStatus ) return;
-	//if (myStatus_== WAITFORTRIG ) return;
-	//if (myStatus_== READY ) return;
-	if (iLoop > 1000000) {
-		iLoop=0;
-		dataType myMex;
-		myMex.append((void*)"STATUS ",7);
-		char mybuffer[255];
-		int n = snprintf(mybuffer,255,"%u",myStatus_);
-		myMex.append((void*)mybuffer,n);
-		connectionManager_->Send(myMex,StatusSck);
-		myLastSentStatus = myStatus_ ;
+void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
+	dataType myMex;
+	myMex.append((void*)"STATUS ",7);
+	char mybuffer[255];
+	int n=0;
+	n = snprintf(mybuffer,255,"%u ",newStatus);
+	myMex.append((void*)mybuffer,n);
+	WORD runnr = 0;
+	WORD spillnr = 0;
+	WORD evinspill = 0;
+	if (eventBuilder_){
+	  runnr = eventBuilder_->GetEventId().runNum_;
+	  spillnr = eventBuilder_->GetEventId().spillNum_;
+	  evinspill = eventBuilder_->GetEventId().eventInSpill_;
 	}
-	++iLoop;
-	return;
+	n = snprintf(mybuffer,255,"%u ",runnr); //runnr
+	myMex.append((void*)mybuffer,n);
+	n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+	myMex.append((void*)mybuffer,n);
+	n = snprintf(mybuffer,255,"%u ",evinspill); //evinspill
+	myMex.append((void*)mybuffer,n);
+	if (myPausedFlag_) myMex.append((void*)"PAUSED",6);
+	connectionManager_->Send(myMex,StatusSck);
+	gettimeofday(&lastSentStatusMessageTime_,NULL);
+}
+
+void Daemon::PublishStatusWithTimeInterval(){
+  timeval tv;
+  gettimeofday(&tv,NULL);
+  long timediff = Utility::timevaldiff(&lastSentStatusMessageTime_,&tv); // in usec
+  if (timediff>200000) SendStatus(myStatus_,myStatus_);
 }
 
 bool Daemon::IsOk(){return true;}

@@ -55,18 +55,26 @@ echo "Starting H4DAQ installed @${daqhome} as ${daquser}"
 echo "=================================================================="
 
 ## create repository if does not exists, otherwise update and compile
-mycommand="cd ${daqhome}; mkdir -p DAQ ; cd DAQ ; [ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; cd H4DAQ ; git pull ; python configure.py --noroot ; make -j 4;  "
+mycommand="cd ${daqhome};  \
+		mkdir -p DAQ ;  \
+		cd DAQ ; \
+		[ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; \
+		cd H4DAQ ;  \
+		git pull ; \
+		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
+		env python configure.py --noroot ; \
+		make -j 4;  "
 IFS=','
 
 for machine in $dr ; do 
 	
-	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nohup nice -n +${nice} ./bin/datareadout  -c data/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
+	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
 
 	
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log ;
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | sed 's/^@@@.*@@@$/\x1b\[01;41m&\x1b\[00m/'  ;
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATAREADOUT on $machine"
@@ -77,7 +85,7 @@ done
 
 for machine in $rc ; do 
 
-	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nohup nice -n +${nice} ./bin/runcontrol  -c data/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
+	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_rc}" == "0" ] && continue;
 	## compile
@@ -92,7 +100,7 @@ done
 
 for machine in $eb ; do 
 
-	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nohup nice -n +${nice} ./bin/eventbuilder   -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
+	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile

@@ -26,7 +26,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	 SendStatus();
+	  PublishStatusWithTimeInterval();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -220,7 +220,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	SendStatus();
+	  PublishStatusWithTimeInterval();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -386,7 +386,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	SendStatus();
+	  PublishStatusWithTimeInterval();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -583,7 +583,7 @@ if ( !IsOk() ) throw config_exception();
 
 while (true) {
 	try{
-	SendStatus();
+	  PublishStatusWithTimeInterval();
 		// check source that can populate the commands -- Connection and HW
 		// check Connection Manager
 		// if cmds not empty do something
@@ -869,7 +869,11 @@ while (true) {
 				MoveToStatus(INITIALIZED);
 		    	 }
 		    else if (gui_pauserun)
-				break;
+		        {
+			        myPausedFlag_=true;
+				SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI
+			        break;
+		        }
 		    else if( gui_restartrun ) 
 		   	{
 				dataType myMex;
