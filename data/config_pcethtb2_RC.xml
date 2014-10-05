@@ -98,6 +98,7 @@
       <type>CAEN_V560</type> <!-- SCALER -->
       <ID>1</ID>
       <baseAddress>0x33000000</baseAddress>
+      <enabledChannels>0x0007</enabledChannels>
     </board>
 
   </Hardware>

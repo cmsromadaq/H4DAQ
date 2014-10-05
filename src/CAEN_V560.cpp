@@ -20,7 +20,7 @@ int CAEN_V560::Init()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V560_VERSION_REGISTER,&data,CAEN_V560_ADDRESSMODE,cvD16);
   if (status)
     {
-      s.str(""); s << "[CAEN_V560]::[ERROR]::Cannot open V560 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      s.str(""); s << "[CAEN_V560]::[ERROR]::Cannot open V560 board @0x" << std::hex << configuration_.baseAddress << std::dec << " " << status; 
       Log(s.str(),1);
       return ERR_OPEN;
     }    
@@ -83,6 +83,7 @@ int CAEN_V560::Config(BoardConfig *bC)
   Board::Config(bC);
   //here the parsing of the xmlnode...
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+  GetConfiguration()->enabledChannels=Configurator::GetInt( bC->getElementContent("enabledChannels"));
   return 0;
 }
 
@@ -94,7 +95,11 @@ int CAEN_V560::Read(vector<WORD> &v)
     return ERR_CONF_NOT_FOUND;
 
   WORD data;
-  for(int i=0; i<CAEN_V560_CHANNELS; ++i) {    
+  for(int i=0; i<CAEN_V560_CHANNELS; ++i) {
+
+    if ( ! (configuration_.enabledChannels & (1<<i) ) )
+      continue; //skipping disabled channels
+
     status|= CAENVME_ReadCycle(handle_, configuration_.baseAddress + CAEN_V560_REG_COUNTER0 + i*0x04 ,&data, CAEN_V560_ADDRESSMODE ,cvD32);
 
     if (status)

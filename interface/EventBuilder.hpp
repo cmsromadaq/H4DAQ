@@ -112,6 +112,7 @@ public:
 	static WORD 	ReadSpillNevents(dataType &x);
 	static WORD 	ReadEventNboards(dataType &x);
 	static WORD 	ReadEventNumber(dataType &x);
+	static inline WORD 	ReadBoardSize(dataType &x){ return *((WORD*)x.data() + BoardSizePos()); }
 	static void BoardHeader(dataType &R,BoardId id);
 	static void BoardTrailer(dataType &R);
 	static void EventHeader(dataType&R);
@@ -150,6 +151,7 @@ public:
 	static inline const int BoardSizePos(){return 2;};
 	static inline const int BoardIdPos(){return 1;};
 	static inline const int EventNboardsPos(){return 3;};
+	static inline const int EventEnumPos(){return 1;};	
 };
 
 //#include "interface/Daemon.hpp" // Command -- fwd decl
