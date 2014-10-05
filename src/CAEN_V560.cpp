@@ -83,6 +83,7 @@ int CAEN_V560::Config(BoardConfig *bC)
   Board::Config(bC);
   //here the parsing of the xmlnode...
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+  GetConfiguration()->enabledChannels=Configurator::GetInt( bC->getElementContent("enabledChannels"));
   return 0;
 }
 
@@ -94,7 +95,11 @@ int CAEN_V560::Read(vector<WORD> &v)
     return ERR_CONF_NOT_FOUND;
 
   WORD data;
-  for(int i=0; i<CAEN_V560_CHANNELS; ++i) {    
+  for(int i=0; i<CAEN_V560_CHANNELS; ++i) {
+
+    if ( ! (configuration_.enabledChannels & (1<<i) ) )
+      continue; //skipping disabled channels
+
     status|= CAENVME_ReadCycle(handle_, configuration_.baseAddress + CAEN_V560_REG_COUNTER0 + i*0x04 ,&data, CAEN_V560_ADDRESSMODE ,cvD32);
 
     if (status)

@@ -55,6 +55,7 @@ public:
   
   typedef struct CAEN_V560_Config_t {
     unsigned int baseAddress;
+    unsigned int enabledChannels;
   } CAEN_V560_Config_t;
 
   CAEN_V560(): Board(), handle_(-1) { type_="CAEN_V560"; };
