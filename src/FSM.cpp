@@ -484,6 +484,8 @@ while (true) {
 		    {
 			    // received EE NOT Open Close Spill
 			eventStarted=false;
+			gettimeofday(&transrate_stopwatch_start,NULL);
+			transrate_size=0;
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
@@ -506,6 +508,7 @@ while (true) {
 				    //   if (buf.size() >100)
 				    //       buf.erase(101,string::npos);
 				    //   Log(buf,3);
+				    transrate_size+=myData.size();
 				    eventBuilder_->MergeSpills(myData);
 
 			    }
@@ -520,7 +523,15 @@ while (true) {
 			 //inform run controller that spill has been completed
 			 myMex.append((void*)"EB_SPILLCOMPL\0\0\0",14);
 			 connectionManager_->Send(myMex,CmdSck);
-		    
+		   	// Transfer
+			 gettimeofday(&transrate_stopwatch_stop,NULL);
+			 ostringstream rate;
+			 long transferTime=Utility::timevaldiff(&transrate_stopwatch_start,&transrate_stopwatch_stop);
+			 rate<<"[FSM]::[SENTBUFFER]::[TransferTime]="<<
+				 transferTime<<"usec "<<
+				 "Size="<<transrate_size<<"bytes "<<
+				 "Rate="<< (transrate_size>>30)/(double(transferTime)/1.e6) <<"Gb/s" ;
+			 Log(rate.str(),1);
 			 MoveToStatus(SENTBUFFER);
 		   	 }
 		    break;
