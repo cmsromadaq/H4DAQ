@@ -32,6 +32,7 @@ pid_t pid_;
 // by default uses deque, it can also use list in case
 queue< Command > todo_; // front/pop/push/empty/size
 STATUS_t myStatus_;
+bool myPausedFlag_;
 
 timeval start_time;
 timeval stopwatch_start_time;
@@ -67,7 +68,7 @@ public:
 	void LogInit(Logger*l);
 	//
 	virtual void ErrorStatus(){};
-	virtual void SendStatus();
+        virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 			
 };
 
