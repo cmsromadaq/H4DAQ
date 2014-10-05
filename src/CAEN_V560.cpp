@@ -20,7 +20,7 @@ int CAEN_V560::Init()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V560_VERSION_REGISTER,&data,CAEN_V560_ADDRESSMODE,cvD16);
   if (status)
     {
-      s.str(""); s << "[CAEN_V560]::[ERROR]::Cannot open V560 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      s.str(""); s << "[CAEN_V560]::[ERROR]::Cannot open V560 board @0x" << std::hex << configuration_.baseAddress << std::dec << " " << status; 
       Log(s.str(),1);
       return ERR_OPEN;
     }    

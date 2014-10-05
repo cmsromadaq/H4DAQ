@@ -97,7 +97,7 @@
     <board>
       <type>CAEN_V560</type> <!-- SCALER -->
       <ID>1</ID>
-      <baseAddress>0x33000000</baseAddress>
+      <baseAddress>0x44000000</baseAddress>
     </board>
 
   </Hardware>
