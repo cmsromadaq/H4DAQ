@@ -3,7 +3,8 @@
 #include <sstream>
 #include <string>
 
-//#define CAEN_V560_DEBUG
+#define CAEN_V560_DEBUG
+
 int CAEN_V560::Init()
 {
   int status=0;
