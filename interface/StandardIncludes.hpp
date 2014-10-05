@@ -23,6 +23,7 @@ using namespace std;
 #include <unistd.h> //fork exit
 #include <sys/types.h> //pid_t
 #include <sys/time.h> //pid_t
+#include <fcntl.h> // for O_...
 
 #ifdef __linux__
 #define LINUX
