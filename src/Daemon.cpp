@@ -14,6 +14,7 @@ Daemon::Daemon(){
 	connectionManager_=new ConnectionManager();
 	myStatus_=START;
 	myPausedFlag_=false;
+	gettimeofday(&lastSentStatusMessageTime_,NULL);
 	gettimeofday(&start_time,NULL);
 	iLoop=0;
 	waitForDR_=0;
@@ -222,7 +223,11 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	STATUS_t oldStatus = myStatus_;
 	myStatus_=newStatus;
 	myPausedFlag_=false;
-	SendStatus(oldStatus,newStatus); //Send status to GUI (formatted correctly)
+	if (!((oldStatus==CLEARBUSY && newStatus==WAITTRIG) ||	\
+	      (oldStatus==WAITTRIG && newStatus==READ) ||	\
+	      (oldStatus==READ && newStatus==CLEARBUSY) )) {
+	  SendStatus(oldStatus,newStatus); //Send status to GUI (formatted correctly)
+	  }
 }
 
 void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
@@ -248,6 +253,14 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	myMex.append((void*)mybuffer,n);
 	if (myPausedFlag_) myMex.append((void*)"PAUSED",6);
 	connectionManager_->Send(myMex,StatusSck);
+	gettimeofday(&lastSentStatusMessageTime_,NULL);
+}
+
+void Daemon::PublishStatusWithTimeInterval(){
+  timeval tv;
+  gettimeofday(&tv,NULL);
+  long timediff = Utility::timevaldiff(&lastSentStatusMessageTime_,&tv); // in usec
+  if (timediff>200000) SendStatus(myStatus_,myStatus_);
 }
 
 bool Daemon::IsOk(){return true;}
