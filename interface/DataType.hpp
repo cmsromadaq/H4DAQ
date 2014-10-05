@@ -25,7 +25,7 @@ public:
 	// --- Destructor
 	~dataType();
 	// --- Get size
-	dataTypeSize_t size(){return size_;}
+	inline dataTypeSize_t size(){return size_;}
 	// --- reserve N bytes in memory
 	void reserve(dataTypeSize_t N);
 	// --- shrink N bytes in memory
@@ -49,6 +49,7 @@ public:
 	// --- release ownership of data. This will lost control of data and location
 	void release();
 	//--- Operators
+	inline bool empty(){return size()==0;}
 	//dataType& operator+=(dataType &x) { this->append(x); return this;}
 
 };
