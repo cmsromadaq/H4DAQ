@@ -78,21 +78,18 @@ if(daemon){
 	if (pid >0 ){ // parent
 		printf("[EventBuilderDaemon] Detaching process %d\n",pid);
 		exit(0); //
-		printf("YOU DONT SEE ME 1\n");
 		} 
 	else if (pid== 0 ) { // child
 		setsid(); // obtain a new group process
 		//int fd = open("/dev/tty", O_RDWR);
 		//ioctl(fd, TIOCNOTTY, NULL);
 		// close all descriptors
-		printf("YOU SEE ME CHILD\n");
 		fflush(NULL);
 		int i;
 		for (i=getdtablesize();i>=0;--i) close(i); /* close all descriptors */
 		i=open("/dev/null",O_RDWR); /* open stdin */
 		dup(i); /* stdout */
 		dup(i); /* stderr */
-		printf("YOU DONT SEE ME CHILD\n");
 		}
 	else printf("[EventBuilderDaemon] Cannot Daemonize");
 	}
