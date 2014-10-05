@@ -55,7 +55,15 @@ echo "Starting H4DAQ installed @${daqhome} as ${daquser}"
 echo "=================================================================="
 
 ## create repository if does not exists, otherwise update and compile
-mycommand="cd ${daqhome}; mkdir -p DAQ ; cd DAQ ; [ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; cd H4DAQ ; git pull ; python configure.py --noroot ; make -j 4;  "
+mycommand="cd ${daqhome};  \
+		mkdir -p DAQ ;  \
+		cd DAQ ; \
+		[ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; \
+		cd H4DAQ ;  \
+		git pull ; \
+		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
+		env python configure.py --noroot ; \
+		make -j 4;  "
 IFS=','
 
 for machine in $dr ; do 
@@ -66,7 +74,7 @@ for machine in $dr ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log ;
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | sed 's/^@@@.*@@@$/\x1b\[01;41m&\x1b\[00m/'  ;
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATAREADOUT on $machine"
