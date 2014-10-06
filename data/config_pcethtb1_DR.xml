@@ -279,8 +279,8 @@
       <timeResolution>3</timeResolution>
       <maxHitsPerEvent>9</maxHitsPerEvent>
       <enabledChannels>0x00FF</enabledChannels>
-      <windowWidth>0x10</windowWidth> <!-- Window Width unit=25 ns --> 
-      <windowOffset>-0x8</windowOffset> <!-- Window Offset unit=25 ns --> 
+      <windowWidth>0x20</windowWidth> <!-- Window Width unit=25 ns --> 
+      <windowOffset>-0x10</windowOffset> <!-- Window Offset unit=25 ns --> 
     </board>
 
   </Hardware>
