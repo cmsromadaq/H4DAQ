@@ -52,7 +52,7 @@ bool isSpillOpen_;
 //WORD runNum_;
 
 EventId lastEvent_;
-
+WORD eventsInThisRun_;
 
 //map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 int merged_;

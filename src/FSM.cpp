@@ -587,7 +587,8 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
 
 // ----------------------- RUN CONTROL FSM -----------
 RunControlFSM::RunControlFSM(): Daemon() {
-
+  gettimeofday(&spillduration_stopwatch_start_time,NULL);
+  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 }
 
 bool RunControlFSM::IsOk(){
@@ -785,6 +786,8 @@ while (true) {
 			    }
 		    if (readyDR_ >= waitForDR_)
 		    {
+		      
+		      	 gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		   	 MoveToStatus(WAITTRIG);
 		    }
@@ -809,6 +812,7 @@ while (true) {
 				  connectionManager_->Send(eeMex,CmdSck);
 				  hwManager_->ClearSignalStatus();
 				  hwManager_->ClearBusy();
+				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -821,6 +825,7 @@ while (true) {
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  hwManager_->ClearBusy();
+				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -898,6 +903,7 @@ while (true) {
 		    	 }
 		    else if (gui_pauserun)
 		        {
+				gui_pauserun=false;
 			        myPausedFlag_=true;
 				SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI
 			        break;
@@ -967,4 +973,25 @@ void RunControlFSM::UpdateMex(){
 			    
 		    }
 	return;
+}
+
+void RunControlFSM::SendSpillDuration(){
+  long spilltime = Utility::timevaldiff(&spillduration_stopwatch_start_time,&spillduration_stopwatch_stop_time);
+  dataType myMex;
+  myMex.append((void*)"SPILLDURATION ",14);
+  char mybuffer[255];
+  int n=0;
+  WORD runnr=0;
+  WORD spillnr=0;
+  if (eventBuilder_){
+    runnr = eventBuilder_->GetEventId().runNum_;
+    spillnr = eventBuilder_->GetEventId().spillNum_;
+  }
+  n = snprintf(mybuffer,255,"%u ",runnr); //runnr
+  myMex.append((void*)mybuffer,n);
+  n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+  myMex.append((void*)mybuffer,n);
+  n = snprintf(mybuffer,255,"%l ",spilltime);
+  myMex.append((void*)mybuffer,n);
+  connectionManager_->Send(myMex,StatusSck);
 }

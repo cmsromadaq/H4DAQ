@@ -26,6 +26,7 @@ EventBuilder::EventBuilder()
 	dump_->SetAsync(); // asyncronous dumping
 	merged_=0;
 	lastBadSpill_=0;  // spill n. starts from 1
+	eventsInThisRun_=0;
 }
 EventBuilder::~EventBuilder()
 {
@@ -515,6 +516,7 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
 	
 	lastEvent_.eventInSpill_++;
+	eventsInThisRun_++;
 	// this are updated in the CloseSpill -- should we keep them consistent
 	//WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
 	//WORD nEvents= *nEventsPtr;
@@ -715,6 +717,7 @@ void EventBuilder::SetRunNum(WORD x)
 {
 //runNum_=x;
 lastEvent_.runNum_=x;
+eventsInThisRun_=0;
 if (dumpEvent_ || recvEvent_)  // POSIX
   system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)x) ).c_str() );
 }

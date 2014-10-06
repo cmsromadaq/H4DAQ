@@ -52,7 +52,8 @@ protected:
 		    bool gui_stoprun 	;
 		    bool gui_die 	;
 		    bool eb_endspill 	;
-
+  timeval spillduration_stopwatch_start_time;
+  timeval spillduration_stopwatch_stop_time;
 public:
 	RunControlFSM();
 	void Loop();
@@ -61,6 +62,7 @@ public:
 	bool IsOk();
 	void inline ResetMex(){gui_pauserun=false; gui_stoprun=false; gui_restartrun=false; gui_die=false; eb_endspill=false;};
 	void UpdateMex();
+        void SendSpillDuration();	
 };
 
 #endif
