@@ -14,9 +14,6 @@ class HwManager;
 class dataType;
 
 
-
-
-
 class Daemon : public LogUtility
 {
 protected:
@@ -71,6 +68,9 @@ public:
 	virtual void ErrorStatus(){};
         virtual void PublishStatusWithTimeInterval();
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
+	
+	//
+	int Daemonize();
 			
 };
 

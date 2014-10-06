@@ -1,10 +1,13 @@
+#ifndef DAEMONIZE_H
+#define DAEMONIZE_H
+
 #include "interface/StandardIncludes.hpp"
 // Daemon detach
 int Daemonize(){
 
 	pid_t pid=fork();
 	if (pid >0 ){ // parent
-		printf("[EventBuilderDaemon] Detaching process %d\n",pid);
+		printf("Detaching process %d\n",pid);
 		exit(0); //
 		} 
 	else if (pid== 0 ) { // child
@@ -20,9 +23,11 @@ int Daemonize(){
 		dup(i); /* stderr */
 		}
 	else {
-		printf("[EventBuilderDaemon] Cannot Daemonize");
+		printf("Cannot Daemonize");
 		return 1;
 		}
 
 	return 0;
 }
+
+#endif
