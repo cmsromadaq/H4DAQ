@@ -337,19 +337,19 @@ int CAEN_V1290::CheckStatusAfterRead()
 int CAEN_V1290::OpWriteTDC(WORD data) 
 {
   int status;
-  const int TIMEOUT = 1000;
+  const int TIMEOUT = 100000;
 
   int time=0;
   /* Check the Write OK bit */
   WORD rdata=0;
   do {
-    status = CAENVME_ReadCycle(handle_,configuration_.baseAddress +  CAEN_V1290_MICROHANDREG ,&rdata, CAEN_V1290_ADDRESSMODE, cvD16);
+    status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1290_MICROHANDREG ,&rdata, CAEN_V1290_ADDRESSMODE, cvD16);
     time++;
 #ifdef CAENV1290_DEBUG
     ostringstream s; s << "[CAEN_V1290]::[INFO]::Handshake micro op writing " << rdata << " #" << time << " " << status;
     Log(s.str(),3);
 #endif
-  } while ((rdata != 0x1) && (time < TIMEOUT) );
+  } while (!(rdata & 0x1) && (time < TIMEOUT) );
 
   if ( time == TIMEOUT ) {
        ostringstream s; s << "[CAEN_V1290]::[ERROR]::Cannot handshake micro op writing " << status; 
@@ -374,7 +374,7 @@ int CAEN_V1290::OpWriteTDC(WORD data)
 int CAEN_V1290::OpReadTDC(WORD* data) 
 {
   int status;
-  const int TIMEOUT = 1000;
+  const int TIMEOUT = 100000;
 
   int time=0;
   /* Check the Write OK bit */
@@ -386,7 +386,7 @@ int CAEN_V1290::OpReadTDC(WORD* data)
     ostringstream s; s << "[CAEN_V1290]::[INFO]::Handshake micro op reading " << rdata << " #" << time << " " << status; 
     Log(s.str(),3);
 #endif
-  } while ((rdata != 0x2) && (time < TIMEOUT) );
+  } while (!(rdata & 0x2) && (time < TIMEOUT) );
 
   if ( time == TIMEOUT ) {
        ostringstream s; s << "[CAEN_V1290]::[ERROR]::Cannot handshake micro op reading " << status; 
