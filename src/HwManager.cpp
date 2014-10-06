@@ -347,7 +347,7 @@ void HwManager::ClearBusy(){
 }
 
 void HwManager::SetBusyOff(){
-	return;
+	//return;
 	if (trigBoard_.boardIndex_<0 ) 
 	  {
 	    ostringstream s;
