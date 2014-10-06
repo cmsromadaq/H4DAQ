@@ -531,6 +531,7 @@ while (true) {
 				 transferTime<<"usec "<<
 				 "Size="<<transrate_size<<"bytes "<<
 				 "Rate="<< (transrate_size>>30)/(double(transferTime)/1.e6) <<"Gb/s" ;
+			 ReportTransferPerformance(transferTime,transrate_size);
 			 Log(rate.str(),1);
 			 MoveToStatus(SENTBUFFER);
 		   	 }
@@ -572,7 +573,17 @@ while (true) {
 } // end while
 } // end Loop
 
-
+void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_t transrate_size){
+  dataType myMex;
+  myMex.append((void*)"TRANSFER ",9);
+  char mybuffer[255];
+  int n=0;
+  n = snprintf(mybuffer,255,"%l ",transferTime);
+  myMex.append((void*)mybuffer,n);
+  n = snprintf(mybuffer,255,"%ll ",transrate_size);
+  myMex.append((void*)mybuffer,n);
+  connectionManager_->Send(myMex,StatusSck);
+}
 
 // ----------------------- RUN CONTROL FSM -----------
 RunControlFSM::RunControlFSM(): Daemon() {

@@ -26,6 +26,7 @@ public:
 	inline void Clear(){Daemon::Clear();}
 	inline int Init(string configFileName="data/config.xml"){return Daemon::Init(configFileName);};
 	bool IsOk();
+        void ReportTransferPerformance(long transferTime, dataTypeSize_t transrate_size);
 };
 
 class DummyRunControlFSM : public Daemon{
