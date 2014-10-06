@@ -70,7 +70,7 @@ public:
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 	
 	//
-	int Daemonize();
+	// int Daemonize();
 			
 };
 
