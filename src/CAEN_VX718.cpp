@@ -71,6 +71,7 @@ int CAEN_VX718::Init()
   		Log(s.str(),1);
 		}
 	SendSignal(DAQ_BUSY_ON);
+        status |= CAENVME_EnableScalerGate(handle_); 
 	usleep(10000);
 	SendSignal(DAQ_BUSY_OFF);
 	usleep(20000);
