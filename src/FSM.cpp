@@ -644,14 +644,35 @@ while (true) {
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
-						   sscanf(ptr2,"%ld",trgNevents_);
+						   if ( sscanf(ptr2,"%ld",trgNevents_) < 1) {
+					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							break;
+						  	}
 						   trgType_=PED_TRIG;
+						   }
+				   else if (!strcmp(ptr,"LED")) // pedestal run
+						   {
+				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
+						   if (shift <0 ) {
+					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							break;
+						  	}
+				   		   char*ptr2= (char*)myCmd.data + shift;
+						   if ( sscanf(ptr2,"%ld",trgNevents_) <1 ){
+					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							break;
+						  	}
+						   trgType_=LED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"PHYSICS"))
 						   {
 						   trgType_=BEAM_TRIG;
 						   }
-				   else trgType_=UNK_TRIG; // LED_TRIG not impl
+				   else {
+					trgType_=UNK_TRIG; // LED_TRIG not impl
+					Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+					break;
+					}
 
 			    	   dataType myFufMex;
 			    	   myFufMex.append((void*)"NOP\0",4);
@@ -676,7 +697,7 @@ while (true) {
 		    // wait for wwe
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
-		    if (trgType_==PED_TRIG ) 
+		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
@@ -712,7 +733,7 @@ while (true) {
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
-		    if (trgType_==PED_TRIG ) 
+		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
@@ -781,7 +802,7 @@ while (true) {
 				break;
 				}
 		    	}
-		    else if (trgType_ == PED_TRIG ) 
+		    else if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
