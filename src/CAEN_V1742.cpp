@@ -156,7 +156,7 @@ int CAEN_V1742::Clear (){
   ret |= CAEN_DGTZ_Reset (digitizerHandle_) ;
 
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program" << endl ;
     Log(s.str(),1);
     return ERR_RESTART ;
   }
@@ -176,7 +176,7 @@ int CAEN_V1742::BufferClear (){
   ret |= CAEN_DGTZ_ClearData(digitizerHandle_); 
 
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to clear buffers\n" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to clear buffers" << endl ;
     Log(s.str(),1);
     return ERR_CLEARBUFFER ;
   }
@@ -395,7 +395,7 @@ int CAEN_V1742::programDigitizer ()
   /* reset the digitizer */
   ret |= CAEN_DGTZ_Reset (digitizerHandle_) ;
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.\nPlease reset digitizer manually then restart the program" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program" << endl ;
     Log(s.str(),1);
     return ERR_RESTART ;
   }
@@ -424,10 +424,10 @@ int CAEN_V1742::programDigitizer ()
       if ( ret |= CAEN_DGTZ_SetInterruptConfig ( digitizerHandle_, CAEN_DGTZ_ENABLE,
                                                CAEN_V1742_VME_INTERRUPT_LEVEL, CAEN_V1742_VME_INTERRUPT_STATUS_ID,
                                                digitizerConfiguration_.InterruptNumEvents, CAEN_V1742_INTERRUPT_MODE)!= CAEN_DGTZ_Success) {
-          printf ( "\nError configuring interrupts. Interrupts disabled\n\n") ;
+          printf ( "Error configuring interrupts. Interrupts disabled") ;
           digitizerConfiguration_.InterruptNumEvents = 0 ;
       }
-      printf ("Interrupt enabled\n") ;
+      printf ("Interrupt enabled") ;
   }
   ret |= CAEN_DGTZ_SetMaxNumEventsBLT (digitizerHandle_, digitizerConfiguration_.NumEvents) ;
   ret |= CAEN_DGTZ_SetAcquisitionMode (digitizerHandle_, CAEN_DGTZ_SW_CONTROLLED) ;
@@ -475,7 +475,7 @@ int CAEN_V1742::programDigitizer ()
     
   if (ret)
     {
-      printf ("Warning: errors found during the programming of the digitizer.\nSome settings may not be executed\n") ;
+      printf ("Warning: errors found during the programming of the digitizer.Some settings may not be executed") ;
       return ERR_DGZ_PROGRAM ;
     }
 
@@ -518,7 +518,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
   (CAEN_V1742_eventBuffer)[3]=eventInfo->EventCounter ;
   (CAEN_V1742_eventBuffer)[4]=eventInfo->TriggerTimeTag ;
 
-  //  printf ("EVENT 1742 %d %d\n",eventInfo->EventCounter,eventInfo->TriggerTimeTag) ;
+  //  printf ("EVENT 1742 %d %d",eventInfo->EventCounter,eventInfo->TriggerTimeTag) ;
   for (gr=0 ;gr< (digitizerConfiguration_.Nch/9) ;gr++) {
     if (event->GrPresent[gr]) {
       for (ch=0 ; ch<9 ; ch++) {
@@ -781,7 +781,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
   /*     if (strcmp (str1, "BINARY")==0) */
   /*         digitizerConfiguration_.OutFileFlags|= OFF_BINARY ; */
   /*     else if (strcmp (str1, "ASCII")!=0) */
-  /*         printf ("%s: invalid output file format\n", str1) ; */
+  /*         printf ("%s: invalid output file format", str1) ; */
   /*     continue ; */
   /* } */
 
@@ -792,7 +792,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
   /*     if (strcmp (str1, "YES")==0) */
   /*         digitizerConfiguration_.OutFileFlags|= OFF_HEADER ; */
   /*     else if (strcmp (str1, "NO")!=0) */
-  /*         printf ("%s: invalid option\n", str) ; */
+  /*         printf ("%s: invalid option", str) ; */
   /*     continue ; */
   /* } */
 
