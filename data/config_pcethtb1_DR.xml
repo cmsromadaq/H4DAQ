@@ -125,20 +125,20 @@
         # options: YES, NO
         #ENABLED_FAST_TRIGGER_DIGITIZING        NO    
         -->
-        <ENABLED_FAST_TRIGGER_DIGITIZING>YES</ENABLED_FAST_TRIGGER_DIGITIZING>
+        <ENABLED_FAST_TRIGGER_DIGITIZING>NO</ENABLED_FAST_TRIGGER_DIGITIZING>
 
         <!--
         # MAX_NUM_EVENTS_BLT: maximum number of events to read out in one Block Transfer. High values corresponds to 
         # options: 1 to 1023
         -->
-        <MAX_NUM_EVENTS_BLT>10</MAX_NUM_EVENTS_BLT>
+        <MAX_NUM_EVENTS_BLT>1</MAX_NUM_EVENTS_BLT>
 
         <!--
         # POST_TRIGGER: post trigger size in percent of the whole acquisition window
         # options: 0 to 100
         # On models 742 there is a delay of about 35nsec on signal Fast Trigger TR; the post trigger is added to this delay  
         -->
-        <POST_TRIGGER>50</POST_TRIGGER>
+        <POST_TRIGGER>0</POST_TRIGGER>
 
         <!--
         # TRIGGER_EDGE: decides whether the trigger occurs on the rising or falling edge of the signal
@@ -239,7 +239,7 @@
 
         <CHANNEL>
           <ID>1</ID>
-          <ENABLE_INPUT>YES</ENABLE_INPUT>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
           <DC_OFFSET>10</DC_OFFSET>
             <!--
             # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -258,12 +258,12 @@
                # the OR of the self trigger of the channels in the group that are enabled by this mask.
                # options: 0 to FF
                -->
-          <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
+          <GROUP_TRG_ENABEL_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
         </CHANNEL>
 
         <CHANNEL>
           <ID>2</ID>
-          <ENABLE_INPUT>YES</ENABLE_INPUT>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
           <DC_OFFSET>10</DC_OFFSET>
             <!--
             # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -287,7 +287,7 @@
 
         <CHANNEL>
           <ID>3</ID>
-          <ENABLE_INPUT>YES</ENABLE_INPUT>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
           <DC_OFFSET>10</DC_OFFSET>
             <!--
             # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
