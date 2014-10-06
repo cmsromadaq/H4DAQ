@@ -54,19 +54,30 @@ int CAEN_V1290::Init()
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V1290_CON_REG,&data,CAEN_V1290_ADDRESSMODE,cvD16);
       data |= CAEN_V1290_EMPTYEVEN_BITMASK; //enable emptyEvent
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V1290_CON_REG,&data,CAEN_V1290_ADDRESSMODE,cvD16);
+      ostringstream s; s << "[CAEN_V1290]::[INFO]::Enabled Empty Event";
+      Log(s.str(),1);
+
     }
 
   /* I step: set TRIGGER Matching mode via OPCODE 00xx */
   if (configuration_.triggerMatchMode)
-    status |= OpWriteTDC(CAEN_V1290_TRMATCH_OPCODE);
+    {
+      status |= OpWriteTDC(CAEN_V1290_TRMATCH_OPCODE);
+      ostringstream s; s << "[CAEN_V1290]::[INFO]::Enabled Trigger Match Mode";
+      Log(s.str(),1);
+    }
     
   /* I step: set Edge detection via OPCODE 22xx */
   status |= OpWriteTDC(CAEN_V1290_EDGEDET_OPCODE);
   status |= OpWriteTDC(configuration_.edgeDetectionMode);
+  s.str(""); s << "[CAEN_V1290]::[INFO]::EdgeDetection " << configuration_.edgeDetectionMode;
+  Log(s.str(),1);
   
   /* I step: set Time Reso via OPCODE 24xx */
   status |= OpWriteTDC(CAEN_V1290_TIMERESO_OPCODE);
   status |= OpWriteTDC(configuration_.timeResolution);
+  s.str(""); s << "[CAEN_V1290]::[INFO]::TimeResolution " << configuration_.timeResolution;
+  Log(s.str(),1);
 
     
   /* II step: set TRIGGER Window Width to value n */
@@ -76,15 +87,18 @@ int CAEN_V1290::Init()
   /* III step: set TRIGGER Window Offset to value -n */
   status |= OpWriteTDC(CAEN_V1290_WINOFFS_OPCODE); 
   status |= OpWriteTDC(configuration_.windowOffset);
+  s.str(""); s << "[CAEN_V1290]::[INFO]::TimeWindowWidth " << configuration_.windowWidth << " TimeWindowOffset " << configuration_.windowOffset;
+  Log(s.str(),1);
+
 
   /* IV step: enable channels*/
   //disable all channels
-  status |= OpWriteTDC(CAEN_V1290_DISCHAN_OPCODE); 
+  status |= OpWriteTDC(CAEN_V1290_DISALLCHAN_OPCODE); 
 
   for (unsigned int i=0;i<channels_;++i)
     if (configuration_.enabledChannels & ( 1 << i ) ) 
       {
-	ostringstream s; s << "[CAEN_V1290]::[INFO]::Enabling channel " << i;
+	s.str(""); s << "[CAEN_V1290]::[INFO]::Enabling channel " << i;
 	Log(s.str(),1);
 	status |=OpWriteTDC(CAEN_V1290_ENCHAN_OPCODE+i);
       }
