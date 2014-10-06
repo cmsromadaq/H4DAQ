@@ -70,7 +70,20 @@ public:
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 	
 	//
-	// int Daemonize();
+	int Daetach();
+	
+	// Define a function for each state in the Loop	
+	inline int DoNext() {MoveToStatus( (STATUS_t) (myStatus_+1));};
+	// virtual int Do_Start(){ DoNext();};
+	// virtual int Do_Init() { DoNext(); };
+	// virtual int Do_BeginSpill(){ DoNext(); };
+	// virtual int Do_Cleared(){ DoNext()};
+	// virtual int Do_WaitForReady(){ DoNext();};
+	// virtual int Do_ClearBusy(){ DoNext();};
+	// virtual int Do_WaitTrigger(){ DoNext();};
+	// virtual int Do_Read(){ DoNext();};
+	// virtual int Do_EndSpill(){ DoNext();};
+	// virtual int Do_RecvBuffer(){ DoNext();};
 			
 };
 

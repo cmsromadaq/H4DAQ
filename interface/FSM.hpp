@@ -46,6 +46,11 @@ protected:
 	long trgNevents_;
 	long trgRead_;
 	int readyDR_; // DR ready to take data
+		    bool gui_pauserun 	;
+		    bool gui_restartrun ;
+		    bool gui_stoprun 	;
+		    bool gui_die 	;
+		    bool eb_endspill 	;
 
 public:
 	RunControlFSM();
@@ -53,6 +58,8 @@ public:
 	inline void Clear(){Daemon::Clear();}
 	inline int Init(string configFileName="data/config.xml"){return Daemon::Init(configFileName);};
 	bool IsOk();
+	void inline ResetMex(){gui_pauserun=false; gui_stoprun=false; gui_restartrun=false; gui_die=false; eb_endspill=false;};
+	void UpdateMex();
 };
 
 #endif

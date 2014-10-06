@@ -840,37 +840,22 @@ while (true) {
 			{
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
-				// TODO check if myCmd slhould destruct data/N or not
 				connectionManager_->Send(myMex,DataSck);
 			}
-
+			ResetMex();
 			MoveToStatus(SENTBUFFER);
 		    break;
 		    }
-	case SENTBUFFER:// TODO ---> I'm HERE,// Loop over the whole queue of messages
+	case RECVBUFFER:{
+			
+			// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
+		    	UpdateMex();
+		    	if ( eb_endspill ) MoveToStatus( SENTBUFFER );
+			break;
+			}
+	case SENTBUFFER:// Loop over the whole queue of messages
 		    { // wait for EB_SPILLCOMPLETED
-		    dataType myMex;
-		    bool gui_pauserun 	= false;
-		    bool gui_restartrun = false;
-		    bool gui_stoprun 	= false;
-		    bool gui_die 	= false;
-		    bool eb_endspill 	= false;
-		    while (connectionManager_->Recv(myMex) ==0 )     // while I have messages on the network buffer
-		    {                                                                     
-			    Command myNewCmd = ParseData( myMex); 
-			    //todo_.push_back(myNewCmd);
-			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
-				    eb_endspill=true;
-			    else if (myNewCmd.cmd == GUI_STOPRUN)
-				    gui_stoprun = true;
-			    else if (myNewCmd.cmd == GUI_PAUSERUN)
-				    gui_pauserun=true;
-			    else if (myNewCmd.cmd == GUI_DIE)
-				    gui_die=true;
-			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
-				    gui_restartrun=true;
-			    
-		    }
+		    UpdateMex();
 		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
 		    if (gui_stoprun)
 		   	 { 
@@ -929,3 +914,25 @@ while (true) {
 } // while-true
 return;
 } // end Loop
+
+
+void RunControlFSM::UpdateMex(){
+		    dataType myMex;
+		    while (connectionManager_->Recv(myMex) ==0 )     // while I have messages on the network buffer
+		    {                                                                     
+			    Command myNewCmd = ParseData( myMex); 
+			    //todo_.push_back(myNewCmd);
+			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
+				    eb_endspill=true;
+			    else if (myNewCmd.cmd == GUI_STOPRUN)
+				    gui_stoprun = true;
+			    else if (myNewCmd.cmd == GUI_PAUSERUN)
+				    gui_pauserun=true;
+			    else if (myNewCmd.cmd == GUI_DIE)
+				    gui_die=true;
+			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
+				    gui_restartrun=true;
+			    
+		    }
+	return;
+}
