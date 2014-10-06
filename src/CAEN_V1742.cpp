@@ -217,9 +217,11 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
+  int TIMEOUT=100;
 
-  while (NumEvents==0 && itry<1000000)
+  while (NumEvents==0 && itry<TIMEOUT)
     {
+      ++itry;      
       ret = CAEN_DGTZ_ReadData (digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, buffer_, &BufferSize) ;
       
       if (ret) {
@@ -230,7 +232,6 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	ErrCode = ERR_READOUT ;
 	return ErrCode ;
       }
-      ++itry;      
 
       if (BufferSize != 0) {
 	ret = CAEN_DGTZ_GetNumEvents (digitizerHandle_, buffer_, BufferSize, &NumEvents) ;
@@ -243,7 +244,15 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	}
       }
     }
-  
+
+  if (itry == TIMEOUT)
+    {
+      s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
+      Log(s.str(),1);
+      ErrCode = ERR_READOUT_TIMEOUT;
+      return ErrCode ;
+     }
+
   //For the moment empty the buffers one by one
   if (NumEvents != 1)
     {
@@ -254,13 +263,6 @@ int CAEN_V1742::Read (vector<WORD> &v)
       // return ErrCode ;
     }
 
-  if (itry == 1000)
-    {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
-      Log(s.str(),1);
-      ErrCode = ERR_READOUT_TIMEOUT;
-      return ErrCode ;
-    }
   
   // /* Analyze data */
   // for (i = 0 ; i < (int)NumEvents ; i++) {
