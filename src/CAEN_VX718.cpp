@@ -65,6 +65,7 @@ int CAEN_VX718::Init()
   uint32_t data;
   for(int i=0;i<1000;i++){
 	SendSignal(DAQ_BUSY_OFF);
+	SendSignal(DAQ_CLEAR_BUSY);
 	BufferClear();
         status |= CAENVME_EnableScalerGate(handle_); 
 	while ( !TriggerReceived() ) usleep(1);
