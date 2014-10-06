@@ -125,7 +125,7 @@
         # options: YES, NO
         #ENABLED_FAST_TRIGGER_DIGITIZING        NO    
         -->
-        <ENABLED_FAST_TRIGGER_DIGITIZING>NO</ENABLED_FAST_TRIGGER_DIGITIZING>
+        <ENABLED_FAST_TRIGGER_DIGITIZING>YES</ENABLED_FAST_TRIGGER_DIGITIZING>
 
         <!--
         # MAX_NUM_EVENTS_BLT: maximum number of events to read out in one Block Transfer. High values corresponds to 
