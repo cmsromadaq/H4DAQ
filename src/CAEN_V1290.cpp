@@ -214,9 +214,16 @@ int CAEN_V1290::Read(vector<WORD> &v)
   data=0;
   
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1290_OUTPUT_BUFFER,&data,CAEN_V1290_ADDRESSMODE,cvD32);
+
+#ifdef CAENV1290_DEBUG
+  s.str(""); s << "[CAEN_V1290]::[DEBUG]::IS GLBHEADER " << (data & 0x40000000);
+  Log(s.str(),3);
+#endif
+
+
   if ( ! (data & 0x40000000) || status )
     {
-      ostringstream s; s << "[CAEN_V1290]::[ERROR]::First word not a Global trailer"; 
+      s.str(""); s << "[CAEN_V1290]::[ERROR]::First word not a Global trailer"; 
       Log(s.str(),1);
       return ERR_READ;
     }
@@ -231,16 +238,33 @@ int CAEN_V1290::Read(vector<WORD> &v)
       data=0;
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1290_OUTPUT_BUFFER,&data,CAEN_V1290_ADDRESSMODE,cvD32);
       int wordType = (data >> 27) & CAEN_V1290_WORDTYE_BITMASK;
+#ifdef CAENV1290_DEBUG
+      s.str(""); s << "[CAEN_V1290]::[DEBUG]::EVENT WORDTYPE " << wordType;
+      Log(s.str(),3);
+#endif
+
       if (wordType == CAEN_V1290_GLBTRAILER)
 	{
+#ifdef CAENV1290_DEBUG
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE EVENT TRAILER" << wordType;
+	  Log(s.str(),3);
+#endif
 	  glb_tra=1;
 	  v.push_back(data);
 	}
       else if (wordType == CAEN_V1290_TDCHEADER )
 	{
+#ifdef CAENV1290_DEBUG
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC HEADER" << wordType;
+	  Log(s.str(),3);
+#endif
 	}
       else if (wordType == CAEN_V1290_TDCTRAILER )
 	{
+#ifdef CAENV1290_DEBUG
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC TRAILER" << wordType;
+	  Log(s.str(),3);
+#endif
 	}
       else if (wordType == CAEN_V1290_TDCERROR )
 	{
@@ -257,7 +281,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
 	  int channel = (data>>21) & 0x1f;
 	  int trailing = (data>>26) & 0x1;
 	  float tdc_time = (float)measurement/10;
-	  ostringstream s; s << "[CAEN_V1290]::[INFO]::HIT CHANNEL " << channel << " TYPE " << trailing << " TIME " << tdc_time; 
+	  s.str(""); s << "[CAEN_V1290]::[INFO]::HIT CHANNEL " << channel << " TYPE " << trailing << " TIME " << tdc_time; 
 	  Log(s.str(),3);
 #endif
 	}
