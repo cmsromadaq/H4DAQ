@@ -245,7 +245,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	  return ErrCode ;
 	}
       }
-      usleep(30);
+      usleep(50);
     }
 
   if (itry == TIMEOUT)
