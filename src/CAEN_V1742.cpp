@@ -217,11 +217,13 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=1000;
+  int TIMEOUT=10000;
 
-  while (NumEvents==0 && itry<TIMEOUT)
+  while (1 > NumEvents && itry<TIMEOUT)
     {
       ++itry;      
+      BufferSize=0;
+      NumEvents=0;
       ret = CAEN_DGTZ_ReadData (digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, buffer_, &BufferSize) ;
       
       if (ret) {
@@ -243,13 +245,17 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	  return ErrCode ;
 	}
       }
+      usleep(30);
     }
 
   if (itry == TIMEOUT)
     {
       s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
       Log(s.str(),1);
-      return BufferClear();
+
+      int status=BufferClear();
+      ErrCode = ERR_READOUT_TIMEOUT;
+      return ErrCode;
      }
 
   //For the moment empty the buffers one by one
