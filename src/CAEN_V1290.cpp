@@ -258,7 +258,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
 	  int trailing = (data>>26) & 0x1;
 	  float tdc_time = (float)measurement/10;
 	  ostringstream s; s << "[CAEN_V1290]::[INFO]::HIT CHANNEL " << channel << " TYPE " << trailing << " TIME " << tdc_time; 
-	  Log(s.str(),1);
+	  Log(s.str(),3);
 #endif
 	}
       else if (wordType == CAEN_V1290_GLBTRTIMETAG )
@@ -341,12 +341,13 @@ int CAEN_V1290::OpWriteTDC(WORD data)
 
   int time=0;
   /* Check the Write OK bit */
-  WORD rdata;
+  WORD rdata=0;
   do {
     status = CAENVME_ReadCycle(handle_,configuration_.baseAddress +  CAEN_V1290_MICROHANDREG ,&rdata, CAEN_V1290_ADDRESSMODE, cvD16);
     time++;
 #ifdef CAENV1290_DEBUG
-    ostringstream s; s << "[CAEN_V1290]::[INFO]::Handshake micro op writing " << rdata << " #" << time << " " << status; 
+    ostringstream s; s << "[CAEN_V1290]::[INFO]::Handshake micro op writing " << rdata << " #" << time << " " << status;
+    Log(s.str(),3);
 #endif
   } while ((rdata != 0x1) && (time < TIMEOUT) );
 
@@ -377,12 +378,13 @@ int CAEN_V1290::OpReadTDC(WORD* data)
 
   int time=0;
   /* Check the Write OK bit */
-  WORD rdata;
+  WORD rdata=0;
   do {
     status = CAENVME_ReadCycle(handle_,configuration_.baseAddress +  CAEN_V1290_MICROHANDREG ,&rdata, CAEN_V1290_ADDRESSMODE, cvD16);
     time++;
 #ifdef CAENV1290_DEBUG
     ostringstream s; s << "[CAEN_V1290]::[INFO]::Handshake micro op reading " << rdata << " #" << time << " " << status; 
+    Log(s.str(),3);
 #endif
   } while ((rdata != 0x2) && (time < TIMEOUT) );
 
