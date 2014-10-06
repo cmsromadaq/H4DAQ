@@ -10,6 +10,7 @@ done
 for machine in pcethtb2 ; do 
 	echo "Terminating runcontrol on $machine"
 	ssh ${machine}.cern.ch "killall runcontrol"
+	echo "Terminating eventbuilder on $machine"
 	ssh ${machine}.cern.ch "killall eventbuilder"
 done
 
@@ -21,7 +22,7 @@ done
 for machine in pcethtb2 ; do 
 	echo "Killing runcontrol on $machine"
 	ssh ${machine}.cern.ch "killall -9 runcontrol"
-	echo "Killing runcontrol on $machine"
+	echo "Killing eventbuilder on $machine"
 	ssh ${machine}.cern.ch "killall -9 eventbuilder"
 done
 

@@ -61,10 +61,14 @@ mycommand="cd ${daqhome};  \
 		[ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; \
 		cd H4DAQ ;  \
 		git pull ; \
+		git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
 		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
 		env python configure.py --noroot ; \
 		make -j 4;  "
 IFS=','
+
+function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;41m\1\x1b[00m:g' ; done }
+function col2 { while read line ; do echo "$line" | sed 's:%%%\(.*\)%%%:\x1b[01;31m\1\x1b[00m:g' ; done }
 
 for machine in $dr ; do 
 	
@@ -74,7 +78,7 @@ for machine in $dr ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | sed 's/^@@@.*@@@$/\x1b\[01;41m&\x1b\[00m/'  ;
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATAREADOUT on $machine"
@@ -89,7 +93,7 @@ for machine in $rc ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_rc}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log ;
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START RUNCONTROL on $machine"
@@ -104,7 +108,7 @@ for machine in $eb ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log ;
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START EVENTBUILDER on $machine"
