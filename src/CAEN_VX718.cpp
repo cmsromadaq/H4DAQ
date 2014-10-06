@@ -63,14 +63,14 @@ int CAEN_VX718::Init()
 
 #ifdef CAEN_VX718_DEBUG_IOSIG
   uint32_t data;
-  for(int i=0;i<1000;i++){
+  for(int i=0;i<50000;i++){
 	SendSignal(DAQ_BUSY_OFF);
 	SendSignal(DAQ_CLEAR_BUSY);
 	BufferClear();
         status |= CAENVME_EnableScalerGate(handle_); 
 	while ( !TriggerReceived() ) usleep(1);
 	SendSignal(DAQ_BUSY_ON);
-	usleep(10000);
+	usleep(500);
 	Log("Loop",1);
 	}	
 #endif
