@@ -795,6 +795,7 @@ while (true) {
 		    break;
 		    }
 	case CLEARBUSY: {
+		        hwManager_->SetBusyOff();
 		        hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
@@ -812,8 +813,10 @@ while (true) {
 				  //				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  hwManager_->ClearSignalStatus();
+				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
+				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -825,8 +828,10 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
+				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
 				break;
 				}
@@ -834,6 +839,7 @@ while (true) {
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
+			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
 			MoveToStatus(READ);
                         }  

@@ -346,6 +346,44 @@ void HwManager::ClearBusy(){
 	  }
 }
 
+void HwManager::SetBusyOff(){
+	if (trigBoard_.boardIndex_<0 ) 
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Trigger Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+	
+	int status = dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->SetBusyOff();
+	if ( status )
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::SetBusyOff failed";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+}
+
+void HwManager::SetBusyOn(){
+	if (trigBoard_.boardIndex_<0 ) 
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::Trigger Board not available";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+	
+	int status = dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->SetBusyOn();
+	if ( status )
+	  {
+	    ostringstream s;
+	    s << "[HwManager]::[ERROR]::SetBusyOn failed";
+	    Log(s.str(),1);
+	    throw hw_exception();
+	  }
+}
+
 bool HwManager::TriggerReceived(){
 	if (trigBoard_.boardIndex_<0 ) 
 	  {

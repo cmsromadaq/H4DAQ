@@ -26,6 +26,7 @@ int CAEN_VX718::Init()
   status |= CAENVME_SetOutputConf(handle_,cvOutput4,configuration_.Output4Polarity,configuration_.Output4LedPolarity,configuration_.Output4Source);
   status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
   /* setting which output line must be pulsed  */
+  outputRegister_=configuration_.outputMaskWord;
   status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
   //setting the input lines
   status |= CAENVME_SetInputConf(handle_,cvInput0,configuration_.Input0Polarity,configuration_.Input0LedPolarity);
@@ -92,8 +93,9 @@ int CAEN_VX718::Config(BoardConfig *bC)
   GetConfiguration()->boardType= static_cast<CVBoardTypes> (Configurator::GetInt( bC->getElementContent("boardType")) );  
   GetConfiguration()->LinkType =Configurator::GetInt( bC->getElementContent("LinkType")); 
   GetConfiguration()->LinkNum  =Configurator::GetInt( bC->getElementContent("LinkNum")); 
-  GetConfiguration()->clearBusyOutputBit= static_cast<CVOutputSelect>(Configurator::GetInt( bC->getElementContent("clearBusyOutputBit")) ); 
-  GetConfiguration()->trigAckOutputBit  = static_cast<CVOutputSelect>(Configurator::GetInt( bC->getElementContent("trigAckOutputBit")) ); 
+  GetConfiguration()->clearBusyOutputBit= static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("clearBusyOutputBit")) ); 
+  GetConfiguration()->daqBusyOutputBit= static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("daqBusyOutputBit")) ); 
+  GetConfiguration()->trigAckOutputBit  = static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("trigAckOutputBit")) ); 
   GetConfiguration()->triggerInputBit   = static_cast<CVInputSelect> (Configurator::GetInt( bC->getElementContent("triggerInputBit")) ); 
       GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
       GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
@@ -154,6 +156,32 @@ int CAEN_VX718::ClearBusy()
   return 0;
 }
 
+int CAEN_VX718::SetBusyOn()
+{
+  int status = 0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  //send DAQ_CLEAR_BUSY
+  status = SendSignal(DAQ_BUSY_ON);
+  if  (status)
+    return status;
+  return 0;
+}
+
+int CAEN_VX718::SetBusyOff()
+{
+  int status = 0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  //send DAQ_CLEAR_BUSY
+  status = SendSignal(DAQ_BUSY_OFF);
+  if  (status)
+    return status;
+  return 0;
+}
+
 bool CAEN_VX718::TriggerReceived()
 {
   int status=0;
@@ -205,6 +233,16 @@ int CAEN_VX718::SendSignal(VX718_DAQ_Signals sig)
     status |= CAENVME_PulseOutputRegister(handle_,configuration_.clearBusyOutputBit);
   else if(sig==DAQ_TRIG_ACK)
     status |= CAENVME_PulseOutputRegister(handle_,configuration_.trigAckOutputBit);
+  else if(sig==DAQ_BUSY_ON)
+    {
+    outputRegister_ |= configuration_.daqBusyOutputBit;
+    status |= CAENVME_SetOutputRegister(handle_,outputRegister_);
+    }
+  else if(sig==DAQ_BUSY_OFF)
+    {
+    outputRegister_ &= ~configuration_.daqBusyOutputBit;
+    status |= CAENVME_SetOutputRegister(handle_,outputRegister_);
+    }
   else
     return ERR_DAQ_SIGNAL_UNKNOWN;
 

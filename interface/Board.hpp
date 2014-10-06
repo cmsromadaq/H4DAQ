@@ -54,6 +54,8 @@ public:
 	TriggerBoard() : Board() {};
 	// --- this are meaningful only for trigger boards. 
 	virtual inline int  ClearBusy(){return 0;};
+	virtual inline int  SetBusyOff(){return 0;};
+	virtual inline int  SetBusyOn(){return 0;};
 	virtual inline bool TriggerReceived(){return false;};
 	virtual inline int  TriggerAck(){return 0;};
 

@@ -25,6 +25,8 @@ public:
     {
       DAQ_CLEAR_BUSY=0,
       DAQ_TRIG_ACK,
+      DAQ_BUSY_ON,
+      DAQ_BUSY_OFF,
       DAQ_LAST_SIGNAL,
     } VX718_DAQ_Signals;
 
@@ -33,8 +35,9 @@ public:
     int32_t LinkType;
     int32_t LinkNum;
 
-    CVOutputSelect clearBusyOutputBit;
-    CVOutputSelect trigAckOutputBit;
+    CVOutputRegisterBits clearBusyOutputBit; // CVOutputRegisterBits
+    CVOutputRegisterBits daqBusyOutputBit;
+    CVOutputRegisterBits trigAckOutputBit;
     CVInputSelect  triggerInputBit;
 
     uint32_t outputMaskWord; 
@@ -83,7 +86,7 @@ public:
 
   } CAEN_VX718_Config_t;
 
-  CAEN_VX718(): handle_(-1), TriggerBoard() { type_="CAEN_VX718"; };
+  CAEN_VX718(): handle_(-1), TriggerBoard() { type_="CAEN_VX718"; outputRegister_=0;};
 
   virtual int Init();
   virtual int Clear();
@@ -95,6 +98,8 @@ public:
 
   //Main functions to handle the event trigger
   virtual int ClearBusy();
+  virtual int SetBusyOn();
+  virtual int SetBusyOff();
   virtual bool TriggerReceived();
   virtual int TriggerAck();
 
@@ -107,6 +112,7 @@ private:
 					
   uint32_t handle_;
   CAEN_VX718_Config_t configuration_;
+  uint32_t outputRegister_;
 };
 
 #endif

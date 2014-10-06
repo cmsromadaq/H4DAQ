@@ -66,6 +66,8 @@ public:
 	void ClearBusy();
 	bool TriggerReceived();
 	void TriggerAck();
+	void SetBusyOff();
+	void SetBusyOn();
 	// --- RunControl Utility
 	bool HaveControlBoard(){ if (ioControlBoard_.boardIndex_ >=0 ) return true ; else return false; };
 
