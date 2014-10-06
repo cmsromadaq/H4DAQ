@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#define CAEN_VX718_DEBUG_IOSIG
+
 int CAEN_VX718::Init()
 {
 
@@ -24,10 +26,10 @@ int CAEN_VX718::Init()
   status |= CAENVME_SetOutputConf(handle_,cvOutput2,configuration_.Output2Polarity,configuration_.Output2LedPolarity,configuration_.Output2Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput3,configuration_.Output3Polarity,configuration_.Output3LedPolarity,configuration_.Output3Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput4,configuration_.Output4Polarity,configuration_.Output4LedPolarity,configuration_.Output4Source);
-  //status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
+  status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
   /* setting which output line must be pulsed  */
-  //outputRegister_=configuration_.outputMaskWord;
-  //status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
+  outputRegister_=configuration_.outputMaskWord;
+  status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
   //setting the input lines
   status |= CAENVME_SetInputConf(handle_,cvInput0,configuration_.Input0Polarity,configuration_.Input0LedPolarity);
   status |= CAENVME_SetInputConf(handle_,cvInput1,configuration_.Input1Polarity,configuration_.Input1LedPolarity);
@@ -58,6 +60,15 @@ int CAEN_VX718::Init()
 
   s.str(""); s << "[CAEN_VX718]::[INFO]::++++++ CAEN VX718 END INIT ++++++";  
   Log(s.str(),1);
+
+#ifdef CAEN_VX718_DEBUG_IOSIG
+  for(int i=0;i<1000;i++){
+	SendSignal(DAQ_BUSY_ON);
+	usleep(10000);
+	SendSignal(DAQ_BUSY_OFF);
+	usleep(20000);
+	}	
+#endif
   return 0;
 }
 
