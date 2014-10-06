@@ -217,7 +217,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=100;
+  int TIMEOUT=1000;
 
   while (NumEvents==0 && itry<TIMEOUT)
     {
@@ -228,7 +228,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	
 	s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!" << endl ;
 	Log(s.str(),1);
-
+	
 	ErrCode = ERR_READOUT ;
 	return ErrCode ;
       }
@@ -249,6 +249,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
     {
       s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
       Log(s.str(),1);
+      ret |= BufferClear();
       ErrCode = ERR_READOUT_TIMEOUT;
       return ErrCode ;
      }
