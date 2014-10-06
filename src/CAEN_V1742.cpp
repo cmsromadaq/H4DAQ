@@ -218,13 +218,12 @@ int CAEN_V1742::Read (vector<WORD> &v)
   NumEvents = 0 ;
   int itry=0;
 
-  // while (NumEvents==0 && itry<1000)
-  //   {
-
+  while (NumEvents==0 && itry<1000)
+    {
       ret = CAEN_DGTZ_ReadData (digitizerHandle_, CAEN_DGTZ_SLAVE_TERMINATED_READOUT_MBLT, buffer_, &BufferSize) ;
       
       if (ret) {
-
+	
 	s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!" << endl ;
 	Log(s.str(),1);
 
@@ -243,9 +242,8 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	  return ErrCode ;
 	}
       }
-
-
-    // }
+      usleep(100);
+    }
   
   //For the moment empty the buffers one by one
   if (NumEvents != 1)
