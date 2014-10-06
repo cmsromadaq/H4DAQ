@@ -520,9 +520,6 @@ while (true) {
 			 connectionManager_->Send(myMex,StatusSck);
 			 myMex.clear();
 
-			 //inform run controller that spill has been completed
-			 myMex.append((void*)"EB_SPILLCOMPL\0\0\0",14);
-			 connectionManager_->Send(myMex,CmdSck);
 		   	// Transfer
 			 gettimeofday(&transrate_stopwatch_stop,NULL);
 			 ostringstream rate;
@@ -533,6 +530,10 @@ while (true) {
 				 "Rate="<< (transrate_size>>30)/(double(transferTime)/1.e6) <<"Gb/s" ;
 			 ReportTransferPerformance(transferTime,transrate_size);
 			 Log(rate.str(),1);
+
+			 //inform run controller that spill has been completed
+			 myMex.append((void*)"EB_SPILLCOMPL\0\0\0",14);
+			 connectionManager_->Send(myMex,CmdSck);
 			 MoveToStatus(SENTBUFFER);
 		   	 }
 		    break;
