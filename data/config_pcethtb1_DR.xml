@@ -5,6 +5,7 @@
     <ListenPort>6004</ListenPort> <!--send Cmds -->
     <!-- <ConnectTo>localhost:5557</ConnectTo> -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo> <!-- RUN CONTROL -->
+    <ConnectTo>pcethtb2.cern.ch:5569</ConnectTo> <!-- EMERGENCY CLI -->
   </Network>
   <Hardware>
     <crateId>1</crateId>
