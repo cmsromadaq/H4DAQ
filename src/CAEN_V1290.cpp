@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-//#define CAENV1290_DEBUG 
+#define CAENV1290_DEBUG 
 
 int CAEN_V1290::Init()
 {
