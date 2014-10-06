@@ -527,7 +527,7 @@ while (true) {
 			 rate<<"[FSM]::[SENTBUFFER]::[TransferTime]="<<
 				 transferTime<<"usec "<<
 				 "Size="<<transrate_size<<"bytes "<<
-				 "Rate="<< (transrate_size>>30)/(double(transferTime)/1.e6) <<"Gb/s" ;
+				 "Rate="<< (transrate_size>>20)/(double(transferTime)/1.e6) <<"MB/s" ;
 			 ReportTransferPerformance(transferTime,transrate_size);
 			 Log(rate.str(),1);
 
