@@ -216,7 +216,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1290_OUTPUT_BUFFER,&data,CAEN_V1290_ADDRESSMODE,cvD32);
 
 #ifdef CAENV1290_DEBUG
-  s.str(""); s << "[CAEN_V1290]::[DEBUG]::IS GLBHEADER " << (data & 0x40000000);
+  s.str(""); s << "[CAEN_V1290]::[DEBUG]::IS GLBHEADER " << ((data & 0x40000000)>>30);
   Log(s.str(),3);
 #endif
 
@@ -246,7 +246,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
       if (wordType == CAEN_V1290_GLBTRAILER)
 	{
 #ifdef CAENV1290_DEBUG
-	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE EVENT TRAILER" << wordType;
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE EVENT TRAILER";
 	  Log(s.str(),3);
 #endif
 	  glb_tra=1;
@@ -255,14 +255,14 @@ int CAEN_V1290::Read(vector<WORD> &v)
       else if (wordType == CAEN_V1290_TDCHEADER )
 	{
 #ifdef CAENV1290_DEBUG
-	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC HEADER" << wordType;
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC HEADER";
 	  Log(s.str(),3);
 #endif
 	}
       else if (wordType == CAEN_V1290_TDCTRAILER )
 	{
 #ifdef CAENV1290_DEBUG
-	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC TRAILER" << wordType;
+	  s.str(""); s << "[CAEN_V1290]::[DEBUG]::WE FOUND THE TDC TRAILER";
 	  Log(s.str(),3);
 #endif
 	}
