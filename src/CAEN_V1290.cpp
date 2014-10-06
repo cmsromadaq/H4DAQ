@@ -83,7 +83,11 @@ int CAEN_V1290::Init()
 
   for (unsigned int i=0;i<channels_;++i)
     if (configuration_.enabledChannels & ( 1 << i ) ) 
-      status |=OpWriteTDC(CAEN_V1290_ENCHAN_OPCODE+i);
+      {
+	ostringstream s; s << "[CAEN_V1290]::[INFO]::Enabling channel " << i;
+	Log(s.str(),1);
+	status |=OpWriteTDC(CAEN_V1290_ENCHAN_OPCODE+i);
+      }
   
   
   status |= OpWriteTDC(CAEN_V1290_MAXHITS_OPCODE); 
