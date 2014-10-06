@@ -298,7 +298,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
 	  int measurement = data & 0x1fffff;
 	  int channel = (data>>21) & 0x1f;
 	  int trailing = (data>>26) & 0x1;
-	  float tdc_time = (float)measurement/10;
+	  float tdc_time = (float)measurement*25./1000.;
 	  s.str(""); s << "[CAEN_V1290]::[INFO]::HIT CHANNEL " << channel << " TYPE " << trailing << " TIME " << tdc_time; 
 	  Log(s.str(),3);
 #endif
