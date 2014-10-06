@@ -49,7 +49,7 @@ for machine in pcethtb2 ; do
 	pids="$pids $( cat /tmp/myfifo_pids)"
 done
 
-## EB -- TO BE DONE
+## EB
 for machine in pcethtb2 ; do 
 	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_start_eb_${machine}_*.log | tail -1 ) " & echo "$!" >/tmp/myfifo_pids & } | while read line ; do echo  "($machine|eb_std): ${line}" ; done >  /tmp/myfifo  &
 	pids="$pids $!"
@@ -59,6 +59,9 @@ for machine in pcethtb2 ; do
 	pids="$pids $( cat /tmp/myfifo_pids)"
 done
 
-cat /tmp/myfifo | sed  's:error:\x1b[01;31m&\x1b[00m:gI'  | sed  's:warn:\x1b[01;34m&\x1b[00m:gI'  | sed 's:debug:\x1b[01;33m&\x1b[00m:gI'  ## RED - BLUE - YELLOW
+#cat /tmp/myfifo
+cat /tmp/myfifo | 
+	sed  's:error:\x1b[01;31m&\x1b[00m:gI'  |&
+	sed  's:debug\|warn[^\ ]*:\x1b[01;33m&\x1b[00m:gI'
 
 
