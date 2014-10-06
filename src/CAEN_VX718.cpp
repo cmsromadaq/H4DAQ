@@ -64,17 +64,13 @@ int CAEN_VX718::Init()
 #ifdef CAEN_VX718_DEBUG_IOSIG
   uint32_t data;
   for(int i=0;i<1000;i++){
-  	status |= CAENVME_ReadRegister(handle_, cvScaler1, &data);
-	if(i%10 == 0 )
-		{
-  		s.str(""); s << "[CAEN_VX718]::[DEBUG]::Scaler="<<data <<" i="<<i;  
-  		Log(s.str(),1);
-		}
-	SendSignal(DAQ_BUSY_ON);
         status |= CAENVME_EnableScalerGate(handle_); 
+	while ( !TriggerReceived() ) usleep(1);
+	SendSignal(DAQ_BUSY_ON);
 	usleep(10000);
 	SendSignal(DAQ_BUSY_OFF);
 	usleep(20000);
+	Log("Loop",1);
 	}	
 #endif
   return 0;
