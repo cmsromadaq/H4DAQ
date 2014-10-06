@@ -249,7 +249,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
     {
       s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
       Log(s.str(),1);
-      ret |= BufferClear();
+      int status = BufferClear();
       ErrCode = ERR_READOUT_TIMEOUT;
       return ErrCode ;
      }
