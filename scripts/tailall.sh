@@ -59,9 +59,10 @@ for machine in pcethtb2 ; do
 	pids="$pids $( cat /tmp/myfifo_pids)"
 done
 
-#cat /tmp/myfifo
 cat /tmp/myfifo | 
 	sed  's:error:\x1b[01;31m&\x1b[00m:gI'  |&
-	sed  's:debug\|warn[^\ ]*:\x1b[01;33m&\x1b[00m:gI'
+	sed  's:debug\|warn[^\ ]*:\x1b[01;33m&\x1b[00m:gI' 
+	#sed  's:warn[^\ ]*:\x1b[01;32m&\x1b[00m:gI' |&
+	#sed  's:debug:\x1b[01;33m&\x1b[00m:gI'
 
 
