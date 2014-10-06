@@ -73,6 +73,7 @@ while (true) {
 			   	 {
 				   hwManager_->BufferClearAll();
 				   hwManager_->ClearBusy(); //just for "safety"
+		        	   hwManager_->SetBusyOff();
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
@@ -101,6 +102,7 @@ while (true) {
 		    }
 	case CLEARBUSY: {
 		        hwManager_->ClearBusy();
+		        hwManager_->SetBusyOff();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -112,6 +114,7 @@ while (true) {
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
 			      hwManager_->ClearBusy();
+		        	    hwManager_->SetBusyOff();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -120,6 +123,7 @@ while (true) {
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->TriggerAck();
+			hwManager_->SetBusyOn();
 			MoveToStatus(READ);
                         }  
 
@@ -715,6 +719,7 @@ while (true) {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
 			    hwManager_->ClearBusy(); //just for "safety"
+		            hwManager_->SetBusyOff();
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
@@ -753,6 +758,7 @@ while (true) {
 		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
 		      hwManager_->ClearBusy();
+		      hwManager_->SetBusyOff();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -766,6 +772,7 @@ while (true) {
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
 		           hwManager_->ClearBusy();
+		           hwManager_->SetBusyOff();
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
