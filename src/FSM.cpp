@@ -72,8 +72,8 @@ while (true) {
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
 				   hwManager_->BufferClearAll();
-				   hwManager_->ClearBusy(); //just for "safety"
 		        	   hwManager_->SetBusyOff();
+				   hwManager_->ClearBusy(); //just for "safety"
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
@@ -101,8 +101,8 @@ while (true) {
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->ClearBusy();
 		        hwManager_->SetBusyOff();
+		        hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -113,8 +113,8 @@ while (true) {
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if (myNewCmd.cmd == EE )  {
-			      hwManager_->ClearBusy();
 		        	    hwManager_->SetBusyOff();
+			            hwManager_->ClearBusy();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -122,8 +122,8 @@ while (true) {
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
-			hwManager_->TriggerAck();
 			hwManager_->SetBusyOn();
+			hwManager_->TriggerAck();
 			MoveToStatus(READ);
                         }  
 
@@ -718,8 +718,8 @@ while (true) {
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    hwManager_->BufferClearAll();
-			    hwManager_->ClearBusy(); //just for "safety"
 		            hwManager_->SetBusyOff();
+			    hwManager_->ClearBusy(); //just for "safety"
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
@@ -757,8 +757,8 @@ while (true) {
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
 		      hwManager_->BufferClearAll();
-		      hwManager_->ClearBusy();
 		      hwManager_->SetBusyOff();
+		      hwManager_->ClearBusy();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -771,8 +771,8 @@ while (true) {
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
-		           hwManager_->ClearBusy();
 		           hwManager_->SetBusyOff();
+		           hwManager_->ClearBusy();
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
@@ -802,8 +802,8 @@ while (true) {
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->ClearBusy();
 		        hwManager_->SetBusyOff();
+		        hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -820,8 +820,8 @@ while (true) {
 				  //				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  hwManager_->ClearSignalStatus();
-				  hwManager_->ClearBusy();
 				  hwManager_->SetBusyOff();
+				  hwManager_->ClearBusy();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -835,8 +835,8 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
-				  hwManager_->ClearBusy();
 				  hwManager_->SetBusyOff();
+				  hwManager_->ClearBusy();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -846,8 +846,8 @@ while (true) {
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
-			hwManager_->TriggerAck();
 			hwManager_->SetBusyOn();
+			hwManager_->TriggerAck();
 			MoveToStatus(READ);
                         }  
 

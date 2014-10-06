@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAEN_VX718_DEBUG_IOSIG
+//#define CAEN_VX718_DEBUG_IOSIG
 
 int CAEN_VX718::Init()
 {
