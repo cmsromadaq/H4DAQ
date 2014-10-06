@@ -579,9 +579,9 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)"TRANSFER ",9);
   char mybuffer[255];
   int n=0;
-  n = snprintf(mybuffer,255,"%l ",transferTime);
+  n = snprintf(mybuffer,255,"%li ",transferTime);
   myMex.append((void*)mybuffer,n);
-  n = snprintf(mybuffer,255,"%ll ",transrate_size);
+  n = snprintf(mybuffer,255,"%lli ",transrate_size);
   myMex.append((void*)mybuffer,n);
   connectionManager_->Send(myMex,StatusSck);
 }
@@ -998,7 +998,7 @@ void RunControlFSM::SendSpillDuration(){
   myMex.append((void*)mybuffer,n);
   n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
   myMex.append((void*)mybuffer,n);
-  n = snprintf(mybuffer,255,"%l ",spilltime);
+  n = snprintf(mybuffer,255,"%li ",spilltime);
   myMex.append((void*)mybuffer,n);
   connectionManager_->Send(myMex,StatusSck);
 }
