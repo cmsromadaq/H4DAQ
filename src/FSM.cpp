@@ -880,7 +880,7 @@ while (true) {
 				connectionManager_->Send(myMex,DataSck);
 			}
 			ResetMex();
-			MoveToStatus(SENTBUFFER);
+			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
 	case RECVBUFFER:{
