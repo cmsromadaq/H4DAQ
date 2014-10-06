@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAENV1290_DEBUG 
+//#define CAENV1290_DEBUG 
 
 int CAEN_V1290::Init()
 {
@@ -241,7 +241,7 @@ int CAEN_V1290::Read(vector<WORD> &v)
 
   if ( ! (data & 0x40000000) || status )
     {
-      s.str(""); s << "[CAEN_V1290]::[ERROR]::First word not a Global trailer"; 
+      ostringstream s; s << "[CAEN_V1290]::[ERROR]::First word not a Global trailer"; 
       Log(s.str(),1);
       return ERR_READ;
     }
