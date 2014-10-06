@@ -217,7 +217,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=10000;
+  int TIMEOUT=1000000;
 
   while (1 > NumEvents && itry<TIMEOUT)
     {
