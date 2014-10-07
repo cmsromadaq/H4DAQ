@@ -7,6 +7,7 @@
 
 //class dataType;
 class LogUtility;
+class ConnectionManager;
 
 class Logger: public Configurable, public AsyncUtils{
 friend class LogUtility;
@@ -37,6 +38,9 @@ vector<LogUtility*> registered_;
 void Register(LogUtility*u); 
 // --- Release a LogUtility
 void Release(LogUtility *u); 
+
+ConnectionManager *logConnMan_;
+int logStatusSck_;
 
 public:
 	// --- Constructor
@@ -75,6 +79,13 @@ public:
 	void Close();
 	// --- Clear from configurator
 	void Clear(){Close();}
+        // --- Set network logging
+        void ConfigLogConnManager(ConnectionManager *logConnMan, int logStatusSck){
+	  logConnMan_=logConnMan;
+	  logStatusSck_=logStatusSck;
+	}
+        // --- Write log on the network
+        void NetworkWrite(string line);
 };
 
 class LogUtility
@@ -93,9 +104,11 @@ class LogUtility
         inline Logger * GetLogger(){return log;} 
 	inline void LogClearDirty(){log=NULL;}
 	inline short int GetLogLevel(){ return log->logLevel_ ;}
+        void ConfigLogConnManager(ConnectionManager *logConnMan, int logStatusSck){log->ConfigLogConnManager(logConnMan,logStatusSck);}
 };
 
 // put this here in order to define dataType. Cannot put before because in it it requires logger. Therefore we use a fwd declaration of dataType
 //#include "interface/EventBuilder.hpp"
+#include "interface/ConnectionManager.hpp"
 
 #endif

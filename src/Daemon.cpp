@@ -41,6 +41,7 @@ int Daemon::Init(string configFileName){
 		eventBuilder_->Init();
 		hwManager_->Init();
 		connectionManager_->Init();
+		ConfigLogConnManager(connectionManager_,StatusSck);
 
 		return 0;
 	} catch( std::exception &e) 
@@ -56,7 +57,7 @@ void Daemon::Clear()
 	if (configurator_) { configurator_->Clear(); delete configurator_; }
 	if (eventBuilder_) {eventBuilder_->Clear(); delete eventBuilder_; }
 	if (hwManager_) { hwManager_->Clear(); delete hwManager_; }
-	if (connectionManager_) { connectionManager_->Clear(); delete connectionManager_;}
+	if (connectionManager_) { connectionManager_->Clear(); ConfigLogConnManager(NULL,-999); delete connectionManager_;}
 }
 
 
