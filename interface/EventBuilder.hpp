@@ -86,7 +86,10 @@ public:
 	void 	SetRunNum(WORD x);// set also the filename ...
 	void  inline SetSpillNum(WORD x){ lastEvent_.spillNum_=x;};
 	void  inline SetEventNum(WORD x){ lastEvent_.eventInSpill_=x;};
-	inline void  SetDirName(string mydir="/tmp/") {dirName_=mydir;}
+	inline void  SetDirName(string mydir="/tmp/") {dirName_=mydir;};
+	inline void ResetLastBadSpill(){lastBadSpill_=0;};
+	inline void ResetMerged(){merged_=0;};
+	inline void Reset(){ mySpill_.clear() ; ResetLastBadSpill();ResetMerged(); isSpillOpen_=false;}; //  called by Error
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check

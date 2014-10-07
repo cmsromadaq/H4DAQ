@@ -204,7 +204,7 @@ while (true) {
 	} // end switch 
 	} // end try
 	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
-	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 } // while-true
 return;
 } // end Loop
@@ -367,7 +367,7 @@ while (true) {
 	} // end switch
 	} //end try
 	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
-	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 }//end while
 return;
 }//end LOOP
@@ -434,11 +434,11 @@ while (true) {
 			    Command myCmd=ParseData(myMex);
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
-					 //hwManager_->BufferClearAll();
-					 //hwManager_->ClearBusy(); //just for "safety"
-					 //eventBuilder_->OpenSpill();
 					 if (! eventBuilder_->AreSpillsMerged() ) Log("[EventBuilder]::[FSM] ERROR, Unmerged spill in new run",3); // TODO Exception
+					 ResetLastBadSpill();
+					 ResetMerged();
 					 MoveToStatus(CLEARED);
+					 // Reset Bad Spill
 				 }
 			    }
 		    break;
@@ -573,7 +573,7 @@ while (true) {
 	} // end switch
 	} //end try
 	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
-	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 
 } // end while
 } // end Loop
@@ -962,7 +962,7 @@ while (true) {
 	} // end switch 
 	} // end try
 	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
-	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); throw e; }
+	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 } // while-true
 return;
 } // end Loop
@@ -1008,4 +1008,17 @@ void RunControlFSM::SendSpillDuration(){
   n = snprintf(mybuffer,255,"%li ",spilltime);
   myMex.append((void*)mybuffer,n);
   connectionManager_->Send(myMex,StatusSck);
+}
+
+void RunControlFSM::ErrorStatus(){
+	Daemon::ErrorStatus();
+	usleep(10000); // wait for all machines to have completed the error cycle
+	//
+	//end the run
+	dataType  endRun; endRun.append( (void*)"ENDRUN\0",7);
+	connectionManager_->Send(endRun,CmdSck);
+	// Go into wait for run num.
+	merged_=0; // this interest the EB only
+	error_=false;
+	MoveToStatus(INITIALIZED);
 }

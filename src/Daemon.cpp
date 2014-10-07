@@ -135,6 +135,12 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
+	else if (N >=6  and !strcmp( (char*) mex.data(), "ERROR")  )
+		{
+		//It doesn't matter wherever you are, if this happens FSM are de-sync, so move immediately to status error
+		myCmd.cmd=ERROR;
+		MoveToStatus(ERROR);
+		}
 	// GUI CMD are not NULL Terminated
 	else 	{ // GUI --- I'M changing the mex
 
@@ -303,4 +309,36 @@ int Daemon::Daetach(){
 		}
 
 	return 0;
+}
+
+
+void ErrorStatus(){
+	// if entered in this loop for the first time
+	if ( !error_)
+		{
+		//Reset Members
+		if(eventBuilder_)eventBuilder_->Reset()
+		//hwManager_-> ???
+		dataType errMex;
+		errMex.append((void*)"ERROR\0\0",6);
+		// send 3 error mex
+		connectionManager_->Send(errMex,CmdSck);
+		usleep(1000);
+		connectionManager_->Send(errMex,CmdSck);
+		usleep(1000);
+		connectionManager_->Send(errMex,CmdSck);
+		}
+	error_=true;
+	//wait for instructions
+	dataType myMex;
+	if (connectionManager_->Recv(myMex) ==0 )
+		{
+		Command myCmd=ParseData(myMex)	;
+		if (myMex ==  ENDRUN ){
+			error_=false;
+			merged_=0;
+			MoveToStatus(INITIALIZED);
+			}
+		}
+	return;			
 }

@@ -43,6 +43,8 @@ const static int CmdSck = 2;
 int iLoop;
 int waitForDR_;
 
+bool error_;
+
 public:
 	// --- Constructor
 	Daemon();
@@ -65,7 +67,7 @@ public:
 	//
 	void LogInit(Logger*l);
 	//
-	virtual void ErrorStatus(){};
+	virtual void ErrorStatus();
         virtual void PublishStatusWithTimeInterval();
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 	

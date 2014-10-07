@@ -63,6 +63,7 @@ public:
 	void inline ResetMex(){gui_pauserun=false; gui_stoprun=false; gui_restartrun=false; gui_die=false; eb_endspill=false;};
 	void UpdateMex();
         void SendSpillDuration();	
+	virtual void ErrorStatus();
 };
 
 #endif
