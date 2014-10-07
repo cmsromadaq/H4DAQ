@@ -264,7 +264,7 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
 	myMex.append((void*)mybuffer,n);
 	myMex.append((void*)"evinspill=",10);
-	n = snprintf(mybuffer,255,"%u ",evinspill); //evinspill
+	n = snprintf(mybuffer,255,"%u ",evinspill-1); //evinspill-1 because lastEvent_ is number_of_events+1
 	myMex.append((void*)mybuffer,n);
 	myMex.append((void*)"gentriginspill=",15);
 	n = snprintf(mybuffer,255,"%u ",gentriginspill); //gentriginspill

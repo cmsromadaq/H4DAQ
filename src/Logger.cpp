@@ -239,6 +239,6 @@ void Logger::Log(string line,short level){
 		}
     }
     else Write(line);
-    NetworkWrite(line);
+    //    NetworkWrite(line);
     return;
 }
