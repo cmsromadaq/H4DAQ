@@ -57,6 +57,7 @@ WORD eventsInThisRun_;
 //map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 int merged_;
 WORD lastBadSpill_;
+WORD badSpillsInThisRun_;
 
 	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
@@ -86,7 +87,7 @@ public:
 	void 	SetRunNum(WORD x);// set also the filename ...
 	void  inline SetSpillNum(WORD x){ lastEvent_.spillNum_=x;};
 	void  inline SetEventNum(WORD x){ lastEvent_.eventInSpill_=x;};
-        inline WORD GetLastBadSpill() {return lastBadSpill_;};
+        inline WORD GetBadSpills() {return badSpillsInThisRun_;};
 	inline void  SetDirName(string mydir="/tmp/") {dirName_=mydir;}
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
