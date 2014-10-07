@@ -21,6 +21,7 @@ enum CMD_t {	NOP=0,
 		SPILLCOMPL,
 		ENDRUN,
 		DIE,
+		ERRORCMD,
 		// GUI Commands 100 - 199: Parsed only by the RunControl
 		GUI_STARTRUN= 100, // run# type#(PED,PHYSICS) freq# (int)
 		GUI_RESTARTRUN,

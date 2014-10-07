@@ -138,7 +138,7 @@ Command Daemon::ParseData(dataType &mex)
 	else if (N >=6  and !strcmp( (char*) mex.data(), "ERROR")  )
 		{
 		//It doesn't matter wherever you are, if this happens FSM are de-sync, so move immediately to status error
-		myCmd.cmd=ERROR;
+		myCmd.cmd=ERRORCMD;
 		MoveToStatus(ERROR);
 		}
 	// GUI CMD are not NULL Terminated
@@ -312,12 +312,12 @@ int Daemon::Daetach(){
 }
 
 
-void ErrorStatus(){
+void Daemon::ErrorStatus(){
 	// if entered in this loop for the first time
 	if ( !error_)
 		{
 		//Reset Members
-		if(eventBuilder_)eventBuilder_->Reset()
+		if(eventBuilder_)eventBuilder_->Reset();
 		//hwManager_-> ???
 		dataType errMex;
 		errMex.append((void*)"ERROR\0\0",6);
@@ -334,9 +334,8 @@ void ErrorStatus(){
 	if (connectionManager_->Recv(myMex) ==0 )
 		{
 		Command myCmd=ParseData(myMex)	;
-		if (myMex ==  ENDRUN ){
+		if (myCmd.cmd ==  ENDRUN ){
 			error_=false;
-			merged_=0;
 			MoveToStatus(INITIALIZED);
 			}
 		}

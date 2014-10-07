@@ -435,8 +435,8 @@ while (true) {
 			    if( myCmd.cmd ==  WWE ) 
 			   	 {
 					 if (! eventBuilder_->AreSpillsMerged() ) Log("[EventBuilder]::[FSM] ERROR, Unmerged spill in new run",3); // TODO Exception
-					 ResetLastBadSpill();
-					 ResetMerged();
+					 eventBuilder_->ResetLastBadSpill();
+					 eventBuilder_->ResetMerged();
 					 MoveToStatus(CLEARED);
 					 // Reset Bad Spill
 				 }
@@ -1032,7 +1032,6 @@ void RunControlFSM::ErrorStatus(){
 	dataType  endRun; endRun.append( (void*)"ENDRUN\0",7);
 	connectionManager_->Send(endRun,CmdSck);
 	// Go into wait for run num.
-	merged_=0; // this interest the EB only
 	error_=false;
 	MoveToStatus(INITIALIZED);
 }
