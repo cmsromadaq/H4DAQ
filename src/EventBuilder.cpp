@@ -718,6 +718,7 @@ void EventBuilder::SetRunNum(WORD x)
 //runNum_=x;
 lastEvent_.runNum_=x;
 eventsInThisRun_=0;
+lastBadSpill_=0;
 if (dumpEvent_ || recvEvent_)  // POSIX
   system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)x) ).c_str() );
 }

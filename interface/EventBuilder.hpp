@@ -86,6 +86,7 @@ public:
 	void 	SetRunNum(WORD x);// set also the filename ...
 	void  inline SetSpillNum(WORD x){ lastEvent_.spillNum_=x;};
 	void  inline SetEventNum(WORD x){ lastEvent_.eventInSpill_=x;};
+        inline WORD GetLastBadSpill() {return lastBadSpill_;};
 	inline void  SetDirName(string mydir="/tmp/") {dirName_=mydir;}
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
