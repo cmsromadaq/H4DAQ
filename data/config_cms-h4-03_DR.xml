@@ -69,21 +69,6 @@
       <PulserAStartInput>0</PulserAStartInput> <!--CVIOSources-->
       <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
     </board>
-    <board>
-      <type>CAEN_V1290</type> <!-- TDC 1290-->
-      <ID>1</ID>
-      <baseAddress>0x00000000</baseAddress>
-      <model>1</model> <!-- V1290N model 16ch -->
-      <triggerTimeSubtraction>1</triggerTimeSubtraction>
-      <triggerMatchMode>1</triggerMatchMode>
-      <emptyEventEnable>1</emptyEventEnable>
-      <edgeDetectionMode>2</edgeDetectionMode>
-      <timeResolution>3</timeResolution>
-      <maxHitsPerEvent>9</maxHitsPerEvent>
-      <enabledChannels>0x00FF</enabledChannels>
-      <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns --> 
-      <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns --> 
-    </board>
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
