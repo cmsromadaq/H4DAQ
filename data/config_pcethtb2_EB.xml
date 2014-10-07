@@ -18,6 +18,6 @@
 	  <dumpDirName>/tmp/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
 	  <sendEvent>0</sendEvent>
-	  <recvEvent>2</recvEvent> <!-- Number of machine to wait for -->
+	  <recvEvent>3</recvEvent> <!-- Number of machine to wait for -->
   </EventBuilder>
 </general>
