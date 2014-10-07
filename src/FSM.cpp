@@ -1028,7 +1028,7 @@ void RunControlFSM::SendSpillDuration(){
   myMex.append((void*)"spillnumber=",12);
   n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
   myMex.append((void*)mybuffer,n);
-  myMex.append((void*)"spilltime=",10);
+  myMex.append((void*)"spillduration=",10);
   n = snprintf(mybuffer,255,"%li ",spilltime);
   myMex.append((void*)mybuffer,n);
   connectionManager_->Send(myMex,StatusSck);

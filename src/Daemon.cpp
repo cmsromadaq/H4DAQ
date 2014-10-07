@@ -242,6 +242,7 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	myMex.append((void*)"STATUS ",7);
 	char mybuffer[255];
 	int n=0;
+	myMex.append((void*)"statuscode=",11);
 	n = snprintf(mybuffer,255,"%u ",newStatus);
 	myMex.append((void*)mybuffer,n);
 	WORD runnr = 0;
