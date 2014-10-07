@@ -256,17 +256,24 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	  gentriginspill = 0; // TODO
 	  evinthisrun = eventBuilder_->eventsInThisRun_;
 	}
+	myMex.append((void*)"runnumber=",10);
 	n = snprintf(mybuffer,255,"%u ",runnr); //runnr
 	myMex.append((void*)mybuffer,n);
+	myMex.append((void*)"spillnumber=",12);
 	n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
 	myMex.append((void*)mybuffer,n);
+	myMex.append((void*)"evinspill=",10);
 	n = snprintf(mybuffer,255,"%u ",evinspill); //evinspill
 	myMex.append((void*)mybuffer,n);
+	myMex.append((void*)"gentriginspill=",15);
 	n = snprintf(mybuffer,255,"%u ",gentriginspill); //gentriginspill
 	myMex.append((void*)mybuffer,n);
+	myMex.append((void*)"evinrun=",8);
 	n = snprintf(mybuffer,255,"%u ",evinthisrun); //evinthisrun
 	myMex.append((void*)mybuffer,n);
-	if (myPausedFlag_) myMex.append((void*)"PAUSED",6);
+	myMex.append((void*)"paused=",7);
+	if (myPausedFlag_) myMex.append((void*)"1",1);
+	else myMex.append((void*)"0",1);
 	connectionManager_->Send(myMex,StatusSck);
 	gettimeofday(&lastSentStatusMessageTime_,NULL);
 }
