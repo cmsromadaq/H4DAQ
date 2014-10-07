@@ -331,7 +331,7 @@ void Daemon::ErrorStatus(){
 	error_=true;
 	//wait for instructions
 	dataType myMex;
-	if (connectionManager_->Recv(myMex) ==0 )
+	if (connectionManager_->Recv(myMex) == 0 )
 		{
 		Command myCmd=ParseData(myMex)	;
 		if (myCmd.cmd ==  ENDRUN ){

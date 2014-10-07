@@ -1031,9 +1031,17 @@ void RunControlFSM::ErrorStatus(){
 	usleep(10000); // wait for all machines to have completed the error cycle
 	//
 	//end the run
-	dataType  endRun; endRun.append( (void*)"ENDRUN\0",7);
+	dataType  endRun; endRun.append( (void*)"ENDRUN\0\0\0",7);
 	connectionManager_->Send(endRun,CmdSck);
 	// Go into wait for run num.
 	error_=false;
+	//wait a bit ~1s,
+	sleep(1);
+	//reset all the mex
+	dataType myMex;
+	while (connectionManager_->Recv(myMex) == 0 ); // nothing, queue of mex will be empty for the RC
+	// repeat ER -- safety
+	connectionManager_->Send(endRun,CmdSck);
+
 	MoveToStatus(INITIALIZED);
 }
