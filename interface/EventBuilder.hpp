@@ -57,6 +57,7 @@ WORD eventsInThisRun_;
 //map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
 int merged_;
 WORD lastBadSpill_;
+WORD badSpillsInThisRun_;
 
 	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
@@ -90,6 +91,7 @@ public:
 	inline void ResetLastBadSpill(){lastBadSpill_=0;};
 	inline void ResetMerged(){merged_=0;};
 	inline void Reset(){ mySpill_.clear() ; ResetLastBadSpill();ResetMerged(); isSpillOpen_=false;}; //  called by Error
+        inline WORD GetBadSpills() {return badSpillsInThisRun_;};
 	// Configurable
 	void Config(Configurator&); // TODO --check that all is complete
 	void Init();//TODO -- check

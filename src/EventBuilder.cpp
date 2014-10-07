@@ -27,6 +27,7 @@ EventBuilder::EventBuilder()
 	merged_=0;
 	lastBadSpill_=0;  // spill n. starts from 1
 	eventsInThisRun_=0;
+	badSpillsInThisRun_=0;
 }
 EventBuilder::~EventBuilder()
 {
@@ -681,6 +682,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 					// TODO -- check spill consistencies to call this function. Check if spill2 is better
 					int sn1=ReadSpillNum(mySpill_);
 					lastBadSpill_=sn1;
+					++badSpillsInThisRun_;
 					merged_=0;
 					mySpill_.clear();
 					}
@@ -718,6 +720,8 @@ void EventBuilder::SetRunNum(WORD x)
 //runNum_=x;
 lastEvent_.runNum_=x;
 eventsInThisRun_=0;
+lastBadSpill_=0;
+badSpillsInThisRun_=0;
 if (dumpEvent_ || recvEvent_)  // POSIX
   system(  ("mkdir -p "+dirName_+ to_string((unsigned long long)x) ).c_str() );
 }

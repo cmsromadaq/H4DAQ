@@ -583,6 +583,20 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)"TRANSFER ",9);
   char mybuffer[255];
   int n=0;
+  WORD runnr=0;
+  WORD spillnr=0;
+  WORD badspills=0;
+  if (eventBuilder_){
+    runnr = eventBuilder_->GetEventId().runNum_;
+    spillnr = eventBuilder_->GetEventId().spillNum_;
+    badspills = eventBuilder_->GetBadSpills();
+  }
+  n = snprintf(mybuffer,255,"%u ",runnr); //runnr
+  myMex.append((void*)mybuffer,n);
+  n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+  myMex.append((void*)mybuffer,n);
+  n = snprintf(mybuffer,255,"%u ",badspills); //badspills
+  myMex.append((void*)mybuffer,n);
   n = snprintf(mybuffer,255,"%li ",transferTime);
   myMex.append((void*)mybuffer,n);
   n = snprintf(mybuffer,255,"%lli ",transrate_size);
