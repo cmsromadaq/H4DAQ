@@ -240,11 +240,13 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	WORD runnr = 0;
 	WORD spillnr = 0;
 	WORD evinspill = 0;
+	WORD gentriginspill = 0;
 	WORD evinthisrun = 0;
 	if (eventBuilder_){
 	  runnr = eventBuilder_->GetEventId().runNum_;
 	  spillnr = eventBuilder_->GetEventId().spillNum_;
 	  evinspill = eventBuilder_->GetEventId().eventInSpill_;
+	  gentriginspill = 0; // TODO
 	  evinthisrun = eventBuilder_->eventsInThisRun_;
 	}
 	n = snprintf(mybuffer,255,"%u ",runnr); //runnr
@@ -252,6 +254,8 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
 	myMex.append((void*)mybuffer,n);
 	n = snprintf(mybuffer,255,"%u ",evinspill); //evinspill
+	myMex.append((void*)mybuffer,n);
+	n = snprintf(mybuffer,255,"%u ",gentriginspill); //gentriginspill
 	myMex.append((void*)mybuffer,n);
 	n = snprintf(mybuffer,255,"%u ",evinthisrun); //evinthisrun
 	myMex.append((void*)mybuffer,n);
