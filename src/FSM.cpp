@@ -74,6 +74,7 @@ while (true) {
 				   hwManager_->BufferClearAll();
 		        	   hwManager_->SetBusyOff();
 				   hwManager_->ClearBusy(); //just for "safety"
+			           hwManager_->TriggerAck();
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
@@ -115,6 +116,7 @@ while (true) {
 			    if (myNewCmd.cmd == EE )  {
 		        	    hwManager_->SetBusyOff();
 			            hwManager_->ClearBusy();
+				    hwManager_->TriggerAck();
 				    MoveToStatus(ENDSPILL);
 				    break;
 			    }
@@ -731,9 +733,6 @@ while (true) {
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
-			    hwManager_->BufferClearAll();
-		            hwManager_->SetBusyOff();
-			    hwManager_->ClearBusy(); //just for "safety"
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
@@ -749,9 +748,8 @@ while (true) {
 #endif
 					 )
 			 {
-			   hwManager_->ClearSignalStatus();
+			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
 			    connectionManager_->Send(wweMex,CmdSck);
-			    hwManager_->BufferClearAll();
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 			 }
@@ -773,6 +771,7 @@ while (true) {
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetBusyOff();
 		      hwManager_->ClearBusy();
+		      hwManager_->TriggerAck();
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -787,6 +786,7 @@ while (true) {
 			   hwManager_->BufferClearAll();
 		           hwManager_->SetBusyOff();
 		           hwManager_->ClearBusy();
+			   hwManager_->TriggerAck();
 			   readyDR_=0;
 			   MoveToStatus(WAITFORREADY);
 			 }
@@ -836,6 +836,7 @@ while (true) {
 				  hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
+			          hwManager_->TriggerAck();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -851,6 +852,7 @@ while (true) {
 				  connectionManager_->Send(eeMex,CmdSck);
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
+			          hwManager_->TriggerAck();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
