@@ -25,6 +25,8 @@ int main(int argc, char** argv)
     }
   }
 
+  printf("Opening VME Bridge %d %d %d\n",VMEBoard,Link,Device);
+
   status = CAENVME_Init(VMEBoard, Link, Device, &BHandle);
   if(  status ) 
     {
@@ -36,9 +38,16 @@ int main(int argc, char** argv)
     printf("VME Crate Initialized \n");
   }
 
-  CAENVME_SystemReset(BHandle);
+  status = CAENVME_SystemReset(BHandle);
   sleep(1);
-  printf("VME Crate has been reset\n");
+  if(  status ) 
+    {
+      printf("\n\n Error opening VME BRIDGE %d %d %d\n",VMEBoard,Link,Device);
+      return 1;
+    }
+
+  printf("VME Crate Initialized \n");
+
   
   return 0;
 
