@@ -1036,7 +1036,7 @@ void RunControlFSM::SendSpillDuration(){
 
 void RunControlFSM::ErrorStatus(){
 	Daemon::ErrorStatus();
-	usleep(10000); // wait for all machines to have completed the error cycle
+	sleep(5); // wait for all machines to have completed the error cycle
 	//
 	//end the run
 	dataType  endRun; endRun.append( (void*)"ENDRUN\0\0\0",7);

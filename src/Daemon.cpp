@@ -325,23 +325,23 @@ void Daemon::ErrorStatus(){
 	// if entered in this loop for the first time
 	if ( !error_)
 		{
+		dataType errMex;
+		errMex.append((void*)"ERROR\0\0",6);
+		// send 3 error mex
+		connectionManager_->Send(errMex,CmdSck);
+		sleep(1);
+		connectionManager_->Send(errMex,CmdSck);
+		sleep(1);
+		connectionManager_->Send(errMex,CmdSck);
 		//Reset Members
 		if(eventBuilder_)eventBuilder_->Reset();
 		//hwManager_-> ???
 		if(hwManager_)
 			{
 			hwManager_->Clear(); // call reset of all board
-			hwManager_->Config(*configurator_); //configure all boards -- ? 
-			hwManager_->Init(); // Init All Boards
+			//hwManager_->Config(*configurator_); //configure all boards -- ? 
+			//hwManager_->Init(); // Init All Boards
 			}
-		dataType errMex;
-		errMex.append((void*)"ERROR\0\0",6);
-		// send 3 error mex
-		connectionManager_->Send(errMex,CmdSck);
-		usleep(1000);
-		connectionManager_->Send(errMex,CmdSck);
-		usleep(1000);
-		connectionManager_->Send(errMex,CmdSck);
 		}
 	error_=true;
 	//wait for instructions
