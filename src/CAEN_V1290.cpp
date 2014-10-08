@@ -72,7 +72,8 @@ int CAEN_V1290::Init()
   status |= OpWriteTDC(configuration_.edgeDetectionMode);
   s.str(""); s << "[CAEN_V1290]::[INFO]::EdgeDetection " << configuration_.edgeDetectionMode;
   Log(s.str(),1);
-  
+ 
+  usleep(100000); 
   /* I step: set Time Reso via OPCODE 24xx */
   status |= OpWriteTDC(CAEN_V1290_TIMERESO_OPCODE);
   status |= OpWriteTDC(configuration_.timeResolution);
