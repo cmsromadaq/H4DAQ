@@ -4,39 +4,27 @@ int main(int argc, char** argv)
 {
 
   int BHandle(0);
-
-  // for (i = 1; i < argc; i++) {
-  //   /* Check for a switch (leading "-"). */
-  //   if (argv[i][0] == '-') {
-  //     /* Use the next character to decide what to do. */
-  //     switch (argv[i][1]) {
-  //     case 'n': n_value = atoi(argv[++i]);
-  // 	break;
-  //     case 'p':p_value = atoi(argv[++i]);
-  // 	break;
-  //     case 'f':f_value = argv[++i];
-  // 	break;
-  //     case 'd':d_value = atoi(argv[++i]);
-  // 	break;
-  //     case 'b': beam_trigger = true;
-  // 	break;
-  //     case 'l': led_trigger = true;
-  // 	break;
-  //     case 'r': pedestal_freq = atof(argv[++i]);
-  // 	break;
-  //     }
-  //   }
-  // }
-
-
-  int status;
+  int status(0);
   CVBoardTypes   VMEBoard;
-  short          Link, Device;
+  short          Link(0), Device(0);
 
   VMEBoard = cvV2718;
-  Device = 0;
-  Link = 0;
-  
+
+  for (int i = 1; i < argc; i++) {
+    /* Check for a switch (leading "-"). */
+    if (argv[i][0] == '-') {
+      /* Use the next character to decide what to do. */
+      switch (argv[i][1]) {
+      case 't': VMEBoard = (CVBoardTypes) atoi(argv[++i]);
+  	break;
+      case 'l': Link = atoi(argv[++i]);
+  	break;
+      case 'd': Device = atoi(argv[++i]);
+  	break;
+      }
+    }
+  }
+
   status = CAENVME_Init(VMEBoard, Link, Device, &BHandle);
   if(  status ) 
     {
@@ -50,7 +38,7 @@ int main(int argc, char** argv)
 
   CAENVME_SystemReset(BHandle);
   sleep(1);
-  printf("VME crate has been reset\n");
+  printf("VME Crate has been reset\n");
   
   return 0;
 
