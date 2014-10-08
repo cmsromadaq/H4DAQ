@@ -13,6 +13,8 @@ Logger::Logger()
 	async_=false;
 	logLevel_=1; // 0 -> no log, 1-> reasonable 3->everything
 	binary_=0;
+	logConnMan_=0;
+	logStatusSck_=-999;
 }
 // Destructor
 Logger::~Logger(){ 
@@ -155,6 +157,15 @@ void Logger::Write(string line, bool dryrun)
 	return;
 }
 
+void Logger::NetworkWrite(string line){
+  if (logConnMan_ && logStatusSck_>=0){
+    dataType myMex;
+    myMex.append((void*)"GUI_LOG ",8);
+    myMex.append((void*)line.c_str(),line.length()+1);
+    logConnMan_->Send(myMex,logStatusSck_);
+  }
+}
+
 void Logger::Close(){
 	if(compress_)
 		{
@@ -228,5 +239,6 @@ void Logger::Log(string line,short level){
 		}
     }
     else Write(line);
+    //    NetworkWrite(line);
     return;
 }
