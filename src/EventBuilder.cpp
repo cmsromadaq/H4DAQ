@@ -28,6 +28,7 @@ EventBuilder::EventBuilder()
 	lastBadSpill_=0;  // spill n. starts from 1
 	eventsInThisRun_=0;
 	badSpillsInThisRun_=0;
+	async_=true; // async utilts, for dqm
 }
 EventBuilder::~EventBuilder()
 {
@@ -400,6 +401,8 @@ void EventBuilder::Config(Configurator &c){
 	bool dumpCompress=Configurator::GetInt(getElementContent(c, "dumpCompress" , eb_node) );
 	dump_->SetCompress(dumpCompress);
 	dump_->SetBinary();
+	postBuiltCmd_="";
+	postBuiltCmd_=getElementContent(c, "postBuiltCmd" , eb_node) ;
 
 	ostringstream s;
 	s<<"[EventBuilder]::[Config]::[INFO] DumpEvent="<<dumpEvent_;
@@ -708,8 +711,30 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 #endif
 		mySpill_.clear();
 		merged_=0;
+		// Spill is completed and written to file	
+		string myCmd= postBuiltCmd_;
+		// change the cmd strings
+		FindAndReplace(myCmd,"%%RUN%%", to_string((unsigned long long)myRunNum));	
+		FindAndReplace(myCmd,"%%SPILL%%", to_string((unsigned long long)spillNum));	
+		FindAndReplace(myCmd,"%%FILE%%", newFileName);	
+
+		pid_t childpid=Fork();
+		if (childpid == 0 ) // child
+			{
+			Log("[EventBuilder]::[MergeSpill]::[DEBUG] Executing command:"+myCmd,3);
+			system(myCmd.c_str());
+			_exit(0);
+			}
+		else if (childpid <0 ) {
+			Log("[EventBuilder]::[MergeSpill]::[ERROR] Cannot spawn a process. Unpack not done.",1);
+			ostringstream s;
+			s<<"[EventBuilder]::[MergeSpill]::[ERROR] Currently running "<<GetN()<<" children processes";
+			Log(s.str(),1);
+			}
+		// do nothing in case of parent
 		}
 #ifdef EB_DEBUG
+
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Done",3);
 #endif
 	return;
@@ -767,4 +792,12 @@ WORD EventBuilder::GetBoardCrateId(dataType &R){
 	WORD myMergedId= *((WORD*)R.data() + BoardIdPos());
 	WORD myResult= ( myMergedId & GetCrateIdBitMask())>>GetCrateIdShift();
 	return myResult;
+}
+
+int EventBuilder::FindAndReplace(string &myString,string find, string replace)
+{
+	size_t f = myString.find(f);
+	if (f == string::npos) return 1;
+	myString.replace(f, find.length(), replace );
+return 0;
 }

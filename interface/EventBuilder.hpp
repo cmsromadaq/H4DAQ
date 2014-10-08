@@ -36,7 +36,7 @@ public:
 	WORD crateId_;
 };
 
-class EventBuilder : public LogUtility, public Configurable{
+class EventBuilder : public LogUtility, public Configurable, public AsyncUtils{
 
 friend class Daemon;
 // ---binary stream of the event -- 1char = 1byte
@@ -58,6 +58,8 @@ WORD eventsInThisRun_;
 int merged_;
 WORD lastBadSpill_;
 WORD badSpillsInThisRun_;
+
+string postBuiltCmd_;
 
 	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
@@ -158,6 +160,8 @@ public:
 	static inline const int EventNboardsPos(){return 3;};
 	static inline const int EventEnumPos(){return 1;};	
 	static inline const int EventTimePos(){return 7;};	
+
+	static int FindAndReplace(string &myString,string find, string replace);
 
 };
 
