@@ -62,6 +62,7 @@ int CAEN_V1290::Init()
   /* I step: set TRIGGER Matching mode via OPCODE 00xx */
   if (configuration_.triggerMatchMode)
     {
+      usleep(100000); 
       status |= OpWriteTDC(CAEN_V1290_TRMATCH_OPCODE);
       ostringstream s; s << "[CAEN_V1290]::[INFO]::Enabled Trigger Match Mode";
       Log(s.str(),1);
@@ -70,6 +71,7 @@ int CAEN_V1290::Init()
   usleep(100000); 
   /* I step: set Edge detection via OPCODE 22xx */
   status |= OpWriteTDC(CAEN_V1290_EDGEDET_OPCODE);
+  usleep(100000); 
   status |= OpWriteTDC(configuration_.edgeDetectionMode);
   s.str(""); s << "[CAEN_V1290]::[INFO]::EdgeDetection " << configuration_.edgeDetectionMode;
   Log(s.str(),1);
@@ -77,6 +79,7 @@ int CAEN_V1290::Init()
   usleep(100000); 
   /* I step: set Time Reso via OPCODE 24xx */
   status |= OpWriteTDC(CAEN_V1290_TIMERESO_OPCODE);
+  usleep(100000); 
   status |= OpWriteTDC(configuration_.timeResolution);
   s.str(""); s << "[CAEN_V1290]::[INFO]::TimeResolution " << configuration_.timeResolution;
   Log(s.str(),1);
@@ -85,11 +88,13 @@ int CAEN_V1290::Init()
   usleep(100000); 
   /* II step: set TRIGGER Window Width to value n */
   status |= OpWriteTDC(CAEN_V1290_WINWIDT_OPCODE); 
+  usleep(100000); 
   status |= OpWriteTDC(configuration_.windowWidth);
     
   usleep(100000); 
   /* III step: set TRIGGER Window Offset to value -n */
   status |= OpWriteTDC(CAEN_V1290_WINOFFS_OPCODE); 
+  usleep(100000); 
   status |= OpWriteTDC(configuration_.windowOffset);
   s.str(""); s << "[CAEN_V1290]::[INFO]::TimeWindowWidth " << configuration_.windowWidth << " TimeWindowOffset " << configuration_.windowOffset;
   Log(s.str(),1);
