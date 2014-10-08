@@ -305,6 +305,18 @@
       <windowOffset>-0x10</windowOffset> <!-- Window Offset unit=25 ns --> 
     </board>
 
+    <board>
+      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+      <ID>1</ID>
+      <baseAddress>0x55000000</baseAddress>
+      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+      <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
+    </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
