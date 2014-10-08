@@ -95,7 +95,9 @@ EventBuilderFSM *d=new EventBuilderFSM();
 d->LogInit(&l);
 //printf("Init\n");
 printf("[EventBuilderDaemon]::Init Configfile => %s\n",configFileName.c_str());
-d->Init(configFileName);
+try{
+	d->Init(configFileName);
+} catch ( std::exception &e ) { printf("%s\n",e.what()); exit(1); }
 try{
   //	printf("Loop\n");
 	d->Loop();
