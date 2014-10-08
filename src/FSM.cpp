@@ -745,7 +745,7 @@ while (true) {
 		    {
 		   	 // read the boards for WWE
 			 if (
-#define RC_DEBUG
+//#define RC_DEBUG
 #ifndef RC_DEBUG
 					 hwManager_->SignalReceived(WWE)
 #else
