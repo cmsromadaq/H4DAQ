@@ -328,6 +328,12 @@ void Daemon::ErrorStatus(){
 		//Reset Members
 		if(eventBuilder_)eventBuilder_->Reset();
 		//hwManager_-> ???
+		if(hwManager_)
+			{
+			hwManager_->Clear(); // call reset of all board
+			hwManager_->Config(*configurator_); //configure all boards -- ? 
+			hwManager_->Init(); // Init All Boards
+			}
 		dataType errMex;
 		errMex.append((void*)"ERROR\0\0",6);
 		// send 3 error mex
