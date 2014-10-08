@@ -64,7 +64,8 @@ mycommand="cd ${daqhome};  \
 		git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
 		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
 		env python configure.py --noroot ; \
-		make -j 4;  "
+		make -j 4;  \
+		./bin/resetCrate -t 1 -d 0 -l 0 ;  "
 IFS=','
 
 function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;41m\1\x1b[00m:g' ; done }
