@@ -33,7 +33,7 @@ int CAEN_V1495PU::Init()
 
   if (status !=1 )
     {
-      s.str(""); s <<"[CAEN_V1495PU]::[ERROR]::Communicator error for device @0x" << std::hex << configuration_.baseAddress << " " << status ;
+      s.str(""); s <<"[CAEN_V1495PU]::[ERROR]::Communication error for device @0x" << std::hex << configuration_.baseAddress << " " << status ;
       Log(s.str(),1);
       return ERR_OPEN;
     }
