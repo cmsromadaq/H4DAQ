@@ -247,7 +247,7 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	myMex.append((void*)mybuffer,n);
 	WORD runnr = 0;
 	WORD spillnr = 0;
-	WORD evinspill = 0;
+	WORD evinspill = 1;
 	WORD gentriginspill = 0;
 	WORD evinthisrun = 0;
 	if (eventBuilder_){
