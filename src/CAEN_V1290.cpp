@@ -67,6 +67,7 @@ int CAEN_V1290::Init()
       Log(s.str(),1);
     }
     
+  usleep(100000); 
   /* I step: set Edge detection via OPCODE 22xx */
   status |= OpWriteTDC(CAEN_V1290_EDGEDET_OPCODE);
   status |= OpWriteTDC(configuration_.edgeDetectionMode);
@@ -81,10 +82,12 @@ int CAEN_V1290::Init()
   Log(s.str(),1);
 
     
+  usleep(100000); 
   /* II step: set TRIGGER Window Width to value n */
   status |= OpWriteTDC(CAEN_V1290_WINWIDT_OPCODE); 
   status |= OpWriteTDC(configuration_.windowWidth);
     
+  usleep(100000); 
   /* III step: set TRIGGER Window Offset to value -n */
   status |= OpWriteTDC(CAEN_V1290_WINOFFS_OPCODE); 
   status |= OpWriteTDC(configuration_.windowOffset);
@@ -92,6 +95,7 @@ int CAEN_V1290::Init()
   Log(s.str(),1);
 
 
+  usleep(100000); 
   /* IV step: enable channels*/
   //disable all channels
   status |= OpWriteTDC(CAEN_V1290_DISALLCHAN_OPCODE); 
@@ -99,15 +103,19 @@ int CAEN_V1290::Init()
   for (unsigned int i=0;i<channels_;++i)
     if (configuration_.enabledChannels & ( 1 << i ) ) 
       {
+  	usleep(100000); 
 	s.str(""); s << "[CAEN_V1290]::[INFO]::Enabling channel " << i;
 	Log(s.str(),1);
 	status |=OpWriteTDC(CAEN_V1290_ENCHAN_OPCODE+i);
       }
   
   
+  usleep(100000); 
   status |= OpWriteTDC(CAEN_V1290_MAXHITS_OPCODE); 
+  usleep(100000); 
   status |= OpWriteTDC(configuration_.maxHitsPerEvent); 
   
+  usleep(100000); 
   /* IV step: Enable trigger time subtraction */
   if (configuration_.triggerTimeSubtraction)
     status |= OpWriteTDC(CAEN_V1290_ENTRSUB_OPCODE);
