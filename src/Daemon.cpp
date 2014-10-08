@@ -47,7 +47,7 @@ int Daemon::Init(string configFileName){
 	} catch( std::exception &e) 
 		{
 		printf("Exception: %s\n",e.what());
-		return 1;
+		throw e;
 		};
 }
 

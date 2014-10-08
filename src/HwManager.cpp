@@ -168,7 +168,7 @@ void HwManager::Init(){
 	      ostringstream s;
 	      s << "[HwManager]::[ERROR]::Error configuring board " << hw_[i]->GetType() << " exit code " << R;
 	      Log(s.str(),1);
-	      throw hw_exception();
+	      throw config_exception();
 	    }
 	}
 }
