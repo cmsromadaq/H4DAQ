@@ -31,7 +31,7 @@ int CAEN_V1495PU::Init()
   short userfpgafwMajorVersion=data>>4 & CAEN_V1495_PATTERNUNIT_USERFPGAFWVERSION_MAJORNUMBER_BITMASK;
   short userfpgafwMinorVersion=data & CAEN_V1495_PATTERNUNIT_USERFPGAFWVERSION_MINORNUMBER_BITMASK;
 
-  if (status !=1 )
+  if (status  )
     {
       s.str(""); s <<"[CAEN_V1495PU]::[ERROR]::Communication error for device @0x" << std::hex << configuration_.baseAddress << " " << status ;
       Log(s.str(),1);
@@ -54,7 +54,7 @@ int CAEN_V1495PU::Init()
       //delay
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_DELAY_ADDRESS , &configuration_.sigDelay ,CAEN_V1495PU_ADDRESSMODE,cvD32);
     }
-  if (status !=1 )
+  if (status  )
     {
       s.str(""); s <<"[CAEN_V1495PU]::[ERROR]::Configruation error for device @0x" <<std::hex <<  configuration_.baseAddress << std::dec << " " << status ;
       Log(s.str(),1);
@@ -132,7 +132,7 @@ int CAEN_V1495PU::Read(vector<WORD> &v)
   while (!gate && ntry<TIMEOUT)
     {
       status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_STATUS_ADDRESS , &data ,CAEN_V1495PU_ADDRESSMODE,cvD32);
-      if (status !=1 )
+      if (status  )
 	{
 	  s.str(""); s  << "[CAEN_V1495PU]::[ERROR]::Error reading status for device @0x" << std::hex <<  configuration_.baseAddress << std::dec <<  status;
 	  Log(s.str(),1);
