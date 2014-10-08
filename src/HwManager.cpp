@@ -288,9 +288,27 @@ int HwManager::CrateInit()
 // --- Clear
 void HwManager::Clear(){
 	// --- reset to un-initialized/ un-config state	
+	if( hw_.empty() ) return;
+	int status=0;
+  	status |= CAENVME_SystemReset(controllerBoard_.boardHandle_);
+	if (status) 
+		{
+		Log("[HwManager]::[Clear]::[ERROR] EXITING 1",1);
+		exit(1);
+		}
+	sleep(2);
 	//runControl_=false;
 	for(int i=0;i<hw_.size();i++)
-		hw_[i]->Clear();
+		{
+		if (i == controllerBoard_.boardIndex_) continue; // do not reset the controller Board
+		//status |= hw_[i]->Clear();
+		status |= hw_[i]->Init();
+		if (status ) 
+			{
+			Log("[HwManager]::[Clear]::[ERROR] EXITING 2",1);
+			exit(2);
+			}
+		}
 	return;
 }
 

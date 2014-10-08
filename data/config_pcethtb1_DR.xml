@@ -308,7 +308,7 @@
     <board>
       <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
       <ID>1</ID>
-      <baseAddress>0x55000000</baseAddress>
+      <baseAddress>0x55550000</baseAddress>
       <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
       <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
       <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->

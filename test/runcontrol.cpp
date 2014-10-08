@@ -96,7 +96,11 @@ printf("INIT\n");
 d->LogInit(&l);
 printf("[RunControllerDaemon]::Init LogLevel=%d\n",d->GetLogLevel() ) ;
 printf("[RunControllerDaemon]::Init Configfile => %s\n",configFileName.c_str());
-d->Init(configFileName);
+try{
+	d->Init(configFileName);
+} 
+catch ( std::exception &e ){ printf("%s\n",e.what()); exit(1);};
+
 try{
 	printf("LOOP\n");
 	d->Loop();

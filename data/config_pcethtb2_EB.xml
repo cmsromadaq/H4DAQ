@@ -19,6 +19,6 @@
 	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
 	  <sendEvent>0</sendEvent>
 	  <recvEvent>3</recvEvent> <!-- Number of machine to wait for -->
-	  <postBuiltCommand>xmessage "built %RUN% %FILE% %SPILL%" &amp;  sleep 10s; kill %% </postBuiltCommand>
+	  <postBuiltCommand>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCommand>
   </EventBuilder>
 </general>
