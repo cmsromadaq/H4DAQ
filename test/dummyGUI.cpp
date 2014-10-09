@@ -33,9 +33,9 @@ if(argc>3)
 	l.SetLogLevel(3);
  	l.SetAsync();
  	l.SetFileName(logFileName);
- 	l.Init();
  printf("-> Activate Logs\n");
 try{
+ 	l.Init();
 	pub.LogInit(&l);
  	sub.LogInit(&l);
 } catch ( std::exception &e) { printf("%s\n Trying to continue\n",e.what());};
