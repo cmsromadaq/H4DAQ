@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define LECROY1182_DEBUG 
+//#define LECROY1182_DEBUG 
 
 int LECROY_1182::Init()
 {
