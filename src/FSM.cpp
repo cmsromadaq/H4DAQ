@@ -936,16 +936,10 @@ while (true) {
 				connectionManager_->Send(myMex,CmdSck);
 				MoveToStatus(INITIALIZED);
 		    	 }
-		    else if (gui_pauserun)
-		        {
-				gui_pauserun=false;
-			        myPausedFlag_=true;
-				SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI
-			        break;
-		        }
 		    else if( gui_restartrun ) 
 		   	{
 				dataType myMex;
+				gui_pauserun=false;
 				myMex.append((void*)"SPILLCOMPL\0",11);
 				connectionManager_->Send(myMex,CmdSck);
 			    	//SEND beginSPILL
@@ -959,6 +953,13 @@ while (true) {
 				connectionManager_->Send(myMex,CmdSck);
 			        MoveToStatus(BYE);
 			}
+		    else if (gui_pauserun)
+		        {
+				//gui_pauserun=false;
+				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
+			        myPausedFlag_=true;
+			        break;
+		        }
 		    else if ( eb_endspill )
 			    // SEND BEGINSPILL
 			    {
