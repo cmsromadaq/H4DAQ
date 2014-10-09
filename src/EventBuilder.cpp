@@ -714,9 +714,9 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		// Spill is completed and written to file	
 		string myCmd= postBuiltCmd_;
 		// change the cmd strings
-		FindAndReplace(myCmd,"%%RUN%%", to_string((unsigned long long)myRunNum));	
-		FindAndReplace(myCmd,"%%SPILL%%", to_string((unsigned long long)spillNum));	
-		FindAndReplace(myCmd,"%%FILE%%", newFileName);	
+		FindAndReplace(myCmd,"\%\%RUN\%\%", to_string((unsigned long long)myRunNum));	
+		FindAndReplace(myCmd,"\%\%SPILL\%\%", to_string((unsigned long long)spillNum));	
+		FindAndReplace(myCmd,"\%\%FILE\%\%", newFileName);	
 
 		pid_t childpid=Fork();
 		if (childpid == 0 ) // child
