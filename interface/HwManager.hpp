@@ -56,6 +56,7 @@ public:
 	// --- Configurable
 	void Init();
 	void Clear();
+	void Close();
 	void Config(Configurator&c);
 	// --- Read All the Boards
 	void BufferClearAll();
@@ -84,6 +85,9 @@ public:
 private:
   //Initialize VME crate
   int CrateInit();
+  //Initialize VME crate
+  int CrateClose();
+
 };
 
 #endif

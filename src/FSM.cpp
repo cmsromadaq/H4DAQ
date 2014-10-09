@@ -199,13 +199,14 @@ while (true) {
 		    }
 	case BYE:
 		    {
+		    hwManager_->Close();  //Clean Exit
 		    exit(0); // return is not working correctly
 		    return;
 		    }
 
 	} // end switch 
 	} // end try
-	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what());  hwManager_->Close(); exit(0);return ; } // grace exit . return doesn't work. 
 	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 } // while-true
 return;
@@ -977,13 +978,14 @@ while (true) {
 		    }
 	case BYE:
 		    {
+		    hwManager_->Close();  //Clean Exit
 		    exit(0); // return is not working correctly
 		    return;
 		    }
 
 	} // end switch 
 	} // end try
-	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
+	catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what());  hwManager_->Close(); exit(0);return ; } // grace exit . return doesn't work. 
 	catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
 } // while-true
 return;

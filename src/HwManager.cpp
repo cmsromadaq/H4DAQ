@@ -185,6 +185,34 @@ void HwManager::Init(){
 	}
 }
 
+// --- Close
+void HwManager::Close(){
+  //Crate init
+  if (hw_.size()>0 )
+  	CrateClose();
+}
+
+// --- Crate Close
+int HwManager::CrateClose(){
+  if (controllerBoard_.boardIndex_ < 0)
+      throw config_exception();
+
+  int status=0;
+  status |= CAENVME_SystemReset(controllerBoard_.boardHandle_);
+  sleep(1);
+  status |= CAENVME_End(controllerBoard_.boardHandle_);
+  
+  if (status)
+    {
+      ostringstream s;
+      s << "[HwManager]::[ERROR]::Error closing VME connection";
+      Log(s.str(),1);
+      throw hw_exception();
+    }
+
+  return 0;
+}
+
 // --- Crate Init
 int HwManager::CrateInit()
 {
