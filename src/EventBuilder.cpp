@@ -798,6 +798,6 @@ int EventBuilder::FindAndReplace(string &myString,string find, string replace)
 {
 	size_t f = myString.find(f);
 	if (f == string::npos) return 1;
-	myString.replace(f, find.length(), replace );
+	myString=myString.replace(f, find.length(), replace );
 return 0;
 }
