@@ -796,8 +796,10 @@ WORD EventBuilder::GetBoardCrateId(dataType &R){
 
 int EventBuilder::FindAndReplace(string &myString,string find, string replace)
 {
+	printf("myString was=%s ",myString.c_str());
 	size_t f = myString.find(f);
 	if (f == string::npos) return 1;
 	myString=myString.replace(f, find.length(), replace );
+	printf("myString is=%s ---- pos=%u -- replace:%s\n",myString.c_str(),f,replace.c_str());
 return 0;
 }
