@@ -796,7 +796,7 @@ WORD EventBuilder::GetBoardCrateId(dataType &R){
 
 int EventBuilder::FindAndReplace(string &myString,string find, string replace)
 {
-	size_t f = myString.find(f);
+	size_t f = myString.find(find);
 	if (f == string::npos) return 1;
 	myString=myString.replace(f, find.length(), replace );
 return 0;
