@@ -108,7 +108,7 @@ int LECROY_1182::Read(vector<WORD> &v)
       if (!status)
 	{
 	  v.push_back(data); //Filling event buffer
-#ifdef LECROY_1182_DEBUG
+#ifdef LECROY1182_DEBUG
 	  ostringstream s; s << "[LECROY_1182]::[INFO]::Read Channel " << "\tchannel " << i << "\tvalue " << data;  
 	  Log(s.str(),3);
 #endif
@@ -149,11 +149,15 @@ int LECROY_1182::CheckStatusAfterRead()
 
   int lecroy1182_full = ~(data & LECROY_1182_FULL_BITMASK);
   int lecroy1182_event = (data & LECROY_1182_EVTBUFFER_BITMASK)>>4; 
-  
-  if( lecroy1182_full || (lecroy1182_event != 0) || status!=1 ) 
-     { 
-       status=Clear();
-     }
+
+#ifdef LECROY1182_DEBUG
+  ostringstream s; s << "[LECROY_1182]::[INFO]::Status after read full " << lecroy1182_full << " " << lecroy1182_event; 
+      Log(s.str(),1);
+#endif
+  // if( lecroy1182_full || (lecroy1182_event != 0) || status!=1 ) 
+  //    { 
+  //      status=Clear();
+  //    }
 
    if (status)
      {
