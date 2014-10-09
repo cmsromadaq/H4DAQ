@@ -154,11 +154,11 @@ int LECROY_1182::CheckStatusAfterRead()
   ostringstream s; s << "[LECROY_1182]::[INFO]::Status after read full " << lecroy1182_notfull << " " << lecroy1182_event; 
   Log(s.str(),1);
 #endif
-   if( !lecroy1182_notfull || (lecroy1182_event != 0) || status!=1 ) 
-      { 
-        status=Clear();
-      }
-
+  if( (!lecroy1182_notfull) || (lecroy1182_event != 0) || status ) 
+    { 
+      status=Clear();
+    }
+  
    if (status)
      {
        ostringstream s; s << "[LECROY_1182]::[ERROR]::Cannot restore healthy state in LECROY_1182 board " << status; 
