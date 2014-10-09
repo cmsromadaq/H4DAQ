@@ -95,7 +95,7 @@ void HwManager::Config(Configurator &c){
 		else if( getElementContent(c,"type",board_node) == "CAEN_V814")
 			{
 			  //constructing a CAEN_V792 board
-			  hw_.push_back( new CAEN_V813() );
+			  hw_.push_back( new CAEN_V814() );
 			}
 		else if( getElementContent(c,"type",board_node) == "CAEN_V1290")
 			{
