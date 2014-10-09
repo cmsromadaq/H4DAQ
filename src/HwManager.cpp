@@ -8,6 +8,7 @@
 #include "interface/CAEN_V792.hpp"
 #include "interface/CAEN_V560.hpp"
 #include "interface/CAEN_V513.hpp"
+#include "interface/LECROY_1182.hpp"
 #include "interface/TimeBoard.hpp"
 
 #include "interface/EventBuilder.hpp" // boardId
@@ -104,6 +105,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a CAEN_V792 board
 			  hw_.push_back( new CAEN_V1742() );
+			}
+		else if( getElementContent(c,"type",board_node) == "LECROY_1182")
+			{
+			  //constructing a CAEN_V792 board
+			  hw_.push_back( new LECROY_1182() );
 			}
 		else
 		  {
