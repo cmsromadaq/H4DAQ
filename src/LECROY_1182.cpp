@@ -8,7 +8,7 @@
 int LECROY_1182::Init()
 {
   int status=0;
-  ostringstream s; s << "[LECROY_1182]::[INFO]::++++++ LECROY 1182 INIT ++++++";
+  ostringstream s; s << "[LECROY_1182]::[INFO]::++++++ LECROY 1182 @0x" << hex << configuration_.baseAddress << dec << " INIT ++++++";
   Log(s.str(),1);
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
