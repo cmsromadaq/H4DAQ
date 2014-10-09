@@ -12,7 +12,7 @@ string logFileName="/dev/stdout";
  int portSub=6002;
 string ConnectTo="pcethtb2";
 
-printf("usage: PubPort SubAddress SubPort");
+printf("usage: PubPort SubAddress SubPort\n    @->'0'\n    !XXXX->NUM\n");
 
 if(argc>1)
 	portPub=atoi(argv[1]);
@@ -53,10 +53,20 @@ while (true){
  printf("-> Write your message\n:");
  getline(cin,mexStr);
  for(int i=0;i<mexStr.size();i++) if(mexStr[i]=='@') mexStr[i]='\0';
- printf("-> Init Mex\n");
+ for(int i=0;i<mexStr.size();i++) if(mexStr[i]=='!') {
+	 string myNumStr=mexStr.substr(i+1,4);
+	 WORD myNum=atoi(myNumStr.c_str());
+	 mexStr.erase(i); // delete '!'
+	 mexStr[i  ]= ((char*) (&myNum))[0];
+	 mexStr[i+1]= ((char*) (&myNum))[1];
+	 mexStr[i+2]= ((char*) (&myNum))[2];
+	 mexStr[i+3]= ((char*) (&myNum))[3];
+	 i=i+3; // fast-forward
+ 	}
+// printf("-> Init Mex\n");
  dataType mex;
  mex.append( (void*)mexStr.c_str(),mexStr.size() +1 ); // NULL TERMINATED
- printf("-> Send Dummy\n");
+ //printf("-> Send Dummy\n");
 	pub.SendMessage(mex);
 	mex.release();
 dataType  mexRecv;
