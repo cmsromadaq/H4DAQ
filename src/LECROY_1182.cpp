@@ -151,8 +151,8 @@ int LECROY_1182::CheckStatusAfterRead()
   bool lecroy1182_event = (data & LECROY_1182_EVTBUFFER_BITMASK)>>4; 
 
 #ifdef LECROY1182_DEBUG
-  ostringstream s; s << "[LECROY_1182]::[INFO]::Status after read full " << lecroy1182_full << " " << lecroy1182_event; 
-      Log(s.str(),1);
+  ostringstream s; s << "[LECROY_1182]::[INFO]::Status after read full " << lecroy1182_notfull << " " << lecroy1182_event; 
+  Log(s.str(),1);
 #endif
    if( !lecroy1182_notfull || (lecroy1182_event != 0) || status!=1 ) 
       { 
