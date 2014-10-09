@@ -84,6 +84,13 @@
       <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns --> 
       <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns --> 
     </board>
+
+    <board>
+      <type>LECROY_1182</type> <!-- LECROY 1182-->
+      <ID>1</ID>
+      <baseAddress>0x00110000</baseAddress>
+    </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
