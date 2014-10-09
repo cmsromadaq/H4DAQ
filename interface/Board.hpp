@@ -14,7 +14,7 @@ enum BoardTypes_t { _TIME_=1, //Fake board to get timestamps
 		    _CAENV1495PU_=8, //General Purpose I/O. FW 2.1 PatternUnit
 		    _CAENV560_=9, //Scaler
 		    _CAENV814_=10, //Low Edge Discriminator
-		    _LECROY1182_=11, //Low Edge Discriminator
+		    _LECROY1182_=11, //8ch ADC 50fC per count 
 		    _MAXBOARDTYPE_, // USED By DQM
 		    _UNKWN_=0 };
 

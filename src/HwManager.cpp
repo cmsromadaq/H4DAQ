@@ -5,6 +5,7 @@
 #include "interface/CAEN_V1742.hpp"
 #include "interface/CAEN_V1495PU.hpp"
 #include "interface/CAEN_V1290.hpp"
+#include "interface/CAEN_V814.hpp"
 #include "interface/CAEN_V792.hpp"
 #include "interface/CAEN_V560.hpp"
 #include "interface/CAEN_V513.hpp"
@@ -90,6 +91,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a CAEN_V792 board
 			  hw_.push_back( new CAEN_V792() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V814")
+			{
+			  //constructing a CAEN_V792 board
+			  hw_.push_back( new CAEN_V813() );
 			}
 		else if( getElementContent(c,"type",board_node) == "CAEN_V1290")
 			{
