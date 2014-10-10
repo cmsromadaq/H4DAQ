@@ -694,7 +694,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
-		if (mySpill_.size()>5) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
+		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
