@@ -26,7 +26,7 @@ EventBuilder::EventBuilder()
 	dump_->SetAsync(); // asyncronous dumping
 	merged_=0;
 	lastBadSpill_=0;  // spill n. starts from 1
-	eventsInThisRun_=0;
+	goodEventsInThisRun_=0;
 	badSpillsInThisRun_=0;
 	async_=true; // async utilts, for dqm
 }
@@ -520,7 +520,6 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
 	
 	lastEvent_.eventInSpill_++;
-	eventsInThisRun_++;
 	// this are updated in the CloseSpill -- should we keep them consistent
 	//WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
 	//WORD nEvents= *nEventsPtr;
@@ -695,6 +694,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
+		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
@@ -745,7 +745,7 @@ void EventBuilder::SetRunNum(WORD x)
 {
 //runNum_=x;
 lastEvent_.runNum_=x;
-eventsInThisRun_=0;
+goodEventsInThisRun_=0;
 lastBadSpill_=0;
 badSpillsInThisRun_=0;
 if (dumpEvent_ || recvEvent_)  // POSIX

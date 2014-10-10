@@ -2,7 +2,7 @@
 #include "interface/FSM.hpp"
 #include "interface/Utility.hpp"
 
-#define FSM_DEBUG
+//#define FSM_DEBUG
 //#define SYNC_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
@@ -588,10 +588,12 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   int n=0;
   WORD runnr=0;
   WORD spillnr=0;
+  WORD goodevinrun=0;
   WORD badspills=0;
   if (eventBuilder_){
     runnr = eventBuilder_->GetEventId().runNum_;
     spillnr = eventBuilder_->GetEventId().spillNum_;
+    goodevinrun = eventBuilder_->GetGoodEvents();
     badspills = eventBuilder_->GetBadSpills();
   }
   myMex.append((void*)"runnumber=",10);
@@ -599,6 +601,9 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"spillnumber=",12);
   n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+  myMex.append((void*)mybuffer,n);
+  myMex.append((void*)"evinrun=",8);
+  n = snprintf(mybuffer,255,"%u ",goodevinrun); //evinrun
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"badspills=",10);
   n = snprintf(mybuffer,255,"%u ",badspills); //badspills
@@ -691,11 +696,16 @@ while (true) {
 				   		   char*ptr2= (char*)myCmd.data + shift;
 #ifdef FSM_DEBUG
 				   {
-				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents"<<shift ;
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents | "<<shift ;
 				   Log(s2.str(),3);
+				   s2.str() = ""; s2 <<"[RunControlFSM]::[Loop]::[DEBUG] myCmd.N="<<myCmd.N<<"| shift1="<<Utility::FindNull(myCmd.N,myCmd.data,1)
+							<<" | shift2="<<Utility::FindNull(myCmd.N,myCmd.data,2)
+							<<" | shift3="<<Utility::FindNull(myCmd.N,myCmd.data,3);
+				   Log(s2.str(),3);
+					
 				   }
 #endif
-						   if ( sscanf(ptr2,"%ld",trgNevents_) < 1) {
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) < 1) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
@@ -721,7 +731,7 @@ while (true) {
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
-						   if ( sscanf(ptr2,"%ld",trgNevents_) <1 ){
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) <1 ){
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
