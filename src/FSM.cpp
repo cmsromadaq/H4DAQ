@@ -2,7 +2,7 @@
 #include "interface/FSM.hpp"
 #include "interface/Utility.hpp"
 
-#define FSM_DEBUG
+//#define FSM_DEBUG
 //#define SYNC_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
@@ -691,11 +691,16 @@ while (true) {
 				   		   char*ptr2= (char*)myCmd.data + shift;
 #ifdef FSM_DEBUG
 				   {
-				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents"<<shift ;
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents | "<<shift ;
 				   Log(s2.str(),3);
+				   s2.str() = ""; s2 <<"[RunControlFSM]::[Loop]::[DEBUG] myCmd.N="<<myCmd.N<<"| shift1="<<Utility::FindNull(myCmd.N,myCmd.data,1)
+							<<" | shift2="<<Utility::FindNull(myCmd.N,myCmd.data,2)
+							<<" | shift3="<<Utility::FindNull(myCmd.N,myCmd.data,3);
+				   Log(s2.str(),3);
+					
 				   }
 #endif
-						   if ( sscanf(ptr2,"%ld",trgNevents_) < 1) {
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) < 1) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
@@ -721,7 +726,7 @@ while (true) {
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
-						   if ( sscanf(ptr2,"%ld",trgNevents_) <1 ){
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) <1 ){
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
