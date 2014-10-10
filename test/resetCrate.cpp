@@ -40,14 +40,15 @@ int main(int argc, char** argv)
 
   status = CAENVME_SystemReset(BHandle);
   sleep(1);
+  status |= CAENVME_End(BHandle);
+
   if(  status ) 
     {
       printf("Error Resetting Crate\n");
       return 1;
     }
 
-  printf("VME Crate Initialized\n");
-
+  printf("VME Crate Closed\n");
   
   return 0;
 
