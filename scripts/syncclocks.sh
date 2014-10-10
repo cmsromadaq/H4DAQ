@@ -2,8 +2,6 @@
 
 for machine in pcethtb1 pcethtb2 pcethtb3 cms-h4-03 ; do 
     echo "Syncronizing clock on $machine"
-    ssh ${machine}.cern.ch "ntpd -q"
-    echo "After syncronization:"
-    ssh ${machine}.cern.ch "date"
+    ssh root@${machine}.cern.ch -i ~/.ssh/key_for_clock_sync/id_rsa_clock
 done
 
