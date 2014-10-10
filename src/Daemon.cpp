@@ -21,6 +21,17 @@ Daemon::Daemon(){
 	srand((unsigned)time(NULL));
 }
 
+Daemon::~Daemon(){
+	if(eventBuilder_) delete eventBuilder_;
+	if(connectionManager_) delete connectionManager_;
+	if(hwManager_) delete hwManager_;
+	if(configurator_) delete configurator_;
+	eventBuilder_ = NULL;
+	connectionManager_=NULL;
+	hwManager_=NULL;
+	configurator_=NULL;
+}
+
 
 int Daemon::Init(string configFileName){
 	try{
