@@ -667,7 +667,7 @@ while (true) {
 				   // find out the type of RUN and the Trigger rate (if exists)
 				   int shift=Utility::FindNull(myCmd.N,myCmd.data,1);
 #ifdef FSM_DEBUG
-				   ostringstream s2; s2<<"[RunControlFSM]::[Loop] Enter GUI_STARTRUN Routine. shift1="<<shift ;
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter GUI_STARTRUN Routine. shift1="<<shift ;
 				   Log(s2.str(),3);
 #endif
 				   if (shift<0) {
@@ -677,20 +677,44 @@ while (true) {
 				   char *ptr= (char*)myCmd.data + shift;
 				   if (!strcmp(ptr,"PED")) // pedestal run
 						   {
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter PED Trigger"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
 						   if (shift <0 ) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 						   if ( sscanf(ptr2,"%ld",trgNevents_) < 1) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] End Scanf trigger set"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 						   trgType_=PED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"LED")) // pedestal run
 						   {
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter LED Trigger"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
 						   if (shift <0 ) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
@@ -713,6 +737,12 @@ while (true) {
 					break;
 					}
 
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Going Send STARTRUN MEX"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 			    	   dataType myFufMex;
 			    	   myFufMex.append((void*)"NOP\0",4);
 			    	   connectionManager_->Send(myFufMex,CmdSck);
