@@ -320,7 +320,7 @@
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
-	  <dumpDirName>/tmp/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress>
 	  <sendEvent>1</sendEvent>
 	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
