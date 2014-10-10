@@ -717,6 +717,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		FindAndReplace(myCmd,"\%\%RUN\%\%", to_string((unsigned long long)myRunNum));	
 		FindAndReplace(myCmd,"\%\%SPILL\%\%", to_string((unsigned long long)spillNum));	
 		FindAndReplace(myCmd,"\%\%FILE\%\%", newFileName);	
+		FindAndReplace(myCmd,"\%\%RAWDIR\%\%", dirName_);	
 
 		pid_t childpid=Fork();
 		if (childpid == 0 ) // child
