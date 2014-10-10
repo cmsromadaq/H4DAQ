@@ -588,10 +588,12 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   int n=0;
   WORD runnr=0;
   WORD spillnr=0;
+  WORD goodevinrun=0;
   WORD badspills=0;
   if (eventBuilder_){
     runnr = eventBuilder_->GetEventId().runNum_;
     spillnr = eventBuilder_->GetEventId().spillNum_;
+    goodevinrun = eventBuilder_->GetGoodEvents();
     badspills = eventBuilder_->GetBadSpills();
   }
   myMex.append((void*)"runnumber=",10);
@@ -599,6 +601,9 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"spillnumber=",12);
   n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+  myMex.append((void*)mybuffer,n);
+  myMex.append((void*)"evinrun=",8);
+  n = snprintf(mybuffer,255,"%u ",goodevinrun); //evinrun
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"badspills=",10);
   n = snprintf(mybuffer,255,"%u ",badspills); //badspills
