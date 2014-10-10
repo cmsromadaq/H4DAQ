@@ -37,7 +37,9 @@ HwManager::HwManager(){
   //runControl_=false;
 }
 // --- Destructor
-HwManager::~HwManager(){}
+HwManager::~HwManager(){
+	Close();
+}
 // --- Configure the HwManager
 void HwManager::Config(Configurator &c){
 	// take the configurator. Translate it into a Board config. Configure the board
