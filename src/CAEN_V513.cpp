@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-#define CAEN_V513_DEBUG
+//#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
@@ -247,29 +247,14 @@ bool CAEN_V513::SignalReceived(CMD_t signal)
 
   if (signal == WWE ) 
       {
-#ifdef CAEN_V513_DEBUG
-	{
-	Log("[CAEN_V513]::[DEBUG] SignalReceived WWE",3);
-	}
-#endif
 	return (data & configuration_.WWEReadBitMask);
       }
   else if (signal == WE ) 
       {
-#ifdef CAEN_V513_DEBUG
-	{
-	Log("[CAEN_V513]::[DEBUG] SignalReceived WE",3);
-	}
-#endif
 	return (data & configuration_.WEReadBitMask);
       }
   else if (signal == EE ) 
       {
-#ifdef CAEN_V513_DEBUG
-	{
-	Log("[CAEN_V513]::[DEBUG] SignalReceived EE",3);
-	}
-#endif
 	return (data & configuration_.EEReadBitMask);
       }
    else
@@ -278,11 +263,6 @@ bool CAEN_V513::SignalReceived(CMD_t signal)
 	Log(s.str(),1);
 	return false;
       }
-#ifdef CAEN_V513_DEBUG
-	{
-	Log("[CAEN_V513]::[DEBUG] SignalReceived None",3);
-	}
-#endif
   return false;
 }
      

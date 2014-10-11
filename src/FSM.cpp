@@ -826,7 +826,7 @@ while (true) {
 
 #ifdef RC_DEBUG
 		      usleep(1000);
-		      ostringstream s; s<< "Waiting for WE" << hwManager_->SignalReceived(WE);
+		      ostringstream s; s<< "Waiting for WE " << hwManager_->SignalReceived(WE);
 		      Log(s.str(),3);
 #endif
 
