@@ -823,6 +823,7 @@ while (true) {
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
+		      usleep(100);
 		   	 // read the boards for WE
 			 if (hwManager_->SignalReceived(WE))
 			 {
