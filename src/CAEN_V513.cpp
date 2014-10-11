@@ -265,6 +265,11 @@ bool CAEN_V513::SignalReceived(CMD_t signal)
       }
   else if (signal == EE ) 
       {
+#ifdef CAEN_V513_DEBUG
+	{
+	Log("[CAEN_V513]::[DEBUG] SignalReceived EE",3);
+	}
+#endif
 	return (data & configuration_.EEReadBitMask);
       }
    else
@@ -273,6 +278,11 @@ bool CAEN_V513::SignalReceived(CMD_t signal)
 	Log(s.str(),1);
 	return false;
       }
+#ifdef CAEN_V513_DEBUG
+	{
+	Log("[CAEN_V513]::[DEBUG] SignalReceived None",3);
+	}
+#endif
   return false;
 }
      
