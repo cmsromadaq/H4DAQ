@@ -4,7 +4,7 @@
 #include <string>
 #include <bitset>
 
-#define CAEN_V513_DEBUG
+//#define CAEN_V513_DEBUG
 
 int CAEN_V513::Init()
 {
