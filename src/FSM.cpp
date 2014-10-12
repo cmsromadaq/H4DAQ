@@ -791,6 +791,8 @@ while (true) {
 		    // wait for wwe
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
+		    dataType guiwweMex;
+		    guiwweMex.append((void*)"GUI_SPS wwe\0",12);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -811,6 +813,7 @@ while (true) {
 			 {
 			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
 			    connectionManager_->Send(wweMex,CmdSck);
+			    connectionManager_->Send(guiwweMex,StatusSck);
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 			 }
@@ -828,6 +831,8 @@ while (true) {
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
+		    dataType guiweMex;
+		    guiweMex.append((void*)"GUI_SPS we\0",11);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
@@ -846,6 +851,7 @@ while (true) {
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
+			   connectionManager_->Send(guiweMex,StatusSck);
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
@@ -890,6 +896,8 @@ while (true) {
 		    // check for END OF SPILL
 		    dataType eeMex;
 		    eeMex.append((void*)"EE\0",3);
+		    dataType guieeMex;
+		    guieeMex.append((void*)"GUI_SPS ee\0",11);
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
@@ -898,6 +906,7 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  connectionManager_->Send(guieeMex,StatusSck);
 				  hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();

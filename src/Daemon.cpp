@@ -277,8 +277,8 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	n = snprintf(mybuffer,255,"%u ",evinspill); 
 	myMex.append((void*)mybuffer,n);
 	myMex.append((void*)"paused=",7);
-	if (myPausedFlag_) myMex.append((void*)"1",1);
-	else myMex.append((void*)"0",1);
+	if (myPausedFlag_) myMex.append((void*)"1\0",2);
+	else myMex.append((void*)"0\0",2);
 	connectionManager_->Send(myMex,StatusSck);
 	gettimeofday(&lastSentStatusMessageTime_,NULL);
 }
