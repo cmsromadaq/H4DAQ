@@ -792,7 +792,7 @@ while (true) {
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
 		    dataType guiwweMex;
-		    guiwweMex.append((void*)"GUI_SPS wwe\0",12);
+		    guiwweMex.append((void*)"GUI_SPS wwe",11);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -832,7 +832,7 @@ while (true) {
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
 		    dataType guiweMex;
-		    guiweMex.append((void*)"GUI_SPS we\0",11);
+		    guiweMex.append((void*)"GUI_SPS we",10);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
@@ -897,7 +897,7 @@ while (true) {
 		    dataType eeMex;
 		    eeMex.append((void*)"EE\0",3);
 		    dataType guieeMex;
-		    guieeMex.append((void*)"GUI_SPS ee\0",11);
+		    guieeMex.append((void*)"GUI_SPS ee",10);
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
