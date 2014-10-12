@@ -690,7 +690,7 @@ while (true) {
 					   break;
 					   }
 				   char *ptr= (char*)myCmd.data + shift;
-				   if (!strcmp(ptr,"PED")) // pedestal run
+				   if (!strcmp(ptr,"PEDESTAL")) // pedestal run
 						   {
 #ifdef FSM_DEBUG
 				   {
