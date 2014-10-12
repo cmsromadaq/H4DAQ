@@ -1123,6 +1123,7 @@ int RunControlFSM::ParseGUIMex(){
 				connectionManager_->Send(myMex,CmdSck);
 				gui_pauserun=false;
 				MoveToStatus(INITIALIZED);
+				return 1;
 		    	 }
 		    else if( gui_restartrun ) 
 		   	{
@@ -1132,7 +1133,9 @@ int RunControlFSM::ParseGUIMex(){
 				connectionManager_->Send(myMex,CmdSck);
 			    	//SEND beginSPILL
 				gui_pauserun=false;
-				MoveToStatus(BEGINSPILL);
+				if(myStatus_==SENTBUFFER)MoveToStatus(BEGINSPILL);
+				//in other cases, stay where you are
+				return 1;
 			}
 		    else if( gui_die )
 			    	//SEND DIE
@@ -1142,6 +1145,7 @@ int RunControlFSM::ParseGUIMex(){
 				connectionManager_->Send(myMex,CmdSck);
 				gui_pauserun=false;
 			        MoveToStatus(BYE);
+				return 1;
 			}
 		    else if (gui_pauserun)
 		        {
@@ -1157,6 +1161,7 @@ int RunControlFSM::ParseGUIMex(){
 				myMex.append((void*)"SPILLCOMPL\0",11);
 				connectionManager_->Send(myMex,CmdSck);
 				MoveToStatus(BEGINSPILL);
+				return 1;
 			    }
 		   return 0;
 }
