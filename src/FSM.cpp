@@ -805,7 +805,7 @@ while (true) {
 			// gui Cmd
 		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) { break; }
+		    if ( ParseGUIMex()>0 ) { break; }
 
 		    // wait for wwe
 		    dataType wweMex;
@@ -844,13 +844,10 @@ while (true) {
 	case CLEARED:
 		    {
 			// gui Cmd
-		    {
-		    ostringstream s;s<<"[FSM]::[DEBUG] PAUSERUN:"<<gui_pauserun;
-		    Log(s.str(),3); // MYDEBUG
-		    }
 		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) { break; }
+		    if ( ParseGUIMex()>0 ) { break; }
+
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
