@@ -805,7 +805,7 @@ while (true) {
 			// gui Cmd
 		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) { ResetMex(); break; }
+		    if ( ParseGUIMex() ) { break; }
 
 		    // wait for wwe
 		    dataType wweMex;
@@ -844,9 +844,13 @@ while (true) {
 	case CLEARED:
 		    {
 			// gui Cmd
+		    {
+		    ostringstream s;s<<"[FSM]::[DEBUG] PAUSERUN:"<<gui_pauserun;
+		    Log(s.str(),3); // MYDEBUG
+		    }
 		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) { ResetMex(); break; }
+		    if ( ParseGUIMex() ) { break; }
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
@@ -1049,11 +1053,17 @@ void RunControlFSM::UpdateMex(){
 			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
 				    eb_endspill=true;
 			    else if (myNewCmd.cmd == GUI_STOPRUN)
+				    {
+				    gui_pauserun=false;
 				    gui_stoprun = true;
+				    }
 			    else if (myNewCmd.cmd == GUI_PAUSERUN)
 				    gui_pauserun=true;
 			    else if (myNewCmd.cmd == GUI_DIE)
+				    {
+				    gui_pauserun=false;
 				    gui_die=true;
+				    }
 			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
 				    {
 				    gui_restartrun=true;
@@ -1114,6 +1124,7 @@ int RunControlFSM::ParseGUIMex(){
 				dataType myMex;
 				myMex.append((void*)"ENDRUN\0",7);
 				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
 				MoveToStatus(INITIALIZED);
 		    	 }
 		    else if( gui_restartrun ) 
@@ -1123,6 +1134,7 @@ int RunControlFSM::ParseGUIMex(){
 				myMex.append((void*)"SPILLCOMPL\0",11);
 				connectionManager_->Send(myMex,CmdSck);
 			    	//SEND beginSPILL
+				gui_pauserun=false;
 				MoveToStatus(BEGINSPILL);
 			}
 		    else if( gui_die )
@@ -1131,6 +1143,7 @@ int RunControlFSM::ParseGUIMex(){
 				dataType myMex;
 				myMex.append((void*)"DIE\0",4);
 				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
 			        MoveToStatus(BYE);
 			}
 		    else if (gui_pauserun)
