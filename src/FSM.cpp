@@ -104,6 +104,10 @@ while (true) {
 					connectionManager_->Send(myMex,CmdSck);
 					MoveToStatus(WAITTRIG);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -817,6 +821,10 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex() ) break;
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
