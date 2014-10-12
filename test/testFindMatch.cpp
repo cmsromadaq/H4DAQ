@@ -1,4 +1,5 @@
 #include "interface/StandardIncludes.hpp"
+#include "interface/Utility.hpp"
 #include "interface/FindMatch.hpp"
 
 #ifndef NO_ROOT
@@ -43,11 +44,33 @@ int main()
 	printf("-- >  t.size = %lu\n",t.size());
 	printf("-- >  t1.size = %lu\n",time1.size());
 	printf("-- >  t2.size = %lu\n",time2.size());
-	printf("-- >  time unit estimation = %u\n", pow(long(time1.size()) -long(time2.size()),2) * TMath::Max(time1.size(),time2.size()) );
-	uint64_t myStart=(uint64_t)time(NULL);
+	long max=TMath::Max(time1.size(),time2.size());
+	long diff=TMath::Abs(long(time1.size()) -long(time2.size()) ) + A.GetMaxWindow() ;
+	double time = pow(max,diff) * 0.11/220.; // 116 ms -- ad hoc factors
+	string timeStr="";
+	if (time > 3600 ) 
+		{
+		long h=TMath::Floor(time/3600.);
+		timeStr += Form("%ld h  ",h);
+		time -= 3600*h;
+		}
+	if(time >60 ) 
+		{
+		long m=TMath::Floor(time/60.);
+		timeStr += Form("%ld m  ",m);
+		time -= 60*m;
+		}
+	timeStr += Form("%lf s",time);
+	printf("-- >  time unit estimation = %s\n", timeStr.c_str());
+	//uint64_t myStart=(uint64_t)time(NULL);
+	timeval tv_start; 
+	gettimeofday(&tv_start,NULL);
 	int status=A.Run();
-	uint64_t myStop=(uint64_t)time(NULL);
-	printf("USER TIME: %u\n",(unsigned int)(myStop-myStart));
+	//uint64_t myStop=(uint64_t)time(NULL);
+	timeval tv_stop;
+	gettimeofday(&tv_stop,NULL);
+	//printf("USER TIME: %u\n",(unsigned int)(myStop-myStart));
+	printf("USER TIME: %ld usec\n", Utility::timevaldiff( &tv_start, &tv_stop) );
 	printf("     status=%d == 0\n", status ) ;
 	printf("     alpha=%lf\n", A.GetAlpha() ) ;
 	printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;

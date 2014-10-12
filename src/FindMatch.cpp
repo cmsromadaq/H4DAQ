@@ -13,6 +13,7 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	// not implemented all the checks. Not intended for general public
 	if ( x.size() != y.size() ) return 1.e100;
 	if ( x.size() <=2 ) return 1.e100;
+	// transform back to 0100010
 	double R=0;
 	// compute delta medio
 	double delta=0;
@@ -23,7 +24,10 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	delta /= x.size();
 	// 
 	for(uint_t i=0;i<x.size();++i)
-		R+= pow( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) ,2); // ???
+	{
+		R+= sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) ); // ???
+		if ( R> d2_ ) return R; // speed up // to further speed up, this have to branch out FindNext
+	}
 	//R /= (x.size()-1);
 
 	uint_t min=time1.size();

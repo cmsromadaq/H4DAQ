@@ -25,6 +25,7 @@ private:
 	double d2_; // 2nd min. Used to check convergence.
 	double d_;
 	vector<pair<uint_t,uint_t> > R_;
+	inline double sqr(double x){return x*x;}
 public:
 	// -- data matching, pattern recognition
 	// -- find match
