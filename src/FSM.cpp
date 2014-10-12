@@ -59,6 +59,8 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			     else if (myCmd.cmd == DIE ) 
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -78,6 +80,10 @@ while (true) {
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -806,6 +812,10 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex() ) break;
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
@@ -838,10 +848,6 @@ while (true) {
 			 }
 
 		    } // beam trg
-			// gui Cmd
-		    ResetMex();
-		    UpdateMex();
-		    ParseGUIMex();
 		    break;
 		    }
 	case WAITFORREADY:
@@ -974,7 +980,7 @@ while (true) {
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();
 		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
-	            ParseGUIMex(); 
+	            if (ParseGUIMex() ) break;
 		    break;
 		    }
 	case ERROR: {
@@ -1012,7 +1018,10 @@ void RunControlFSM::UpdateMex(){
 			    else if (myNewCmd.cmd == GUI_DIE)
 				    gui_die=true;
 			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
+				    {
 				    gui_restartrun=true;
+				    gui_pauserun=false;
+				    }
 			    
 		    }
 	return;
@@ -1062,7 +1071,7 @@ void RunControlFSM::ErrorStatus(){
 	MoveToStatus(INITIALIZED);
 }
 
-void RunControlFSM::ParseGUIMex(){
+int RunControlFSM::ParseGUIMex(){
 		    if (gui_stoprun)
 		   	 { 
 				dataType myMex;
@@ -1092,7 +1101,7 @@ void RunControlFSM::ParseGUIMex(){
 				//gui_pauserun=false;
 				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
 			        myPausedFlag_=true;
-			        return;
+			        return 1;
 		        }
 		    else if ( eb_endspill )
 			    // SEND BEGINSPILL
@@ -1102,4 +1111,5 @@ void RunControlFSM::ParseGUIMex(){
 				connectionManager_->Send(myMex,CmdSck);
 				MoveToStatus(BEGINSPILL);
 			    }
+		   return 0;
 }
