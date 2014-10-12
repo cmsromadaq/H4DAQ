@@ -10,6 +10,7 @@ verbosity=3
 daquser="cmsdaq"
 daqhome="/home/cmsdaq"
 norecompile=0
+ebrecompile=0
 logdir="/tmp"
 dr=""
 rc=""
@@ -30,6 +31,7 @@ while true; do
     -n | --nice ) nice="$2"; shift 2 ;;
     -d | --dryrun ) dryrun=1; shift;;
     --norecompile ) norecompile=1; shift;;
+    --ebrecompile ) ebrecompile=1; shift;;
     --daquser )
       daquser="$2"; shift 2 ;;
     --daqhome )
@@ -109,7 +111,7 @@ for machine in $eb ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
+	[ "${ebrecompile}" == "0" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START EVENTBUILDER on $machine"

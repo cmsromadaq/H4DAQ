@@ -59,6 +59,8 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			     else if (myCmd.cmd == DIE ) 
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -78,6 +80,10 @@ while (true) {
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -98,6 +104,10 @@ while (true) {
 					connectionManager_->Send(myMex,CmdSck);
 					MoveToStatus(WAITTRIG);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -680,7 +690,7 @@ while (true) {
 					   break;
 					   }
 				   char *ptr= (char*)myCmd.data + shift;
-				   if (!strcmp(ptr,"PED")) // pedestal run
+				   if (!strcmp(ptr,"PEDESTAL")) // pedestal run
 						   {
 #ifdef FSM_DEBUG
 				   {
@@ -773,9 +783,16 @@ while (true) {
 		    }
 	case BEGINSPILL: 
 		    {
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex() ) break;
+
 		    // wait for wwe
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
+		    dataType guiwweMex;
+		    guiwweMex.append((void*)"GUI_SPS wwe",11);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -796,6 +813,7 @@ while (true) {
 			 {
 			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
 			    connectionManager_->Send(wweMex,CmdSck);
+			    connectionManager_->Send(guiwweMex,StatusSck);
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 			 }
@@ -806,9 +824,15 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex() ) break;
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
+		    dataType guiweMex;
+		    guiweMex.append((void*)"GUI_SPS we",10);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
@@ -823,10 +847,11 @@ while (true) {
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
-		   	 // read the boards for WWE
+		   	 // read the boards for WE
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
+			   connectionManager_->Send(guiweMex,StatusSck);
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
@@ -837,7 +862,7 @@ while (true) {
 			   MoveToStatus(WAITFORREADY);
 			 }
 
-		    }
+		    } // beam trg
 		    break;
 		    }
 	case WAITFORREADY:
@@ -871,6 +896,8 @@ while (true) {
 		    // check for END OF SPILL
 		    dataType eeMex;
 		    eeMex.append((void*)"EE\0",3);
+		    dataType guieeMex;
+		    guieeMex.append((void*)"GUI_SPS ee",10);
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
@@ -879,6 +906,7 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  connectionManager_->Send(guieeMex,StatusSck);
 				  hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
@@ -970,46 +998,7 @@ while (true) {
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();
 		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
-		    if (gui_stoprun)
-		   	 { 
-				dataType myMex;
-				myMex.append((void*)"ENDRUN\0",7);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(INITIALIZED);
-		    	 }
-		    else if( gui_restartrun ) 
-		   	{
-				dataType myMex;
-				gui_pauserun=false;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-			    	//SEND beginSPILL
-				MoveToStatus(BEGINSPILL);
-			}
-		    else if( gui_die )
-			    	//SEND DIE
-			{
-				dataType myMex;
-				myMex.append((void*)"DIE\0",4);
-				connectionManager_->Send(myMex,CmdSck);
-			        MoveToStatus(BYE);
-			}
-		    else if (gui_pauserun)
-		        {
-				//gui_pauserun=false;
-				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
-			        myPausedFlag_=true;
-			        break;
-		        }
-		    else if ( eb_endspill )
-			    // SEND BEGINSPILL
-			    {
-				dataType myMex;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(BEGINSPILL);
-			    }
-			    
+	            if (ParseGUIMex() ) break;
 		    break;
 		    }
 	case ERROR: {
@@ -1047,7 +1036,10 @@ void RunControlFSM::UpdateMex(){
 			    else if (myNewCmd.cmd == GUI_DIE)
 				    gui_die=true;
 			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
+				    {
 				    gui_restartrun=true;
+				    gui_pauserun=false;
+				    }
 			    
 		    }
 	return;
@@ -1095,4 +1087,47 @@ void RunControlFSM::ErrorStatus(){
 	connectionManager_->Send(endRun,CmdSck);
 
 	MoveToStatus(INITIALIZED);
+}
+
+int RunControlFSM::ParseGUIMex(){
+		    if (gui_stoprun)
+		   	 { 
+				dataType myMex;
+				myMex.append((void*)"ENDRUN\0",7);
+				connectionManager_->Send(myMex,CmdSck);
+				MoveToStatus(INITIALIZED);
+		    	 }
+		    else if( gui_restartrun ) 
+		   	{
+				dataType myMex;
+				gui_pauserun=false;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+			    	//SEND beginSPILL
+				MoveToStatus(BEGINSPILL);
+			}
+		    else if( gui_die )
+			    	//SEND DIE
+			{
+				dataType myMex;
+				myMex.append((void*)"DIE\0",4);
+				connectionManager_->Send(myMex,CmdSck);
+			        MoveToStatus(BYE);
+			}
+		    else if (gui_pauserun)
+		        {
+				//gui_pauserun=false;
+				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
+			        myPausedFlag_=true;
+			        return 1;
+		        }
+		    else if ( eb_endspill )
+			    // SEND BEGINSPILL
+			    {
+				dataType myMex;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+				MoveToStatus(BEGINSPILL);
+			    }
+		   return 0;
 }
