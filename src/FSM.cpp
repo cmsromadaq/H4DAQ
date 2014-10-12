@@ -779,6 +779,11 @@ while (true) {
 		    }
 	case BEGINSPILL: 
 		    {
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex() ) break;
+
 		    // wait for wwe
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
@@ -812,10 +817,6 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
-			// gui Cmd
-		    ResetMex();
-		    UpdateMex();
-		    if ( ParseGUIMex() ) break;
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
