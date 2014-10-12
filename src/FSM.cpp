@@ -435,6 +435,10 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -453,6 +457,10 @@ while (true) {
 					 MoveToStatus(CLEARED);
 					 // Reset Bad Spill
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -468,6 +476,10 @@ while (true) {
 				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -777,16 +789,23 @@ while (true) {
 				   // init RunNum in eventBuilder
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
-				 }
+				 } // end GUI_STARTRUN
+				else if( myCmd.cmd ==  GUI_DIE) 
+				{
+					dataType myMex;
+					myMex.append((void*)"DIE\0",4);
+					connectionManager_->Send(myMex,CmdSck);
+				        MoveToStatus(BYE);
+				}
 			    }
 		    break;
 		    }
 	case BEGINSPILL: 
 		    {
 			// gui Cmd
-		    ResetMex();
+		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) break;
+		    if ( ParseGUIMex()>0 ) { break; }
 
 		    // wait for wwe
 		    dataType wweMex;
@@ -825,9 +844,10 @@ while (true) {
 	case CLEARED:
 		    {
 			// gui Cmd
-		    ResetMex();
+		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) break;
+		    if ( ParseGUIMex()>0 ) { break; }
+
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
@@ -1030,11 +1050,17 @@ void RunControlFSM::UpdateMex(){
 			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
 				    eb_endspill=true;
 			    else if (myNewCmd.cmd == GUI_STOPRUN)
+				    {
+				    gui_pauserun=false;
 				    gui_stoprun = true;
+				    }
 			    else if (myNewCmd.cmd == GUI_PAUSERUN)
 				    gui_pauserun=true;
 			    else if (myNewCmd.cmd == GUI_DIE)
+				    {
+				    gui_pauserun=false;
 				    gui_die=true;
+				    }
 			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
 				    {
 				    gui_restartrun=true;
@@ -1095,6 +1121,7 @@ int RunControlFSM::ParseGUIMex(){
 				dataType myMex;
 				myMex.append((void*)"ENDRUN\0",7);
 				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
 				MoveToStatus(INITIALIZED);
 		    	 }
 		    else if( gui_restartrun ) 
@@ -1104,6 +1131,7 @@ int RunControlFSM::ParseGUIMex(){
 				myMex.append((void*)"SPILLCOMPL\0",11);
 				connectionManager_->Send(myMex,CmdSck);
 			    	//SEND beginSPILL
+				gui_pauserun=false;
 				MoveToStatus(BEGINSPILL);
 			}
 		    else if( gui_die )
@@ -1112,6 +1140,7 @@ int RunControlFSM::ParseGUIMex(){
 				dataType myMex;
 				myMex.append((void*)"DIE\0",4);
 				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
 			        MoveToStatus(BYE);
 			}
 		    else if (gui_pauserun)
