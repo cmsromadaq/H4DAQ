@@ -837,7 +837,11 @@ while (true) {
 			   MoveToStatus(WAITFORREADY);
 			 }
 
-		    }
+		    } // beam trg
+			// gui Cmd
+		    ResetMex();
+		    UpdateMex();
+		    ParseGUIMex();
 		    break;
 		    }
 	case WAITFORREADY:
@@ -970,46 +974,7 @@ while (true) {
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();
 		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
-		    if (gui_stoprun)
-		   	 { 
-				dataType myMex;
-				myMex.append((void*)"ENDRUN\0",7);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(INITIALIZED);
-		    	 }
-		    else if( gui_restartrun ) 
-		   	{
-				dataType myMex;
-				gui_pauserun=false;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-			    	//SEND beginSPILL
-				MoveToStatus(BEGINSPILL);
-			}
-		    else if( gui_die )
-			    	//SEND DIE
-			{
-				dataType myMex;
-				myMex.append((void*)"DIE\0",4);
-				connectionManager_->Send(myMex,CmdSck);
-			        MoveToStatus(BYE);
-			}
-		    else if (gui_pauserun)
-		        {
-				//gui_pauserun=false;
-				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
-			        myPausedFlag_=true;
-			        break;
-		        }
-		    else if ( eb_endspill )
-			    // SEND BEGINSPILL
-			    {
-				dataType myMex;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(BEGINSPILL);
-			    }
-			    
+	            ParseGUIMex(); 
 		    break;
 		    }
 	case ERROR: {
@@ -1095,4 +1060,46 @@ void RunControlFSM::ErrorStatus(){
 	connectionManager_->Send(endRun,CmdSck);
 
 	MoveToStatus(INITIALIZED);
+}
+
+void RunControlFSM::ParseGUIMex(){
+		    if (gui_stoprun)
+		   	 { 
+				dataType myMex;
+				myMex.append((void*)"ENDRUN\0",7);
+				connectionManager_->Send(myMex,CmdSck);
+				MoveToStatus(INITIALIZED);
+		    	 }
+		    else if( gui_restartrun ) 
+		   	{
+				dataType myMex;
+				gui_pauserun=false;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+			    	//SEND beginSPILL
+				MoveToStatus(BEGINSPILL);
+			}
+		    else if( gui_die )
+			    	//SEND DIE
+			{
+				dataType myMex;
+				myMex.append((void*)"DIE\0",4);
+				connectionManager_->Send(myMex,CmdSck);
+			        MoveToStatus(BYE);
+			}
+		    else if (gui_pauserun)
+		        {
+				//gui_pauserun=false;
+				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
+			        myPausedFlag_=true;
+			        return;
+		        }
+		    else if ( eb_endspill )
+			    // SEND BEGINSPILL
+			    {
+				dataType myMex;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+				MoveToStatus(BEGINSPILL);
+			    }
 }
