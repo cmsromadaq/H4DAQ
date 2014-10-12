@@ -435,6 +435,10 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -453,6 +457,10 @@ while (true) {
 					 MoveToStatus(CLEARED);
 					 // Reset Bad Spill
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -468,6 +476,10 @@ while (true) {
 				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -777,16 +789,23 @@ while (true) {
 				   // init RunNum in eventBuilder
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
-				 }
+				 } // end GUI_STARTRUN
+				else if( myCmd.cmd ==  GUI_DIE) 
+				{
+					dataType myMex;
+					myMex.append((void*)"DIE\0",4);
+					connectionManager_->Send(myMex,CmdSck);
+				        MoveToStatus(BYE);
+				}
 			    }
 		    break;
 		    }
 	case BEGINSPILL: 
 		    {
 			// gui Cmd
-		    ResetMex();
+		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) break;
+		    if ( ParseGUIMex() ) { ResetMex(); break; }
 
 		    // wait for wwe
 		    dataType wweMex;
@@ -825,9 +844,9 @@ while (true) {
 	case CLEARED:
 		    {
 			// gui Cmd
-		    ResetMex();
+		    if( !gui_pauserun ) ResetMex();
 		    UpdateMex();
-		    if ( ParseGUIMex() ) break;
+		    if ( ParseGUIMex() ) { ResetMex(); break; }
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);

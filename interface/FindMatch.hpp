@@ -10,8 +10,8 @@ class FindMatch
 private:
 	vector<uint64_t> time1;
 	vector<uint64_t> time2;
-	double alpha=15.;
-	int maxWindow=1;
+	double alpha;
+	int maxWindow;
 	// -- test distance
 	double Distance(vector<uint_t> &x,vector<uint_t> &y);
 	// -- find next test element
@@ -26,6 +26,7 @@ private:
 	double d_;
 	vector<pair<uint_t,uint_t> > R_;
 public:
+	FindMatch(){ alpha=15.; maxWindow=1;};
 	// -- data matching, pattern recognition
 	// -- find match
 	int Run();
