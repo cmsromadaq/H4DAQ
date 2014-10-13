@@ -160,8 +160,8 @@ void Logger::Write(string line, bool dryrun)
 void Logger::NetworkWrite(string line){
   if (logConnMan_ && logStatusSck_>=0){
     dataType myMex;
-    myMex.append((void*)"GUI_LOG DEBUGMESSAGE",20);
-    //    myMex.append((void*)line.c_str(),line.length()+1);
+    myMex.append((void*)"GUI_LOG ",8);
+    myMex.append((void*)line.c_str(),line.length());
     logConnMan_->Send(myMex,logStatusSck_);
   }
 }
@@ -240,7 +240,6 @@ void Logger::Log(string line,short level){
     }
     else Write(line);
     // network logging only level 1
-    NetworkWrite(line);
-    //    if (level <=1 )NetworkWrite(line);
+    if (level <=1 )NetworkWrite(line);
     return;
 }
