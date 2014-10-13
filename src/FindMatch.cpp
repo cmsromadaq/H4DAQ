@@ -5,6 +5,8 @@ int FindMatch::SetTimes(vector<uint64_t> &x,vector<uint64_t> &y)
 {
 	time1=x; // copy
 	time2=y; 
+	iDCutX_=-1;
+	iDCutY_=-1;
 	return 0;
 }
 
@@ -26,7 +28,11 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	for(uint_t i=0;i<x.size();++i)
 	{
 		R+= sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) ); // ???
-		if ( R> d2_ ) return R; // speed up // to further speed up, this have to branch out FindNext
+		if ( R> d2_ ) {
+			iDCutX_=x[i];
+			iDCutY_=y[i];
+			return R; // speed up // to further speed up, this have to branch out FindNext
+		}
 	}
 	//R /= (x.size()-1);
 
@@ -86,7 +92,8 @@ int FindMatch::FindNext(vector<uint_t> &x,int N)
 //	 else printf("0");
 // printf("\n");
 //#endif
- if( swap(pos,0)> 0 ) return -2 ; // if return 1, I'm using all of them, first==last, so should not be here
+//if( swap(pos,0)> 0 ) return -2 ; // if return 1, I'm using all of them, first==last, so should not be here
+ if( swapFast(pos)> 0 ) return -2 ; 
 #ifdef FM_DEBUG
  printf("NEW:%d:",N);
  for( uint_t i=0;i<N;++i)
@@ -104,8 +111,49 @@ int FindMatch::FindNext(vector<uint_t> &x,int N)
  return 0;
 }
 
+int FindMatch::swapFast(vector<bool> &x )
+{
+	// find the last 1,0
+	for(long i=x.size()-2; i>=0 ;--i)
+	{
+	if (iDCutX_ >=0 && swappingX_) 
+		{
+		 i=iDCutX_; // branch off: cut all un-required branches
+		 iDCutX_=-1;
+		}
+	if (iDCutY_ >=0 && swappingY_) 
+		{
+		 i=iDCutY_; // branch off: cut all un-required branches
+		 iDCutY_=-1;
+		}
+	if (x[i]==true && x[i+1]==false )	
+		{
+		bool tmp= x[i];
+		x[i]=x[i+1];
+		x[i+1]=tmp;
+		// put following 0s to the end
+		// search for 1
+		uint_t last;
+		for(last =x.size() -1 ; last > i+2 && !x[last]  ;last -- );
 
-// 0 = swapped ; 1 = not swapped
+		for( uint_t j=i+2; j<last ;++j) // if j
+			{
+			if (x[j] == false)// ?!?
+				{ // swap with last
+				bool tmp= x[j];
+				x[j]=x[last];
+				x[last]=tmp;
+				//update last
+				for(last =x.size() -1 ; last > i+2 && !x[last]  ;last -- );
+				}
+			}
+		return 0;
+
+		}
+	}
+	return 1;
+}
+
 int FindMatch::swap(vector<bool> &x,int offset) {
 	if (offset >= x.size() -1 ) return 1; // not swap
 	if ( swap(x,offset+1)==0 ) return 0;
@@ -188,9 +236,13 @@ for (int w=0;w <= maxWindow ;++w)
 			d2_=d_;
 			d_=d1;
 			CopyResult(matched1,matched2);
+			swappingX_=false;
+			swappingY_=true;
 			}
 		}while ( (status2=FindNext(matched2,time2.size())) == 0 ); //end while combination 2
 	if (status2< 0 ) return -200 + status2;	
+	swappingX_=true;
+	swappingY_=false;
 	}while (  (status1=FindNext(matched1,time1.size()) ) == 0 ); //end while combination 1
 	if (status1< 0 ) return -100 + status1;	
 	} // end for
