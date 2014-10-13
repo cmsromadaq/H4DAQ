@@ -75,11 +75,6 @@
       <ID>1</ID>
       <baseAddress>0x00110000</baseAddress>
     </board>
-    <board>
-      <type>LECROY_1182</type> <!-- LECROY 1182-->
-      <ID>2</ID>
-      <baseAddress>0x00120000</baseAddress>
-    </board>
 
     <board>
       <type>CAEN_V1290</type> <!-- TDC 1290-->
@@ -95,6 +90,30 @@
       <enabledChannels>0x00FF</enabledChannels>
       <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns --> 
       <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns --> 
+    </board>
+
+    <board>
+      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+      <ID>1</ID>
+      <baseAddress>0xAAAA0000</baseAddress>
+      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+      <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
+    </board>
+
+    <board>
+      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+      <ID>2</ID>
+      <baseAddress>0xBBBB0000</baseAddress>
+      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+      <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
     </board>
 
   </Hardware>
