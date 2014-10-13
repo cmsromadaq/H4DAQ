@@ -212,6 +212,10 @@ int HwManager::CrateClose(){
       throw hw_exception();
     }
 
+  ostringstream s;
+  s << "[HwManager]::[INFO]::Closing VME connection";
+  Log(s.str(),1);
+
   return 0;
 }
 

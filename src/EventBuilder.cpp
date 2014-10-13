@@ -1,10 +1,11 @@
 #include "interface/EventBuilder.hpp"
 #include "interface/DataType.hpp"
 #include "interface/Utility.hpp"
+#include "interface/Board.hpp"
 #include <sstream>
 
 #define EB_DEBUG
-#define TIME_DEBUG
+//#define TIME_DEBUG
 
 
 
@@ -26,7 +27,7 @@ EventBuilder::EventBuilder()
 	dump_->SetAsync(); // asyncronous dumping
 	merged_=0;
 	lastBadSpill_=0;  // spill n. starts from 1
-	eventsInThisRun_=0;
+	goodEventsInThisRun_=0;
 	badSpillsInThisRun_=0;
 	async_=true; // async utilts, for dqm
 }
@@ -520,7 +521,6 @@ void EventBuilder::AddEventToSpill(dataType &event){
 	if (mySpill_.size() < WORDSIZE*4)  return; //throw exception TODO
 	
 	lastEvent_.eventInSpill_++;
-	eventsInThisRun_++;
 	// this are updated in the CloseSpill -- should we keep them consistent
 	//WORD *nEventsPtr=((WORD*)mySpill_.data() +3 );
 	//WORD nEvents= *nEventsPtr;
@@ -601,6 +601,8 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	long left2=spill2.size() - WORDSIZE*SpillHeaderWords();
 	ptr1+= WORDSIZE*SpillHeaderWords();
 	ptr2+= WORDSIZE*SpillHeaderWords();
+
+	long dTimeFirstEvent=0;
 	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
 	       {
 #ifdef EB_DEBUG
@@ -620,15 +622,42 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		if (eventSize1 == 0 || eventSize2 == 0 ) return 2;
 		//---- Unire i due eventi
 		//check Time here;
-#ifdef TIME_DEBUG
-		{ // this code may slow down the code, as well as produce large log files
+		// assuming first board is a time board
+		// check that first board is time _TIME_
+		WORD tB=(WORD)_TIME_;
+		WORD bId1 = * (WORD*)(ptr1+ (EventTimePos()-2)*WORDSIZE );
+		WORD bId2 = * (WORD*)(ptr2+ (EventTimePos()-2)*WORDSIZE );
+		if ( (bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
+			{
+			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId1= "<<bId1
+					  <<" bId1&bitMask= "<<(bId1 &GetBoardTypeIdBitMask ()) << " lowbit= "<< ((bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() )<< " == tB=" << tB ; 
+			Log(s.str(),1); 
+			}
+		if ( (bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
+			{
+			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId2="<<bId2
+					  <<"bId2&bitMask="<<(bId2 &GetBoardTypeIdBitMask ()) << " lowbit="<<((bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift () )<< " == tB=" << tB ; 
+			Log(s.str(),1); 
+			} 
 		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		if (iEvent==0 ) dTimeFirstEvent=int64_t(time1)-int64_t(time2);
+		// assume sigma=1*sqrt(2), cutting on 20
+		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>20 )
+			{
+			ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] bad spill for time";
+			// this is a bad Spill
+			Log(s2.str(),1);
+			return 3;
+			}
+#ifdef TIME_DEBUG
+		{ // this code may slow down the code, as well as produce large log files
 		ostringstream s2;
 			s2<<"[EventBuilder]::[TIMEINFO] "<<spillNum1<<" "<<iEvent<<" "<< time1<<" "<<time2;
 		Log(s2.str(),2);
 		}
 #endif
+
 		dataType event1(eventSize1,ptr1);
 		dataType event2(eventSize2,ptr2);
 		dataType myEvent;MergeEventStream(myEvent,event1,event2);
@@ -695,6 +724,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
+		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
 		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
@@ -745,7 +775,7 @@ void EventBuilder::SetRunNum(WORD x)
 {
 //runNum_=x;
 lastEvent_.runNum_=x;
-eventsInThisRun_=0;
+goodEventsInThisRun_=0;
 lastBadSpill_=0;
 badSpillsInThisRun_=0;
 if (dumpEvent_ || recvEvent_)  // POSIX

@@ -62,6 +62,7 @@ public:
 	bool IsOk();
 	void inline ResetMex(){gui_pauserun=false; gui_stoprun=false; gui_restartrun=false; gui_die=false; eb_endspill=false;};
 	void UpdateMex();
+	int ParseGUIMex();  // if 1 -> break; 
         void SendSpillDuration();	
 	virtual void ErrorStatus();
 };

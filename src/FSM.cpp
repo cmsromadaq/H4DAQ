@@ -59,6 +59,8 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			     else if (myCmd.cmd == DIE ) 
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -78,6 +80,10 @@ while (true) {
 				   eventBuilder_->OpenSpill();
 				   MoveToStatus(CLEARED);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -98,6 +104,10 @@ while (true) {
 					connectionManager_->Send(myMex,CmdSck);
 					MoveToStatus(WAITTRIG);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -425,6 +435,10 @@ while (true) {
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -443,6 +457,10 @@ while (true) {
 					 MoveToStatus(CLEARED);
 					 // Reset Bad Spill
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -458,6 +476,10 @@ while (true) {
 				   //					 hwManager_->BufferClearAll();
 					 MoveToStatus(CLEARBUSY);
 				 }
+			    else if(myCmd.cmd == ENDRUN ) 
+				MoveToStatus(INITIALIZED);
+			    else if(myCmd.cmd == DIE)
+				MoveToStatus(BYE);
 			    }
 		    break;
 		    }
@@ -588,10 +610,12 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   int n=0;
   WORD runnr=0;
   WORD spillnr=0;
+  WORD goodevinrun=0;
   WORD badspills=0;
   if (eventBuilder_){
     runnr = eventBuilder_->GetEventId().runNum_;
     spillnr = eventBuilder_->GetEventId().spillNum_;
+    goodevinrun = eventBuilder_->GetGoodEvents();
     badspills = eventBuilder_->GetBadSpills();
   }
   myMex.append((void*)"runnumber=",10);
@@ -599,6 +623,9 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"spillnumber=",12);
   n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
+  myMex.append((void*)mybuffer,n);
+  myMex.append((void*)"evinrun=",8);
+  n = snprintf(mybuffer,255,"%u ",goodevinrun); //evinrun
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"badspills=",10);
   n = snprintf(mybuffer,255,"%u ",badspills); //badspills
@@ -667,7 +694,7 @@ while (true) {
 				   // find out the type of RUN and the Trigger rate (if exists)
 				   int shift=Utility::FindNull(myCmd.N,myCmd.data,1);
 #ifdef FSM_DEBUG
-				   ostringstream s2; s2<<"[RunControlFSM]::[Loop] Enter GUI_STARTRUN Routine. shift1="<<shift ;
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter GUI_STARTRUN Routine. shift1="<<shift ;
 				   Log(s2.str(),3);
 #endif
 				   if (shift<0) {
@@ -675,29 +702,58 @@ while (true) {
 					   break;
 					   }
 				   char *ptr= (char*)myCmd.data + shift;
-				   if (!strcmp(ptr,"PED")) // pedestal run
+				   if (!strcmp(ptr,"PEDESTAL")) // pedestal run
 						   {
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter PED Trigger"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
 						   if (shift <0 ) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
-						   if ( sscanf(ptr2,"%ld",trgNevents_) < 1) {
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Starting Scanf nEvents | "<<shift ;
+				   Log(s2.str(),3);
+				   s2.str() = ""; s2 <<"[RunControlFSM]::[Loop]::[DEBUG] myCmd.N="<<myCmd.N<<"| shift1="<<Utility::FindNull(myCmd.N,myCmd.data,1)
+							<<" | shift2="<<Utility::FindNull(myCmd.N,myCmd.data,2)
+							<<" | shift3="<<Utility::FindNull(myCmd.N,myCmd.data,3);
+				   Log(s2.str(),3);
+					
+				   }
+#endif
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) < 1) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] End Scanf trigger set"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 						   trgType_=PED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"LED")) // pedestal run
 						   {
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Enter LED Trigger"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
 						   if (shift <0 ) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
 				   		   char*ptr2= (char*)myCmd.data + shift;
-						   if ( sscanf(ptr2,"%ld",trgNevents_) <1 ){
+						   if ( sscanf(ptr2,"%ld",&trgNevents_) <1 ){
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
@@ -713,6 +769,12 @@ while (true) {
 					break;
 					}
 
+#ifdef FSM_DEBUG
+				   {
+				   ostringstream s2; s2<<"[RunControlFSM]::[Loop]::[DEBUG] Going Send STARTRUN MEX"<<shift ;
+				   Log(s2.str(),3);
+				   }
+#endif
 			    	   dataType myFufMex;
 			    	   myFufMex.append((void*)"NOP\0",4);
 			    	   connectionManager_->Send(myFufMex,CmdSck);
@@ -727,15 +789,29 @@ while (true) {
 				   // init RunNum in eventBuilder
 				   eventBuilder_->SetRunNum(myRunNum);
 				   MoveToStatus(BEGINSPILL);
-				 }
+				 } // end GUI_STARTRUN
+				else if( myCmd.cmd ==  GUI_DIE) 
+				{
+					dataType myMex;
+					myMex.append((void*)"DIE\0",4);
+					connectionManager_->Send(myMex,CmdSck);
+				        MoveToStatus(BYE);
+				}
 			    }
 		    break;
 		    }
 	case BEGINSPILL: 
 		    {
+			// gui Cmd
+		    if( !gui_pauserun ) ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex()>0 ) { break; }
+
 		    // wait for wwe
 		    dataType wweMex;
 		    wweMex.append((void*)"WWE\0",4);
+		    dataType guiwweMex;
+		    guiwweMex.append((void*)"GUI_SPS wwe",11);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -756,6 +832,7 @@ while (true) {
 			 {
 			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
 			    connectionManager_->Send(wweMex,CmdSck);
+			    connectionManager_->Send(guiwweMex,StatusSck);
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 			 }
@@ -766,9 +843,16 @@ while (true) {
 		    }
 	case CLEARED:
 		    {
+			// gui Cmd
+		    if( !gui_pauserun ) ResetMex();
+		    UpdateMex();
+		    if ( ParseGUIMex()>0 ) { break; }
+
 		    // wait for we
 		    dataType weMex;
 		    weMex.append((void*)"WE\0",3);
+		    dataType guiweMex;
+		    guiweMex.append((void*)"GUI_SPS we",10);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
@@ -783,10 +867,11 @@ while (true) {
 		    }
 		    else if (trgType_==BEAM_TRIG)
 		    {
-		   	 // read the boards for WWE
+		   	 // read the boards for WE
 			 if (hwManager_->SignalReceived(WE))
 			 {
 			   connectionManager_->Send(weMex,CmdSck);
+			   connectionManager_->Send(guiweMex,StatusSck);
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
@@ -797,7 +882,7 @@ while (true) {
 			   MoveToStatus(WAITFORREADY);
 			 }
 
-		    }
+		    } // beam trg
 		    break;
 		    }
 	case WAITFORREADY:
@@ -831,6 +916,8 @@ while (true) {
 		    // check for END OF SPILL
 		    dataType eeMex;
 		    eeMex.append((void*)"EE\0",3);
+		    dataType guieeMex;
+		    guieeMex.append((void*)"GUI_SPS ee",10);
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
@@ -839,6 +926,7 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //				  usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  connectionManager_->Send(guieeMex,StatusSck);
 				  hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
@@ -930,46 +1018,7 @@ while (true) {
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();
 		    // ORDER MATTERS!!! FIRST GUI, THEN EB_SPILL
-		    if (gui_stoprun)
-		   	 { 
-				dataType myMex;
-				myMex.append((void*)"ENDRUN\0",7);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(INITIALIZED);
-		    	 }
-		    else if( gui_restartrun ) 
-		   	{
-				dataType myMex;
-				gui_pauserun=false;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-			    	//SEND beginSPILL
-				MoveToStatus(BEGINSPILL);
-			}
-		    else if( gui_die )
-			    	//SEND DIE
-			{
-				dataType myMex;
-				myMex.append((void*)"DIE\0",4);
-				connectionManager_->Send(myMex,CmdSck);
-			        MoveToStatus(BYE);
-			}
-		    else if (gui_pauserun)
-		        {
-				//gui_pauserun=false;
-				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
-			        myPausedFlag_=true;
-			        break;
-		        }
-		    else if ( eb_endspill )
-			    // SEND BEGINSPILL
-			    {
-				dataType myMex;
-				myMex.append((void*)"SPILLCOMPL\0",11);
-				connectionManager_->Send(myMex,CmdSck);
-				MoveToStatus(BEGINSPILL);
-			    }
-			    
+	            if (ParseGUIMex() ) break;
 		    break;
 		    }
 	case ERROR: {
@@ -1001,13 +1050,22 @@ void RunControlFSM::UpdateMex(){
 			    if (myNewCmd.cmd == EB_SPILLCOMPLETED )  
 				    eb_endspill=true;
 			    else if (myNewCmd.cmd == GUI_STOPRUN)
+				    {
+				    gui_pauserun=false;
 				    gui_stoprun = true;
+				    }
 			    else if (myNewCmd.cmd == GUI_PAUSERUN)
 				    gui_pauserun=true;
 			    else if (myNewCmd.cmd == GUI_DIE)
+				    {
+				    gui_pauserun=false;
 				    gui_die=true;
+				    }
 			    else if (myNewCmd.cmd == GUI_RESTARTRUN)
+				    {
 				    gui_restartrun=true;
+				    gui_pauserun=false;
+				    }
 			    
 		    }
 	return;
@@ -1055,4 +1113,55 @@ void RunControlFSM::ErrorStatus(){
 	connectionManager_->Send(endRun,CmdSck);
 
 	MoveToStatus(INITIALIZED);
+}
+
+int RunControlFSM::ParseGUIMex(){
+		    if (gui_stoprun)
+		   	 { 
+				dataType myMex;
+				myMex.append((void*)"ENDRUN\0",7);
+				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
+				MoveToStatus(INITIALIZED);
+				return 1;
+		    	 }
+		    else if( gui_restartrun ) 
+		   	{
+				dataType myMex;
+				gui_pauserun=false;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+			    	//SEND beginSPILL
+				gui_pauserun=false;
+				if(myStatus_==SENTBUFFER)MoveToStatus(BEGINSPILL);
+				//in other cases, stay where you are
+				return 1;
+			}
+		    else if( gui_die )
+			    	//SEND DIE
+			{
+				dataType myMex;
+				myMex.append((void*)"DIE\0",4);
+				connectionManager_->Send(myMex,CmdSck);
+				gui_pauserun=false;
+			        MoveToStatus(BYE);
+				return 1;
+			}
+		    else if (gui_pauserun)
+		        {
+				//gui_pauserun=false;
+				if (! myPausedFlag_)SendStatus(myStatus_,myStatus_); // just for sending the paused information to the GUI --
+			        myPausedFlag_=true;
+			        return 1;
+		        }
+		    else if ( eb_endspill )
+			    // SEND BEGINSPILL
+			    {
+				dataType myMex;
+				myMex.append((void*)"SPILLCOMPL\0",11);
+				connectionManager_->Send(myMex,CmdSck);
+				MoveToStatus(BEGINSPILL);
+				return 1;
+			    }
+		   return 0;
 }

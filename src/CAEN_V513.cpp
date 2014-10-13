@@ -98,7 +98,7 @@ int CAEN_V513::Init()
       unsigned int nt=0;
       while(!SignalReceived(WE))
 	{
-	  //usleep(1000);
+	  //	  usleep(1000);
 	  ++nt;
 	}
       BufferClear();

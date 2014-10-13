@@ -21,6 +21,17 @@ Daemon::Daemon(){
 	srand((unsigned)time(NULL));
 }
 
+Daemon::~Daemon(){
+	if(eventBuilder_) delete eventBuilder_;
+	if(connectionManager_) delete connectionManager_;
+	if(hwManager_) delete hwManager_;
+	if(configurator_) delete configurator_;
+	eventBuilder_ = NULL;
+	connectionManager_=NULL;
+	hwManager_=NULL;
+	configurator_=NULL;
+}
+
 
 int Daemon::Init(string configFileName){
 	try{
@@ -247,15 +258,14 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	myMex.append((void*)mybuffer,n);
 	WORD runnr = 0;
 	WORD spillnr = 0;
-	WORD evinspill = 1;
-	WORD gentriginspill = 0;
-	WORD evinthisrun = 0;
+	WORD evinspill = 0;
 	if (eventBuilder_){
 	  runnr = eventBuilder_->GetEventId().runNum_;
 	  spillnr = eventBuilder_->GetEventId().spillNum_;
-	  evinspill = eventBuilder_->GetEventId().eventInSpill_;
-	  gentriginspill = 0; // TODO
-	  evinthisrun = eventBuilder_->eventsInThisRun_;
+	  if (eventBuilder_->GetEventId().eventInSpill_>0){
+	    evinspill = eventBuilder_->GetEventId().eventInSpill_-1;
+	    //evinspill-1 because lastEvent_ is number_of_events+1
+	  }
 	}
 	myMex.append((void*)"runnumber=",10);
 	n = snprintf(mybuffer,255,"%u ",runnr); //runnr
@@ -264,13 +274,7 @@ void Daemon::SendStatus(STATUS_t oldStatus, STATUS_t newStatus){
 	n = snprintf(mybuffer,255,"%u ",spillnr); //spillnr
 	myMex.append((void*)mybuffer,n);
 	myMex.append((void*)"evinspill=",10);
-	n = snprintf(mybuffer,255,"%u ",evinspill-1); //evinspill-1 because lastEvent_ is number_of_events+1
-	myMex.append((void*)mybuffer,n);
-	myMex.append((void*)"gentriginspill=",15);
-	n = snprintf(mybuffer,255,"%u ",gentriginspill); //gentriginspill
-	myMex.append((void*)mybuffer,n);
-	myMex.append((void*)"evinrun=",8);
-	n = snprintf(mybuffer,255,"%u ",evinthisrun); //evinthisrun
+	n = snprintf(mybuffer,255,"%u ",evinspill); 
 	myMex.append((void*)mybuffer,n);
 	myMex.append((void*)"paused=",7);
 	if (myPausedFlag_) myMex.append((void*)"1",1);
