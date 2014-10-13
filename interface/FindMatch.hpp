@@ -17,6 +17,7 @@ private:
 	// -- find next test element
 	int FindNext(vector<uint_t> &x,int N);
 	int swap(vector<bool> &x,int offset) ;
+	int swapFast(vector<bool> &x );
 
 	// -- copy matched1, matched2 in Result
 	int CopyResult(vector<uint_t> &x, vector<uint_t> &y);
@@ -26,6 +27,11 @@ private:
 	double d_;
 	vector<pair<uint_t,uint_t> > R_;
 	inline double sqr(double x){return x*x;}
+	// speed up
+	long iDCutX_;
+	long iDCutY_;
+	bool swappingX_;
+	bool swappingY_;
 public:
 	FindMatch(){ alpha=15.; maxWindow=1;};
 	// -- data matching, pattern recognition

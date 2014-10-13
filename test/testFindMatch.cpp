@@ -17,7 +17,7 @@ int main()
 #ifndef NO_ROOT
 	TRandom3 r;r.SetSeed( (unsigned)time(NULL) ) ;
 	FindMatch A;
-	A.SetMaxWindow(0); 
+	A.SetMaxWindow(1); 
 	// create a basic spill random time distributions
 	vector<uint64_t> t;	
 	uint64_t lastTime=100;
@@ -32,7 +32,7 @@ int main()
 	uint64_t delta=TMath::Floor(r.Uniform(10,100) );
 	for(unsigned int i=0; i<t.size(); ++i)
 		{
-			// 0.0005
+			// 0.0005 for 2000
 		if (r.Uniform() > 0.0005) time1.push_back(t[i]);
 		if (r.Uniform() > 0.0005) time2.push_back(
 				TMath::Floor( r.Gaus(t[i],1.1) ) + delta
@@ -78,10 +78,10 @@ int main()
 	// PLOT
 	{
 		TCanvas *c=new TCanvas("c","c",800,800);
-		TH1D *h0 =new TH1D("time" ,"time;time;time" ,1000,0,1000.);
-		TH1D *h1 =new TH1D("time1","time1;time;time1",1000,0,1000.);
-		TH1D *h2 =new TH1D("time2","time2;time;time2",1000,0,1000.);
-		TH1D *h2_shifted =new TH1D("time2_shift","time2;time;time2",1000,0,1000.) ; h2_shifted->SetLineColor(kRed);
+		TH1D *h0 =new TH1D("time" ,"time;time;time" ,1000,0,2000.);
+		TH1D *h1 =new TH1D("time1","time1;time;time1",1000,0,2000.);
+		TH1D *h2 =new TH1D("time2","time2;time;time2",1000,0,2000.);
+		TH1D *h2_shifted =new TH1D("time2_shift","time2;time;time2",2000,0,2000.) ; h2_shifted->SetLineColor(kRed);
 		TPad *p0= new TPad("p0","p0",0,0,1,0.35); p0->SetTopMargin(0); p0->SetBottomMargin(.05/.35);
 		TPad *p1= new TPad("p1","p1",0,0.35,1,.65);p1->SetTopMargin(0); p1->SetBottomMargin(0);
 		TPad *p2= new TPad("p2","p2",0,0.65,1,1);p2->SetTopMargin(.05/.35); p2->SetBottomMargin(0);
@@ -122,6 +122,8 @@ int main()
 		h2_shifted->Draw("HIST SAME");
 		h2->Draw("HIST SAME"); // redraw
 		c->SaveAs("Matched.png");
+		c->SaveAs("Matched.pdf");
+		c->SaveAs("Matched.root");
 	}
 	return 0;
 #else
