@@ -627,8 +627,18 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		WORD tB=(WORD)_TIME_;
 		WORD bId1 = * (ptr1+ (EventTimePos()-2)*WORDSIZE );
 		WORD bId2 = * (ptr2+ (EventTimePos()-2)*WORDSIZE );
-		if ( (bId1 &GetBoardTypeIdBitMask () ) >> Utility::lowbit( GetBoardTypeIdBitMask ()) != tB )  Log("[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board",1); 
-		if ( (bId2 &GetBoardTypeIdBitMask () ) >> Utility::lowbit( GetBoardTypeIdBitMask ()) != tB )  Log("[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board",1); 
+		if ( (bId1 &GetBoardTypeIdBitMask () ) << Utility::lowbit( GetBoardTypeIdBitMask ()) != tB )  
+			{
+			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId1="<<bId1
+					  <<"bId1&bitMask="<<(bId1 &GetBoardTypeIdBitMask ()) << " lowbit"<<(bId1 &GetBoardTypeIdBitMask () ) << Utility::lowbit( GetBoardTypeIdBitMask ()) << " == tB=" << tB ; 
+			Log(s.str(),1); 
+			}
+		if ( (bId2 &GetBoardTypeIdBitMask () ) << Utility::lowbit( GetBoardTypeIdBitMask ()) != tB )  
+			{
+			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId2="<<bId2
+					  <<"bId2&bitMask="<<(bId2 &GetBoardTypeIdBitMask ()) << " lowbit"<<(bId2 &GetBoardTypeIdBitMask () ) << Utility::lowbit( GetBoardTypeIdBitMask ()) << " == tB=" << tB ; 
+			Log(s.str(),1); 
+			} 
 		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		if (iEvent==0 ) dTimeFirstEvent=int64_t(time1)-int64_t(time2);
