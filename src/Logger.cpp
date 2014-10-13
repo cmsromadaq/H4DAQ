@@ -239,6 +239,7 @@ void Logger::Log(string line,short level){
 		}
     }
     else Write(line);
-    //    NetworkWrite(line);
+    // network logging only level 1
+    if (level <=1 )NetworkWrite(line);
     return;
 }
