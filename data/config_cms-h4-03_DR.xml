@@ -75,11 +75,6 @@
       <ID>1</ID>
       <baseAddress>0x00110000</baseAddress>
     </board>
-    <board>
-      <type>LECROY_1182</type> <!-- LECROY 1182-->
-      <ID>2</ID>
-      <baseAddress>0x00120000</baseAddress>
-    </board>
 
     <board>
       <type>CAEN_V1290</type> <!-- TDC 1290-->
