@@ -4,7 +4,7 @@
 #include "interface/FindMatch.hpp"
 #include "interface/dataType.hpp"
 
-int main() 
+int main(int argc, char*argv) 
 {
  // This is an emerency program for merging two spills 
 //
