@@ -625,8 +625,8 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		// assuming first board is a time board
 		// check that first board is time _TIME_
 		WORD tB=(WORD)_TIME_;
-		WORD bId1 = * (ptr1+ (EventTimePos()-2)*WORDSIZE );
-		WORD bId2 = * (ptr2+ (EventTimePos()-2)*WORDSIZE );
+		WORD bId1 = * (WORD*)(ptr1+ (EventTimePos()-2)*WORDSIZE );
+		WORD bId2 = * (WORD*)(ptr2+ (EventTimePos()-2)*WORDSIZE );
 		if ( (bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
 			{
 			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId1= "<<bId1
