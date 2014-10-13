@@ -5,6 +5,14 @@
 #include "interface/DataType.hpp"
 #include "interface/Board.hpp"
 
+#ifndef NO_ROOT
+	#include "TPad.h"
+	#include "TCanvas.h"
+	#include "TH1D.h"
+	#include "TROOT.h"
+	#include "TStyle.h"
+#endif
+
 int main(int argc, char**argv) 
 {
  // This is an emerency program for merging two spills 
@@ -119,8 +127,11 @@ fclose(fr2);
 	printf("     status=%d == 0\n", status ) ;
 	printf("     alpha=%lf\n", A.GetAlpha() ) ;
 	printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;
+	printf("     d=%lf\n", A.GetDistance() ) ;
+	printf("     d2=%lf\n", A.GetDistance2() ) ;
 
 	vector<pair<uint_t,uint_t> > matched=A.GetMatch(); // positions in time1/time2
+	printf("     Matched size=%u\n", matched.size() ) ;
 
 	
 
@@ -148,10 +159,47 @@ fclose(fr2);
 	/// update size
 	WORD *spillSizePtr= ((WORD*) mySpill.data() )+ EventBuilder::SpillSizePos();
 	(*spillSizePtr)=(WORD)mySpill.size();
-
 	// write on disk
 	FILE *fw=fopen(outFileName.c_str(),"wb");
 	fwrite(mySpill.data(),1,mySpill.size(),fw);
 	fflush(fw);
 	fclose(fw);
+#ifndef NO_ROOT
+	{
+		gStyle->SetOptStat(0);
+		TCanvas *c=new TCanvas("c","c",800,800);
+		int nBins=4000;
+		double maxX=20000;
+		TH1D *h1 =new TH1D("time1","time1;time;time1",nBins,0,maxX);
+		TH1D *h2 =new TH1D("time2","time2;time;time2",nBins,0,maxX);
+		//TH1D *m1 =new TH1D("matched1","matched1;time;time1",nBins,0,maxX);
+		//TH1D *m2 =new TH1D("matched2","matched2;time;time2",nBins,0,maxX);
+		TH1D *h0 =new TH1D("matched2_1" ,"shifted;time;#Delta time" ,nBins,0,maxX);
+		// plot wrt a reference
+		uint64_t ref=time1[0];
+		if (time2[0]< ref) ref=time2[0];
+		ref += 2;
+		TPad *p0= new TPad("p0","p0",0,0,1,0.5); p0->SetTopMargin(0);       p0->SetBottomMargin(.05/.50);
+		TPad *p1= new TPad("p1","p1",0,0.5,1,1); p1->SetTopMargin(.05/.50); p1->SetBottomMargin(0);
+		p0->Draw();
+		p1->Draw();
+		for(unsigned int i=0;i<time1.size();++i) h1->Fill( time1[i] - time1[0] , 0.5);
+		for(unsigned int i=0;i<time2.size();++i) h2->Fill( time2[i] - time2[0] , 0.5);
+		double delta=0;
+		for(unsigned int i=0;i<matched.size();++i) delta += int64_t(time1[matched[i].first]) - int64_t(time2[matched[i].second]);
+		delta /= matched.size();
+		for(unsigned int i=0;i<time2.size();++i) h0->Fill( int64_t(time2[i]) +delta -time1[0], 1.0);
+		h0->SetLineColor(kGreen);
+
+		p0->cd();
+		h1->Draw("HIST");
+
+		p1->cd();
+		h0->Draw("HIST");
+		h2->Draw("HIST SAME");
+		c->SaveAs( (outFileName + ".pdf").c_str() ) ;
+
+	}
+#endif
+	return 0;
 }

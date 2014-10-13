@@ -41,6 +41,7 @@ public:
 	int SetTimes(vector<uint64_t> &x, vector<uint64_t> &y);
 	// --Get Results
 	const double inline GetDistance(){ return d_; };
+	const double inline GetDistance2(){ return d2_; };
 	const vector<pair<uint_t,uint_t> > inline GetMatch(){ return R_; };
 	// -- Get Par
 	const double inline GetAlpha(){return alpha;};
