@@ -1,5 +1,6 @@
 #include "interface/FindMatch.hpp"
 //#define FM_DEBUG
+#define FM_TIME_DEBUG
 
 int FindMatch::SetTimes(vector<uint64_t> &x,vector<uint64_t> &y)
 {
@@ -27,11 +28,18 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	// 
 	for(uint_t i=0;i<x.size();++i)
 	{
-		R+= sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) ); // ???
+		double chi2=sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
+		R+= chi2;// ???
 		if ( R> d2_ ) {
 			iDCutX_=x[i];
 			iDCutY_=y[i];
 			return R; // speed up // to further speed up, this have to branch out FindNext
+		}
+		if (chi2>20){ // APPROX
+			iDCutX_=x[i];
+			iDCutY_=y[i];
+			R=1.e99;
+			return R;
 		}
 	}
 	//R /= (x.size()-1);
@@ -118,11 +126,17 @@ int FindMatch::swapFast(vector<bool> &x )
 	{
 	if (iDCutX_ >=0 && swappingX_) 
 		{
+#ifdef FM_TIME_DEBUG
+		if (swappingX_) printf("X:%d\n",iDCutX_);
+#endif
 		 i=iDCutX_; // branch off: cut all un-required branches
 		 iDCutX_=-1;
 		}
 	if (iDCutY_ >=0 && swappingY_) 
 		{
+#ifdef FM_TIME_DEBUG
+		if (swappingY_) printf("Y:%d\n",iDCutY_);
+#endif
 		 i=iDCutY_; // branch off: cut all un-required branches
 		 iDCutY_=-1;
 		}
