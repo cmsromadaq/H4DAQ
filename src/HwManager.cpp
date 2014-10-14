@@ -294,16 +294,16 @@ int HwManager::CrateInit()
       status |= CAENComm_Info(myBoardInfo.CommHandle, CAENComm_VMELIB_handle ,&controllerBoard_.boardHandle_);
 
       ostringstream s;
-      s << "[HwManager]::[ERROR]::Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " & VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum ;
+      s << "Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " & VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum ;
 
       if (status)
 	{
-	  s << " cannot be initialized"  ;
-	  Log(s.str(),1);
+	  ostringstream s1; s1 << "[HwManager]::[ERROR]::" << s << " cannot be initialized"  ;
+	  Log(s1.str(),1);
 	  throw config_exception();
 	}
-      s << " initialized"  ;
-      Log(s.str(),1);
+      ostringstream s1; s1 << "[HwManager]::[INFO]::" << s << " initialized"  ;
+      Log(s1.str(),1);
       if (digiBoard_.boardHandle_<0)
 	{
 	  Log("[HwManager]::[ERROR]::VME Crate Controller Handle is wrong",1);
