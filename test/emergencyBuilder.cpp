@@ -84,7 +84,11 @@ fclose(fr2);
 	{
 		printf("event1, check Event # %llu\n",iEvent);
 		long eventSize1= EventBuilder::IsEventOk(ptr1,left1);
-		if (eventSize1 == 0 ) return 2;
+		if (eventSize1 == 0 ) {
+				printf("event %llu has size 0\n",iEvent);
+				printf("event %c%c%c%c\n\n",ptr1[0],ptr1[1],ptr1[2],ptr1[3]);
+				return 2;
+				}
 		WORD tB=(WORD)_TIME_;
 		WORD bId1 = * (WORD*)(ptr1+ (EventBuilder::EventTimePos()-2)*WORDSIZE );
 		if ( (bId1 &EventBuilder::GetBoardTypeIdBitMask () ) >> EventBuilder::GetBoardTypeShift() != tB )  return 3;
@@ -99,10 +103,13 @@ fclose(fr2);
 	{
 		printf("event2, check Event # %llu\n",iEvent);
 		long eventSize2= EventBuilder::IsEventOk(ptr2,left2);
-		if (eventSize2 == 0 ) return 2;
+		if (eventSize2 == 0 ) {
+			printf("event %llu has size 0\n",iEvent);
+			return 4;
+			}
 		WORD tB=(WORD)_TIME_;
 		WORD bId2 = * (WORD*)(ptr2+ (EventBuilder::EventTimePos()-2)*WORDSIZE );
-		if ( (bId2 &EventBuilder::GetBoardTypeIdBitMask () ) >> EventBuilder::GetBoardTypeShift() != tB )  return 3;
+		if ( (bId2 &EventBuilder::GetBoardTypeIdBitMask () ) >> EventBuilder::GetBoardTypeShift() != tB )  return 5;
 		uint64_t mytime2 = *( (uint64_t*) (ptr2 + EventBuilder::EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		time2.push_back(mytime2);
 		myEvents2.push_back(ptr2);
@@ -145,10 +152,10 @@ fclose(fr2);
 	mySpill.append((void*)&runNum1,WORDSIZE); // 
 	mySpill.append((void*)&spillNum1,WORDSIZE); // 
 	mySpill.append( (void*)&zero, WORDSIZE); // spillSize
-	mySpill.append((void*)&spillNevents1,WORDSIZE);
+	mySpill.append((void*)&spillNevents1,WORDSIZE); // this must be updated
 	for(unsigned int iEvent=0; iEvent< matched.size() ;++iEvent)
 	{
-		printf("merging event %u with event %u\n",matched[iEvent].first,matched[iEvent].second);
+		//printf("merging event %u with event %u\n",matched[iEvent].first,matched[iEvent].second);
 		dataType event1(myEventSize1[matched[iEvent].first],myEvents1[matched[iEvent].first]);
 		dataType event2(myEventSize2[matched[iEvent].second],myEvents2[matched[iEvent].second]);
 		dataType myEvent;
@@ -162,6 +169,9 @@ fclose(fr2);
 	/// update size
 	WORD *spillSizePtr= ((WORD*) mySpill.data() )+ EventBuilder::SpillSizePos();
 	(*spillSizePtr)=(WORD)mySpill.size();
+	WORD *spillNevtPtr= ((WORD*) mySpill.data() )+ EventBuilder::SpillNeventPos();
+	(*spillNevtPtr)=(WORD) matched.size();
+	printf("MATCHED %u EVENTS\n",matched.size());
 	// write on disk
 	FILE *fw=fopen(outFileName.c_str(),"wb");
 	fwrite(mySpill.data(),1,mySpill.size(),fw);

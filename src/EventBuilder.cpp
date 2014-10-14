@@ -578,7 +578,8 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 
 	if (runNum1 != runNum2) { Log("[EventBuilder]::[MergeSpills]::[ERROR] RunNumber does not match",1); return 1; } // 
 	if (spillNum1 != spillNum2){ Log("[EventBuilder]::[MergeSpills]::[ERROR] Spill numbers does not match",1);return 1;} 
-	if (spillNevents1 != spillNevents2){Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Ignoring spill.",1); return 1; }
+	if (spillNevents1 != spillNevents2){Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Trying ignoring last.",1); } // return 1; } // assume lasts are wrong
+	if (  abs(int64_t(spillNevents1) - int64_t(spillNevents2)) >1 ) { Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Ignoring spill.",1); return 1;}
 	dataType oldSpill(spill1.size(),spill1.data());	
 	spill1.release();spill1.clear();
 
@@ -589,7 +590,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	spill1.append((void*)&runNum1,WORDSIZE); // 
 	spill1.append((void*)&spillNum1,WORDSIZE); // 
 	spill1.append( (void*)&zero, WORDSIZE); // spillSize
-	spill1.append((void*)&spillNevents1,WORDSIZE);
+	spill1.append((void*)&spillNevents1,WORDSIZE); // will be updated
 
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers Added",3);
@@ -603,7 +604,9 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	ptr2+= WORDSIZE*SpillHeaderWords();
 
 	long dTimeFirstEvent=0;
-	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
+	int skippedEvents=0;
+	WORD merged=0;
+	for(unsigned long long iEvent=0;iEvent< spillNevents1 && iEvent< spillNevents2 ;iEvent++)
 	       {
 #ifdef EB_DEBUG
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge iEvent="<<iEvent;
@@ -641,14 +644,21 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 			} 
 		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		int skipMe=0;
 		if (iEvent==0 ) dTimeFirstEvent=int64_t(time1)-int64_t(time2);
 		// assume sigma=1*sqrt(2), cutting on 20
-		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>20 )
+		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>50 )
 			{
 			ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] bad spill for time";
 			// this is a bad Spill
 			Log(s2.str(),1);
-			return 3;
+			skipMe++;
+			skippedEvents++;
+			if (skippedEvents >20) 
+				{
+				ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] Too many time wrong: ignoring spill";
+				return 3;
+				}
 			}
 #ifdef TIME_DEBUG
 		{ // this code may slow down the code, as well as produce large log files
@@ -663,7 +673,10 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		dataType myEvent;MergeEventStream(myEvent,event1,event2);
 		event1.release();
 		event2.release();
-		spill1.append(myEvent);
+		if(!skipMe){
+			spill1.append(myEvent);
+			merged++;
+			}
 		//----
 		ptr1+= eventSize1;
 		ptr2+= eventSize2;
@@ -675,6 +688,10 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	// update Spill Size
 	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
 	(*spillSizePtr)=(WORD)spill1.size();
+
+	WORD *spillNevtPtr= ((WORD*) spill1.data() )+ SpillNeventPos();
+	(*spillNevtPtr)=(WORD)merged;
+	
 #ifdef EB_DEBUG
 	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
 #endif

@@ -227,7 +227,7 @@ int FindMatch::Iterative()
 	t1_ave /= time1.size();
 	t2_ave /= time2.size();
 	//delta = t1_ave-t2_ave;
-	delta =  time1[0] - time2[0];
+	delta =  int64_t(time1[0]) - int64_t(time2[0]);
 	/// ----- for(uint_t i=0;i<time1.size() && i<time2.size() ;++i ) 
 	/// ----- 		{
 	/// ----- 		printf("%llu - %llu \n",time1[i]-time1[0], time2[i]-time2[0]);
