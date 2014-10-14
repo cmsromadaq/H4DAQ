@@ -647,7 +647,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		int skipMe=0;
 		if (iEvent==0 ) dTimeFirstEvent=int64_t(time1)-int64_t(time2);
 		// assume sigma=1*sqrt(2), cutting on 20
-		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>50 )
+		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>20 )
 			{
 			ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] bad spill for time";
 			// this is a bad Spill
@@ -657,6 +657,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 			if (skippedEvents >20) 
 				{
 				ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] Too many time wrong: ignoring spill";
+				Log(s2.str(),1);
 				return 3;
 				}
 			}
