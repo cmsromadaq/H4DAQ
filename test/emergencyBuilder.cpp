@@ -11,6 +11,7 @@
 	#include "TH1D.h"
 	#include "TROOT.h"
 	#include "TStyle.h"
+	#include "TLegend.h"
 #endif
 
 int main(int argc, char**argv) 
@@ -21,7 +22,7 @@ printf("Usage ./bin/... file1 file2 outfile. Please make me configurable.\n");
 if (argc <3 ) return 0;
  
 FindMatch A;
-A.SetMaxWindow(1); 
+A.SetMaxWindow(2); 
 
 vector<uint64_t> time1,time2,time3;
 
@@ -197,13 +198,14 @@ fclose(fr2);
 		p5->Draw();
 		p6->Draw();
 		p7->Draw();
-		for(unsigned int i=0;i<time1.size();++i) h1->Fill( time1[i] - time1[0] , 0.5);
-		for(unsigned int i=0;i<time2.size();++i) h2->Fill( time2[i] - time2[0] , 0.5);
+		for(unsigned int i=0;i<time1.size();++i) h1->Fill( time1[i] - time1[0] , 0.6);
+		for(unsigned int i=0;i<time2.size();++i) h2->Fill( time2[i] - time2[0] , 0.3);
 		double delta=0;
 		for(unsigned int i=0;i<matched.size();++i) delta += int64_t(time1[matched[i].first]) - int64_t(time2[matched[i].second]);
 		delta /= matched.size();
 		for(unsigned int i=0;i<time2.size();++i) h0->Fill( int64_t(time2[i]) +delta -time1[0], 1.0);
 		h0->SetLineColor(kGreen);
+		h2->SetLineColor(kRed);
 
 		//p0->cd();
 		//h1->Draw("HIST");
@@ -211,34 +213,50 @@ fclose(fr2);
 		p7->cd();
 		h0->GetXaxis()->SetRangeUser(     0,62500-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
+		TLegend *l=new TLegend(0.35,.5,.65,.98);
+			l->SetFillColor(0);
+			l->SetFillStyle(0);
+			l->SetBorderSize(0);
+			l->AddEntry(h0,"Merged","F");
+			l->AddEntry(h1,"Time1","F");
+			l->AddEntry(h2,"Time2","F");
+			l->Draw();
 		p6->cd();
 		h0->GetXaxis()->SetRangeUser(62500,125000-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p5->cd();
 		h0->GetXaxis()->SetRangeUser(125000,187500-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p4->cd();
 		h0->GetXaxis()->SetRangeUser(187500,250000-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p3->cd();
 		h0->GetXaxis()->SetRangeUser(250000,312500-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p2->cd();
 		h0->GetXaxis()->SetRangeUser(312500,375000-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p1->cd();
 		h0->GetXaxis()->SetRangeUser(375000,437500-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		p0->cd();
 		h0->GetXaxis()->SetRangeUser(437500,500000-1);
 		h0->DrawCopy("HIST");
+		h1->Draw("HIST SAME");
 		h2->Draw("HIST SAME");
 		c->SaveAs( (outFileName + ".pdf").c_str() ) ;
 
