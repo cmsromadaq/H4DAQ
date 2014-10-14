@@ -21,7 +21,7 @@ int main()
 	// create a basic spill random time distributions
 	vector<uint64_t> t;	
 	uint64_t lastTime=100;
-	for(int i=0;i<2000; ++i) // ~ eventInSPill
+	for(int i=0;i<200; ++i) // ~ eventInSPill
 	{
 		lastTime +=  TMath::Floor(r.Uniform(5,30.) );
 		t.push_back(lastTime);
@@ -33,8 +33,8 @@ int main()
 	for(unsigned int i=0; i<t.size(); ++i)
 		{
 			// 0.0005 for 2000
-		if (r.Uniform() > 0.0005) time1.push_back(t[i]);
-		if (r.Uniform() > 0.0005) time2.push_back(
+		if (r.Uniform() > 0.05) time1.push_back(t[i]);
+		if (r.Uniform() > 0.05) time2.push_back(
 				TMath::Floor( r.Gaus(t[i],1.1) ) + delta
 				);
 		}

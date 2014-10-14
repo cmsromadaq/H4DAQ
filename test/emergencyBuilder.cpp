@@ -22,7 +22,7 @@ printf("Usage ./bin/... file1 file2 outfile. Please make me configurable.\n");
 if (argc <3 ) return 0;
  
 FindMatch A;
-A.SetMaxWindow(2); 
+A.SetMaxWindow(1); 
 
 vector<uint64_t> time1,time2,time3;
 
@@ -117,7 +117,8 @@ fclose(fr2);
 	A.SetTimes(time1,time2);
 	timeval tv_start; 
 	gettimeofday(&tv_start,NULL);
-	int status=A.Run();
+	//int status=A.Run();
+	int status=A.Iterative();
 	if (status >0 ) return status+100;
 	timeval tv_stop;
 	gettimeofday(&tv_stop,NULL);
@@ -130,6 +131,7 @@ fclose(fr2);
 	printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;
 	printf("     d=%lf\n", A.GetDistance() ) ;
 	printf("     d2=%lf\n", A.GetDistance2() ) ;
+	printf("     maxChi2=%lf\n", A.GetMaxChi2() ) ;
 
 	vector<pair<uint_t,uint_t> > matched=A.GetMatch(); // positions in time1/time2
 	printf("     Matched size=%u\n", matched.size() ) ;

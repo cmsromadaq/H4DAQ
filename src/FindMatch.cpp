@@ -1,6 +1,6 @@
 #include "interface/FindMatch.hpp"
 //#define FM_DEBUG
-#define FM_TIME_DEBUG
+//#define FM_TIME_DEBUG
 
 int FindMatch::SetTimes(vector<uint64_t> &x,vector<uint64_t> &y)
 {
@@ -26,10 +26,12 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 		}
 	delta /= x.size();
 	// 
+	double myMaxChi2=0;
 	for(uint_t i=0;i<x.size();++i)
 	{
 		double chi2=sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
 		R+= chi2;// ???
+		if (chi2 >myMaxChi2) myMaxChi2=chi2;
 		if ( R> d2_ ) {
 			iDCutX_=x[i];
 			iDCutY_=y[i];
@@ -38,16 +40,20 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 		if (chi2>20){ // APPROX
 			iDCutX_=x[i];
 			iDCutY_=y[i];
+			//printf("chi2 > 20: %lf: i=%u t[0]=%llu t[1]=%llu delta=%lf\n",chi2,i,time1[x[i]],time2[y[i]],delta); // DEBUG
 			R=1.e99;
 			return R;
 		}
 	}
+	printf("Min Cand=%lf\n",R); //DEBUG
 	//R /= (x.size()-1);
 
 	uint_t min=time1.size();
 	if (time2.size() <min) min=time2.size() ;
 	min-= x.size();
 	R += alpha*min;
+
+	if (R<d_ ) maxChi2_=myMaxChi2;
 
 #ifdef FM_DEBUG
 	if( R < 10 ) printf("--> delta=%lf D=%lf PEN=%lf\n",delta,R,alpha*min);
@@ -129,15 +135,17 @@ int FindMatch::swapFast(vector<bool> &x )
 #ifdef FM_TIME_DEBUG
 		if (swappingX_) printf("X:%d\n",iDCutX_);
 #endif
-		 i=iDCutX_; // branch off: cut all un-required branches
-		 iDCutX_=-1;
+		 //i=iDCutX_; // branch off: cut all un-required branches
+		 iDCutX_=-1; // reset both
+		 iDCutY_=-1;
 		}
 	if (iDCutY_ >=0 && swappingY_) 
 		{
 #ifdef FM_TIME_DEBUG
 		if (swappingY_) printf("Y:%d\n",iDCutY_);
 #endif
-		 i=iDCutY_; // branch off: cut all un-required branches
+		// i=iDCutY_; // branch off: cut all un-required branches
+		 iDCutX_=-1;
 		 iDCutY_=-1;
 		}
 	if (x[i]==true && x[i+1]==false )	
@@ -209,6 +217,69 @@ int FindMatch::CopyResult(vector<uint_t> &x, vector<uint_t> &y)
 	return 0;
 }
 
+int FindMatch::Iterative()
+{
+	long double delta;
+	long double t1_ave= 0.;
+	long double t2_ave= 0.;
+	for(uint_t i=0;i<time1.size() ;++i ) t1_ave += time1[i];
+	for(uint_t i=0;i<time2.size() ;++i ) t2_ave += time2[i];
+	t1_ave /= time1.size();
+	t2_ave /= time2.size();
+	//delta = t1_ave-t2_ave;
+	delta =  time1[0] - time2[0];
+	/// ----- for(uint_t i=0;i<time1.size() && i<time2.size() ;++i ) 
+	/// ----- 		{
+	/// ----- 		printf("%llu - %llu \n",time1[i]-time1[0], time2[i]-time2[0]);
+	/// ----- 		}
+
+	R_.clear();
+	// 
+	uint_t pos1=0,pos2=0;
+	double myMaxChi2=0;
+	for(;pos1 <time1.size() && pos2<time2.size() ; )
+		{
+		double chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
+		//if ( time1[pos1] -time1[0] > 438000 &&  time1[pos1] -time1[0] < 440000 )printf("INFO : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1]-time1[0],time2[pos2]-time2[0],delta,chi2);
+		if(chi2 <20)
+			{
+			if(chi2>myMaxChi2) myMaxChi2=chi2;
+			R_.push_back(pair<uint_t,uint_t>(pos1,pos2));
+			++pos1 ;
+			++pos2;
+			continue;
+			}
+		// try pos1++
+		chi2=sqr( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
+		if(chi2 <20)
+			{
+			if(chi2>myMaxChi2) myMaxChi2=chi2;
+			R_.push_back(pair<uint_t,uint_t>(pos1+1,pos2));
+			pos1+=2;
+			++pos2;
+			continue;
+			}
+		// try pos2++
+		chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
+		if(chi2 <20)
+			{
+			if(chi2>myMaxChi2) myMaxChi2=chi2;
+			R_.push_back(pair<uint_t,uint_t>(pos1,pos2+1));
+			pos2+=2;
+			++pos1;
+			continue;
+			}
+		printf("unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2);
+		// increment both and continue
+		++pos1; ++ pos2;
+		
+		}
+	d2_=100;
+	d_=1;
+	maxChi2_=myMaxChi2;
+	return 0;
+}
+
 int FindMatch::Run()
 {
 // Gen Permutations
@@ -250,9 +321,9 @@ for (int w=0;w <= maxWindow ;++w)
 			d2_=d_;
 			d_=d1;
 			CopyResult(matched1,matched2);
-			swappingX_=false;
-			swappingY_=true;
 			}
+		swappingX_=false;
+		swappingY_=true;
 		}while ( (status2=FindNext(matched2,time2.size())) == 0 ); //end while combination 2
 	if (status2< 0 ) return -200 + status2;	
 	swappingX_=true;

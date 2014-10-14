@@ -23,6 +23,7 @@ private:
 	int CopyResult(vector<uint_t> &x, vector<uint_t> &y);
 
 	// -- results: distance vector
+	double maxChi2_; // extra
 	double d2_; // 2nd min. Used to check convergence.
 	double d_;
 	vector<pair<uint_t,uint_t> > R_;
@@ -42,6 +43,7 @@ public:
 	// --Get Results
 	const double inline GetDistance(){ return d_; };
 	const double inline GetDistance2(){ return d2_; };
+	const double inline GetMaxChi2(){ return maxChi2_; };
 	const vector<pair<uint_t,uint_t> > inline GetMatch(){ return R_; };
 	// -- Get Par
 	const double inline GetAlpha(){return alpha;};
@@ -50,6 +52,7 @@ public:
 	const bool inline Converged(){return (d2_ - d_ ) > 0.2; } ;
 	// SET
 	inline void SetMaxWindow(int i){ maxWindow=i;};
+	int Iterative();
 
 };
 #endif
