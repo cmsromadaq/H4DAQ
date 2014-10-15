@@ -61,6 +61,8 @@ WORD badSpillsInThisRun_;
 
 string postBuiltCmd_;
 
+//map<unsigned int , bool > eventToSkip_;
+
 	int MergeSpills(dataType &spill1,dataType &spill2 ); 
 	
 public:

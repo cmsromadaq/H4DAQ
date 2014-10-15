@@ -2,6 +2,7 @@
 #include "interface/DataType.hpp"
 #include "interface/Utility.hpp"
 #include "interface/Board.hpp"
+#include "interface/FindMatch.hpp"
 #include <sstream>
 
 #define EB_DEBUG
@@ -601,11 +602,6 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	if (spillNevents1 != spillNevents2){
 			Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Trying ignoring last.",1); 
 			} // return 1; } // assume lasts are wrong
-	if (  abs(int64_t(spillNevents1) - int64_t(spillNevents2)) >1 ) { 
-			ostringstream s;s<<"[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Ignoring spill. Delta="<<abs(int64_t(spillNevents1) - int64_t(spillNevents2)) ;
-			Log(s.str(),1); 
-			return 1;
-			}
 	dataType oldSpill(spill1.size(),spill1.data());	
 	spill1.release();spill1.clear();
 
@@ -629,66 +625,87 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	ptr1+= WORDSIZE*SpillHeaderWords();
 	ptr2+= WORDSIZE*SpillHeaderWords();
 
-	long dTimeFirstEvent=0;
-	int skippedEvents=0;
-	WORD merged=0;
-	for(unsigned long long iEvent=0;iEvent< spillNevents1 && iEvent< spillNevents2 ;++iEvent)
+	vector<uint64_t> time1,time2;
+	// save here the positions of the events
+	vector<char*> myEvents1;
+	vector<long>  myEventSize1;
+
+	vector<char*> myEvents2;
+	vector<long>  myEventSize2;
+
+	// loop over first -- save positions
+	for(unsigned long long iEvent=0;iEvent< spillNevents1 ;iEvent++)
+	{
+		long eventSize1= EventBuilder::IsEventOk(ptr1,left1);
+		if (eventSize1 == 0 ) {
+				printf("event %llu has size 0\n",iEvent);
+				printf("event %c%c%c%c\n\n",ptr1[0],ptr1[1],ptr1[2],ptr1[3]);
+				return 2;
+				}
+		WORD tB=(WORD)_TIME_;
+		WORD bId1 = * (WORD*)(ptr1+ (EventBuilder::EventTimePos()-2)*WORDSIZE );
+		if ( (bId1 &EventBuilder::GetBoardTypeIdBitMask () ) >> EventBuilder::GetBoardTypeShift() != tB )  return 3;
+		uint64_t mytime1 = *( (uint64_t*) (ptr1 + EventBuilder::EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		time1.push_back(mytime1);
+		myEvents1.push_back(ptr1);
+		myEventSize1.push_back(eventSize1);
+		ptr1+= eventSize1;
+		left1-=eventSize1;
+	}
+	// loop over second -- and save positions
+	for(unsigned long long iEvent=0;iEvent< spillNevents2 ;iEvent++)
+	{
+		long eventSize2= EventBuilder::IsEventOk(ptr2,left2);
+		if (eventSize2 == 0 ) {
+			printf("event %llu has size 0\n",iEvent);
+			return 4;
+			}
+		WORD tB=(WORD)_TIME_;
+		WORD bId2 = * (WORD*)(ptr2+ (EventBuilder::EventTimePos()-2)*WORDSIZE );
+		if ( (bId2 &EventBuilder::GetBoardTypeIdBitMask () ) >> EventBuilder::GetBoardTypeShift() != tB )  return 5;
+		uint64_t mytime2 = *( (uint64_t*) (ptr2 + EventBuilder::EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
+		time2.push_back(mytime2);
+		myEvents2.push_back(ptr2);
+		myEventSize2.push_back(eventSize2);
+		ptr2+= eventSize2;
+		left2-=eventSize2;
+	}
+
+	FindMatch A;
+	A.SetTimes(time1,time2);
+#ifdef TIME_DEBUG
+	printf("Going to Run Matching %u - %u\n",time1.size(),time2.size());
+	timeval tv_start; 
+	gettimeofday(&tv_start,NULL);
+#endif
+	//int status=A.Run();
+	int status=A.Iterative();
+	if (status >0 ) return status+100;
+	if( !A.Converged() ) {printf("Not Converged\n");return 200;}
+	vector<pair<uint_t,uint_t> > matched=A.GetMatch(); // positions in time1/time2
+
+#ifdef TIME_DEBUG
+	timeval tv_stop;
+	gettimeofday(&tv_stop,NULL);
+	printf("USER TIME: %ld usec\n", Utility::timevaldiff( &tv_start, &tv_stop) );
+	printf("     status=%d == 0\n", status ) ;
+	printf("     alpha=%lf\n", A.GetAlpha() ) ;
+	printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;
+	printf("     d=%lf\n", A.GetDistance() ) ;
+	printf("     d2=%lf\n", A.GetDistance2() ) ;
+	printf("     maxChi2=%lf\n", A.GetMaxChi2() ) ;
+	printf("     Matched size=%u\n", matched.size() ) ;
+#endif
+
+
+	for(unsigned long long iEvent=0;iEvent< matched.size()  ;++iEvent)
 	       {
 #ifdef EB_DEBUG
+	{
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge iEvent="<<iEvent;
 	Log(s.str(),3);
-	s.str()="";
-	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Event Headers: "<< ptr1 << " : "<<ptr2 ;
-	Log(s.str(),3);
+	}
 #endif
-		long eventSize1= IsEventOk(ptr1,left1);
-		long eventSize2= IsEventOk(ptr2,left2);
-#ifdef EB_DEBUG
-	s.str()="";
-	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: EventSize1"<<eventSize1<<"!=0  eventSize2="<<eventSize2<<"!=0"<< " Left="<< left1 <<" : "<<left2;
-	Log(s.str(),3);
-#endif
-		if (eventSize1 == 0 || eventSize2 == 0 ) return 2;
-		//---- Unire i due eventi
-		//check Time here;
-		// assuming first board is a time board
-		// check that first board is time _TIME_
-		WORD tB=(WORD)_TIME_;
-		WORD bId1 = * (WORD*)(ptr1+ (EventTimePos()-2)*WORDSIZE );
-		WORD bId2 = * (WORD*)(ptr2+ (EventTimePos()-2)*WORDSIZE );
-		if ( (bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
-			{
-			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId1= "<<bId1
-					  <<" bId1&bitMask= "<<(bId1 &GetBoardTypeIdBitMask ()) << " lowbit= "<< ((bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() )<< " == tB=" << tB ; 
-			Log(s.str(),1); 
-			return 10;
-			}
-		if ( (bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
-			{
-			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId2="<<bId2
-					  <<"bId2&bitMask="<<(bId2 &GetBoardTypeIdBitMask ()) << " lowbit="<<((bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift () )<< " == tB=" << tB ; 
-			Log(s.str(),1); 
-			return 10;
-			} 
-		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
-		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
-		int skipMe=0;
-		if (iEvent==0 ) dTimeFirstEvent=int64_t(time1)-int64_t(time2);
-		// assume sigma=1*sqrt(2), cutting on 20
-		else if ( abs(int64_t(time1)-int64_t(time2) -dTimeFirstEvent )>20 )
-			{
-			ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] bad spill for time";
-			// this is a bad Spill
-			Log(s2.str(),1);
-			skipMe++;
-			skippedEvents++;
-			if (skippedEvents >20) 
-				{
-				ostringstream s2;s2<<"[EventBuilder]::[MergeSpill]::[Warning] Too many time wrong: ignoring spill";
-				Log(s2.str(),1);
-				return 3;
-				}
-			}
 #ifdef TIME_DEBUG
 		{ // this code may slow down the code, as well as produce large log files
 		ostringstream s2;
@@ -697,20 +714,15 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		}
 #endif
 
-		dataType event1(eventSize1,ptr1);
-		dataType event2(eventSize2,ptr2);
+		dataType event1(myEventSize1[matched[iEvent].first],myEvents1[matched[iEvent].first]);
+		dataType event2(myEventSize2[matched[iEvent].second],myEvents2[matched[iEvent].second]);
+
 		dataType myEvent;MergeEventStream(myEvent,event1,event2);
+
 		event1.release();
 		event2.release();
-		if(!skipMe){
-			spill1.append(myEvent);
-			merged++;
-			}
-		//----
-		ptr1+= eventSize1;
-		ptr2+= eventSize2;
-		left1-=eventSize1;
-		left2-=eventSize2;
+
+		spill1.append(myEvent);
 	       }	
 	
 	spill1.append(T); 
@@ -719,7 +731,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	(*spillSizePtr)=(WORD)spill1.size();
 
 	WORD *spillNevtPtr= ((WORD*) spill1.data() )+ SpillNeventPos();
-	(*spillNevtPtr)=(WORD)merged;
+	(*spillNevtPtr)=(WORD)matched.size();
 	
 #ifdef EB_DEBUG_VERBOSE
 	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
