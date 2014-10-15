@@ -759,6 +759,10 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
 #endif
 	lastNeventMerged_=matched.size();
+	if (!(lastNeventMerged_==spillNevents1 && spillNevents1==spillNevents2)){
+	  int dropped = (spillNevents1>spillNevents2 ? spillNevents1 : spillNevents2)-lastNeventMerged_;
+	  Log(Form("[EventBuilder]::[MergeSpills]::[WARNING] Dropped %d events from this spill while merging.",dropped),1);
+	}
 	return 0;
 }
 
