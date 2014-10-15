@@ -215,7 +215,7 @@ fclose(fr2);
 		double delta=0;
 		for(unsigned int i=0;i<matched.size();++i) delta += int64_t(time1[matched[i].first]) - int64_t(time2[matched[i].second]);
 		delta /= matched.size();
-		for(unsigned int i=0;i<time2.size();++i) h0->Fill( int64_t(time2[i]) +delta -time1[0], 1.0);
+		for(unsigned int i=0;i<matched.size();++i) h0->Fill( int64_t(time2[ matched[i].second]) +delta -time1[0], 1.0);
 		h0->SetLineColor(kGreen);
 		h2->SetLineColor(kRed);
 

@@ -71,6 +71,7 @@ void EventBuilder::BoardHeader(dataType &R, BoardId id)
 		<<" TYP="<<id.boardType_
 		<<" WORD="<<std::hex<< myId<<std::dec;
 	printf("%s\n",s.str().c_str());
+	fflush(stdout);
 #endif
 
 	return ;
@@ -194,6 +195,10 @@ vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 }
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[StreamToWord]::[DEBUG] Converting to Word %u bytes\n",x.size());
+	fflush(stdout);
+#endif
 	if( x.size() % WORDSIZE  != 0 ) 
 		{
 		printf("[EventBuilder]::[StreamToWord] Error in rounding last byte\n",2);
@@ -635,12 +640,14 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId1= "<<bId1
 					  <<" bId1&bitMask= "<<(bId1 &GetBoardTypeIdBitMask ()) << " lowbit= "<< ((bId1 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() )<< " == tB=" << tB ; 
 			Log(s.str(),1); 
+			return 10;
 			}
 		if ( (bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift() != tB )  
 			{
 			ostringstream s; s<<"[EventBuilder]::[MergeSpill]::[ERROR] Time Board not the first board: bId2="<<bId2
 					  <<"bId2&bitMask="<<(bId2 &GetBoardTypeIdBitMask ()) << " lowbit="<<((bId2 &GetBoardTypeIdBitMask () ) >> GetBoardTypeShift () )<< " == tB=" << tB ; 
 			Log(s.str(),1); 
+			return 10;
 			} 
 		uint64_t time1 = *( (uint64_t*) (ptr1 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
 		uint64_t time2 = *( (uint64_t*) (ptr2 + EventTimePos()*WORDSIZE)   );  // carefull to parenthesis
