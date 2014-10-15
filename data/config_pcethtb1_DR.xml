@@ -277,19 +277,6 @@
     </board>
 
     <board>
-      <type>CAEN_V792</type> <!-- ADC 792-->
-      <ID>1</ID>
-      <baseAddress>0x11000000</baseAddress>
-      <model>0</model> <!-- V792 model 32ch -->
-      <blkEnd>1</blkEnd> <!-- BLKEND -->
-      <zeroSuppression>0</zeroSuppression> <!-- ZS -->
-      <emptyEnable>1</emptyEnable> <!-- EMPTYEN -->
-      <overRange>1</overRange> <!-- OVERFLOW BIT -->
-      <iped>0x60</iped> <!-- IPED value -->
-      <zsThreshold>0x0</zsThreshold> <!-- ZS THR value -->
-    </board>
-
-    <board>
       <type>CAEN_V1290</type> <!-- TDC 1290-->
       <ID>1</ID>
       <baseAddress>0x22000000</baseAddress>
