@@ -102,6 +102,10 @@ int CAEN_V814::Config(BoardConfig *bC)
     GetConfiguration()->chThreshold[i]=0;
   //here the parsing of the xmlnode...
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+  GetConfiguration()->patternMask=Configurator::GetInt( bC->getElementContent("patternMask"));
+  GetConfiguration()->outputWidth=Configurator::GetInt( bC->getElementContent("outputWidth"));
+  GetConfiguration()->majorityThreshold=Configurator::GetInt( bC->getElementContent("majorityThreshold"));
+  GetConfiguration()->commonThreshold=Configurator::GetInt( bC->getElementContent("commonThreshold"));
 
 
   //Now threshold per channel if they exist in configuration
