@@ -55,9 +55,10 @@ EventId lastEvent_;
 WORD goodEventsInThisRun_;
 
 //map<WORD,pair<int,dataType> > spills_; //store incomplete spills if in recv mode. SPILLNUM -> NMerged, SpillStream
-int merged_;
+int merged_; // dr merged so far
 WORD lastBadSpill_;
 WORD badSpillsInThisRun_;
+WORD lastNeventMerged_;
 
 string postBuiltCmd_;
 
@@ -81,6 +82,7 @@ public:
 	inline void*	GetStream(){ return mySpill_.data();};
 	inline int  	GetSize(){return mySpill_.size();};
 	inline bool 	AreSpillsMerged(){ return mySpill_.size() == 0 ; };
+	inline WORD 	GetLastNeventMerged(){ return lastNeventMerged_;};
 	inline string 	GetDirName()const {return dirName_;}
 	inline EventId  GetEventId() const { return lastEvent_;}
 	// --- Set  Info

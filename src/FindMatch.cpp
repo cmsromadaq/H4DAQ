@@ -19,12 +19,15 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	// transform back to 0100010
 	double R=0;
 	// compute delta medio
-	double delta=0;
+	int64_t deltaI=0;
 	for(uint_t i=0;i<x.size();++i)
 		{
-		delta += int64_t(time1[x[i]])-int64_t(time2[y[i]]);
+		deltaI += int64_t(time1[x[i]])-int64_t(time2[y[i]]);
 		}
-	delta /= x.size();
+	//delta should be precise in updating himself, so int. probably the division down here would be the same
+	long double delta = int64_t(deltaI/x.size() ) + (deltaI%x.size())/x.size(); // integer division
+	//delta /= x.size();
+	//delta /= x.size();
 	// 
 	double myMaxChi2=0;
 	for(uint_t i=0;i<x.size();++i)
@@ -144,7 +147,7 @@ int FindMatch::swapFast(vector<bool> &x )
 #ifdef FM_TIME_DEBUG
 		if (swappingY_) printf("Y:%d\n",iDCutY_);
 #endif
-		// i=iDCutY_; // branch off: cut all un-required branches
+		 i=iDCutY_; // branch off: cut all un-required branches
 		 iDCutX_=-1;
 		 iDCutY_=-1;
 		}

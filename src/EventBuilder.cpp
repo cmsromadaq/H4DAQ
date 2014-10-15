@@ -638,8 +638,12 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	{
 		long eventSize1= EventBuilder::IsEventOk(ptr1,left1);
 		if (eventSize1 == 0 ) {
-				printf("event %llu has size 0\n",iEvent);
-				printf("event %c%c%c%c\n\n",ptr1[0],ptr1[1],ptr1[2],ptr1[3]);
+				ostringstream s; 
+				s<<"[EventBuilder]::[MergeSpills]::[ERROR] event:"<<iEvent<<"in first spill has size 0: unconsistent event";
+				Log(s.str(),1);
+				s.str()="";
+				s<<"[EventBuilder]::[MergeSpills]::[ERROR] Header is:"<<ptr1[0]<<ptr1[1]<<ptr1[2]<<ptr1[3];
+				Log(s.str(),1);
 				return 2;
 				}
 		WORD tB=(WORD)_TIME_;
@@ -657,7 +661,12 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	{
 		long eventSize2= EventBuilder::IsEventOk(ptr2,left2);
 		if (eventSize2 == 0 ) {
-			printf("event %llu has size 0\n",iEvent);
+				ostringstream s; 
+				s<<"[EventBuilder]::[MergeSpills]::[ERROR] event:"<<iEvent<<"in second spill has size 0: unconsistent event";
+				Log(s.str(),1);
+				s.str()="";
+				s<<"[EventBuilder]::[MergeSpills]::[ERROR] Header is:"<<ptr2[0]<<ptr2[1]<<ptr2[2]<<ptr2[3];
+				Log(s.str(),1);
 			return 4;
 			}
 		WORD tB=(WORD)_TIME_;
@@ -674,27 +683,40 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	FindMatch A;
 	A.SetTimes(time1,time2);
 #ifdef TIME_DEBUG
-	printf("Going to Run Matching %u - %u\n",time1.size(),time2.size());
+	{
+	ostringstream s;
+	s<<"[EventBuilder]::[MergeSpills]::[TIME_DEBUG] Going to run Matching "<<time1.size()<<" - "<<time2.size();
+	Log(s.str(),3);
+	}
 	timeval tv_start; 
 	gettimeofday(&tv_start,NULL);
 #endif
 	//int status=A.Run();
 	int status=A.Iterative();
-	if (status >0 ) return status+100;
-	if( !A.Converged() ) {printf("Not Converged\n");return 200;}
+	if (status >0 ) 
+		{
+		ostringstream s; s<<"[EventBuilder]::[MergeSpills]::[Error] Matching algorithm exited with error status "<<status;
+		Log(s.str(),1);
+		return status+100;
+		}
+	if( !A.Converged() ) {
+		Log("[EventBuilder]::[MergeSpills]::[Warning] Matching algorithm did not converged" ,1);
+		return 200;
+		}
 	vector<pair<uint_t,uint_t> > matched=A.GetMatch(); // positions in time1/time2
 
 #ifdef TIME_DEBUG
 	timeval tv_stop;
 	gettimeofday(&tv_stop,NULL);
-	printf("USER TIME: %ld usec\n", Utility::timevaldiff( &tv_start, &tv_stop) );
-	printf("     status=%d == 0\n", status ) ;
-	printf("     alpha=%lf\n", A.GetAlpha() ) ;
-	printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;
-	printf("     d=%lf\n", A.GetDistance() ) ;
-	printf("     d2=%lf\n", A.GetDistance2() ) ;
-	printf("     maxChi2=%lf\n", A.GetMaxChi2() ) ;
-	printf("     Matched size=%u\n", matched.size() ) ;
+	ostringstream s;
+		s<<"[EventBuiledr]::[MergeSpills]::[TIME_DEBUG] User Time for matching "<<Utility::timevaldiff( &tv_start, &tv_stop) <<" usec";
+		Log(s.str(),2);
+	// ---printf("     alpha=%lf\n", A.GetAlpha() ) ;
+	// ---printf("     Window (If SLOW REDUCE)=%d\n", A.GetMaxWindow() ) ;
+	// ---printf("     d=%lf\n", A.GetDistance() ) ;
+	// ---printf("     d2=%lf\n", A.GetDistance2() ) ;
+	// ---printf("     maxChi2=%lf\n", A.GetMaxChi2() ) ;
+	s.str()=""; s<<"[EventBuiledr]::[MergeSpills]::[TIME_DEBUG] Matched Size="<<   matched.size();
 #endif
 
 
@@ -736,6 +758,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 #ifdef EB_DEBUG_VERBOSE
 	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
 #endif
+	lastNeventMerged_=matched.size();
 	return 0;
 }
 
