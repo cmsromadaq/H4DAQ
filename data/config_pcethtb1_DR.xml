@@ -304,6 +304,16 @@
       <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
     </board>
 
+    <board>
+      <type>CAEN_V814</type> <!-- CAEN V814 PU -->
+      <ID>1</ID>
+      <baseAddress>0xEEEE0000</baseAddress>
+      <patternMask>0x0000FFFF</patternMask>
+      <majorityThreshold>0x6</majorityThreshold>
+      <outputWidth>0xC3</outputWidth>
+      <commonThreshold>0x14</commonThreshold>
+    </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
