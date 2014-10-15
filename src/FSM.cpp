@@ -618,7 +618,7 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
     spillnr = eventBuilder_->GetEventId().spillNum_;
     goodevinrun = eventBuilder_->GetGoodEvents();
     badspills = eventBuilder_->GetBadSpills();
-    eventsmerged=eventBuilder_->GetLastNeventMerged(); // TODO: ADD ME TO GUI INFO
+    eventsmerged=eventBuilder_->GetLastNeventMerged();
   }
   myMex.append((void*)"runnumber=",10);
   n = snprintf(mybuffer,255,"%u ",runnr); //runnr
@@ -631,6 +631,9 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"badspills=",10);
   n = snprintf(mybuffer,255,"%u ",badspills); //badspills
+  myMex.append((void*)mybuffer,n);
+  myMex.append((void*)"eventsmerged=",13);
+  n = snprintf(mybuffer,255,"%u ",eventsmerged); //eventsmerged
   myMex.append((void*)mybuffer,n);
   myMex.append((void*)"transferTime=",13);
   n = snprintf(mybuffer,255,"%li ",transferTime);
