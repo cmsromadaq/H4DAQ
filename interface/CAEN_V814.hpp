@@ -36,7 +36,7 @@ public:
   typedef struct CAEN_V814_Config_t {
     unsigned int baseAddress;
     unsigned int patternMask;
-    unsigned int outputWdith;
+    unsigned int outputWidth;
     unsigned int majorityThreshold;
     unsigned int commonThreshold;
     unsigned int chThreshold[CAEN_V814_CHANNELS];

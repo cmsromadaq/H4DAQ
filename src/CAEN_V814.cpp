@@ -156,7 +156,7 @@ int CAEN_V814::SetOutputWidth()
 {
   int status=0;
 
-  WORD data=configuration_.outputWdith;
+  WORD data=configuration_.outputWidth;
   status |= CAENVME_WriteCycle(handle_, configuration_.baseAddress +  CAEN_V814_OUT_WIDTH_0_7_ADD , &data, CAEN_V814_ADDRESSMODE,CAEN_V814_DATAWIDTH);
   status |= CAENVME_WriteCycle(handle_, configuration_.baseAddress +  CAEN_V814_OUT_WIDTH_8_15_ADD , &data, CAEN_V814_ADDRESSMODE,CAEN_V814_DATAWIDTH);
 
