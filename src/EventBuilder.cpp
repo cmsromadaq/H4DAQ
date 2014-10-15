@@ -262,8 +262,9 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
 #ifdef EB_DEBUG
-	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bites");
+	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bites", NBytes);
 	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
+	fflush(stdout);
 #endif
 	if (myWords[NWords-1] != Trailer[0] ) 
 		{
