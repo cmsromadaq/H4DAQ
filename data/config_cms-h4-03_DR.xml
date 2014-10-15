@@ -71,6 +71,12 @@
     </board>
 
     <board>
+      <type>LECROY_1182</type> <!-- LECROY 1182-->
+      <ID>1</ID>
+      <baseAddress>0x00140000</baseAddress>
+    </board>
+
+    <board>
       <type>CAEN_V1290</type> <!-- TDC 1290-->
       <ID>1</ID>
       <baseAddress>0x00000000</baseAddress>
@@ -86,6 +92,42 @@
       <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns --> 
     </board>
 
+    <board>
+      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+      <ID>1</ID>
+      <baseAddress>0xAAAA0000</baseAddress>
+      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+      <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
+    </board>
+
+    <board>
+      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+      <ID>2</ID>
+      <baseAddress>0xBBBB0000</baseAddress>
+      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+      <sigDelay>0x0</sigDelay> <!--MASKF WORD -->
+    </board>
+
+    <board>
+      <type>CAEN_V792</type> <!-- ADC 792-->
+      <ID>1</ID>
+      <baseAddress>0x11000000</baseAddress>
+      <model>0</model> <!-- V792 model 32ch -->
+      <blkEnd>1</blkEnd> <!-- BLKEND -->
+      <zeroSuppression>0</zeroSuppression> <!-- ZS -->
+      <emptyEnable>1</emptyEnable> <!-- EMPTYEN -->
+      <overRange>1</overRange> <!-- OVERFLOW BIT -->
+      <iped>0x60</iped> <!-- IPED value -->
+      <zsThreshold>0x0</zsThreshold> <!-- ZS THR value -->
+    </board>
 
   </Hardware>
   <EventBuilder>
