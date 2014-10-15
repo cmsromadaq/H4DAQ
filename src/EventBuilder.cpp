@@ -206,6 +206,10 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	dataTypeSize_t nWord=x.size() /WORDSIZE ;
 	for(unsigned long long int n=0; n<nWord ; n++)
 		{
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[StreamToWord]::[DEBUG]  Word %llu of %llu\n",n,nWord);
+	fflush(stdout);
+#endif
 		R.push_back( *( (WORD*)x.data() + n) );
 		}
 	// check rounding
@@ -343,7 +347,13 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 		ptr += readByte;
 		}
 	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk READED TRAILER\n");
+#endif
 	ptr += WORDSIZE;
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR\n");
+#endif
 	if ( myTrail[0] != Trailer[0] )  {
 #ifdef EB_DEBUG
 	printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
