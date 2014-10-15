@@ -600,7 +600,11 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	if (runNum1 != runNum2) { Log("[EventBuilder]::[MergeSpills]::[ERROR] RunNumber does not match",1); return 1; } // 
 	if (spillNum1 != spillNum2){ Log("[EventBuilder]::[MergeSpills]::[ERROR] Spill numbers does not match",1);return 1;} 
 	if (spillNevents1 != spillNevents2){
-			Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. Trying ignoring last.",1); 
+			Log("[EventBuilder]::[MergeSpills]::[WARNING] Event in spills different. ",1); 
+			} // return 1; } // assume lasts are wrong
+	if (spillNevents1 == 0 ||  spillNevents2== 0){
+			Log("[EventBuilder]::[MergeSpills]::[WARNING] No Event In Spill. Ignoring Spill.",1); 
+			return 1;
 			} // return 1; } // assume lasts are wrong
 	dataType oldSpill(spill1.size(),spill1.data());	
 	spill1.release();spill1.clear();
