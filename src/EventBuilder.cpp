@@ -262,7 +262,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
 #ifdef EB_DEBUG
-	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bites", NBytes);
+	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bytes\n", NBytes);
 	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
 	fflush(stdout);
 #endif
@@ -336,6 +336,9 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #endif
 			return 0;
 			}
+#ifdef EB_DEBUG
+	printf("[EventBuilder]::[IsEventOk] LEFT = %llu > READ=%llu\n",leftsize,readByte);
+#endif
 		leftsize -= readByte;
 		ptr += readByte;
 		}
