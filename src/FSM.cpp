@@ -864,11 +864,11 @@ while (true) {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
-		      hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
+		      // hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetBusyOff();
-		      hwManager_->ClearBusy();
-		      hwManager_->TriggerAck();
+		      hwManager_->ClearBusy(); //Clearing BUSY
+		      hwManager_->TriggerAck(); //Send RESET for DAQ_TRCG_ACK to be sure it's off 
 		      readyDR_=0;
 		      MoveToStatus(WAITFORREADY);
 		    }
@@ -920,38 +920,44 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
-		    // check for END OF SPILL
-		    dataType eeMex;
-		    eeMex.append((void*)"EE\0",3);
-		    dataType guieeMex;
-		    guieeMex.append((void*)"GUI_SPS ee",10);
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
 			if (hwManager_->SignalReceived(EE) )
-				{
-				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  //				  usleep(10000);
-				  connectionManager_->Send(eeMex,CmdSck);
-				  connectionManager_->Send(guieeMex,StatusSck);
-				  hwManager_->ClearSignalStatus();
-				  hwManager_->SetBusyOff();
-				  hwManager_->ClearBusy();
-			          hwManager_->TriggerAck();
-				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
-				  SendSpillDuration();
-				MoveToStatus(ENDSPILL);
-				break;
+			  {
+			    // check for END OF SPILL
+			    dataType eeMex;
+			    eeMex.append((void*)"EE\0",3);
+			    dataType guieeMex;
+			    guieeMex.append((void*)"GUI_SPS ee",10);
+
+			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+			    //				  usleep(10000);
+			    connectionManager_->Send(eeMex,CmdSck);
+			    connectionManager_->Send(guieeMex,StatusSck);
+			    hwManager_->ClearSignalStatus();
+			    hwManager_->SetBusyOff();
+			    hwManager_->ClearBusy();
+			    hwManager_->TriggerAck();
+			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
+			    SendSpillDuration();
+			    MoveToStatus(ENDSPILL);
+			    break;
 				}
 		    	}
 		    else if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
+				  // check for END OF SPILL
+				  dataType eeMex;
+				  eeMex.append((void*)"EE\0",3);
+				  dataType guieeMex;
+				  guieeMex.append((void*)"GUI_SPS ee",10);
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
-				  hwManager_->ClearSignalStatus();
+				  // hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
 			          hwManager_->TriggerAck();
