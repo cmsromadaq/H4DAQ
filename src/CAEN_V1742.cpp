@@ -656,6 +656,21 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       //PG FIXME abort run start?
     }
 
+  content = bC->getElementContent ("DRS4_FREQUENCY") ;
+  if (content != "NULL")
+    {
+      stringstream ststream (content) ;
+      int frequency ;
+      ststream >> frequency;
+      digitizerConfiguration_.DRS4Frequency = (CAEN_DGTZ_DRS4Frequency_t) frequency;
+    }
+  else 
+    {
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DRS4_FREQUENCY not found in board xml node config" << endl ;
+      Log(s.str(),1);
+      //PG FIXME abort run start?
+    }
+
   // Test Pattern
   content = bC->getElementContent ("TEST_PATTERN") ;
   if (content != "NULL")

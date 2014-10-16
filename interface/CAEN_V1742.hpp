@@ -53,7 +53,10 @@ public:
     float Ts ;
 
     int RecordLength ;
+    CAEN_DGTZ_DRS4Frequency_t DRS4Frequency;
+
     unsigned int PostTrigger ;
+
 
     int NumEvents ;
     int InterruptNumEvents ; 

@@ -914,12 +914,17 @@ while (true) {
 		    break;
 		    }
 	case CLEARBUSY: {
+			ResetMex();
 		        hwManager_->SetBusyOff();
 		        hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
 		    {
+			// something went in error ? -> check
+		    //if (connectionManager_->Recv(myMex) ==0 ){Command myCmd=ParseData(myMex);};
+		    UpdateMex();
+
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
@@ -1017,7 +1022,7 @@ while (true) {
 				myMex.append(myCmd.data,myCmd.N);
 				connectionManager_->Send(myMex,DataSck);
 			}
-			ResetMex();
+			//ResetMex(); //moved in Clear
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
