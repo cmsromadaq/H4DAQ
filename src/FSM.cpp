@@ -977,6 +977,7 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
+			usleep(10000); //DEBUG
 			MoveToStatus(READ);
                         }  
 
