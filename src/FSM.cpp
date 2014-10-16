@@ -909,12 +909,12 @@ while (true) {
 		      
 		      	 gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+			 ResetMex();
 		   	 MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
 	case CLEARBUSY: {
-			ResetMex();
 		        hwManager_->SetBusyOff();
 		        hwManager_->ClearBusy();
 			MoveToStatus(WAITTRIG);
@@ -977,7 +977,7 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
-			usleep(10000); //DEBUG
+		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(10000); //DEBUG
 			MoveToStatus(READ);
                         }  
 
