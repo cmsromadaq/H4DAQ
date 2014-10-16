@@ -819,6 +819,7 @@ while (true) {
 		    guiwweMex.append((void*)"GUI_SPS wwe",11);
 		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
+			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
 			    connectionManager_->Send(wweMex,CmdSck);
 			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
@@ -863,6 +864,7 @@ while (true) {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
+		      hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 		      hwManager_->BufferClearAll();
 		      hwManager_->SetBusyOff();
 		      hwManager_->ClearBusy();
@@ -949,6 +951,7 @@ while (true) {
 				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
+				  hwManager_->ClearSignalStatus();
 				  hwManager_->SetBusyOff();
 				  hwManager_->ClearBusy();
 			          hwManager_->TriggerAck();
