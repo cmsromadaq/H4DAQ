@@ -38,7 +38,7 @@ HDIR = $(BASEDIR)/interface
 .PHONY: all
 all: all2
 
-include make/Makefile.ROOT
+include make/Makefile.NOROOT
 include make/Makefile.ZMQ
 include make/Makefile.CAEN
 include make/Makefile.XML
