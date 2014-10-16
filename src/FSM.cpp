@@ -1009,10 +1009,6 @@ while (true) {
 			eventBuilder_->CloseEvent(event);
 			// ----- Add Event To Spill
                         eventBuilder_->AddEventToSpill(event);                                
-		    	if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
-				{
-				usleep(10000); // limit rate
-				}
 			MoveToStatus(CLEARBUSY);
 		    break;
 		    }
