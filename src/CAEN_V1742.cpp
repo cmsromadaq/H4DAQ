@@ -443,60 +443,52 @@ int CAEN_V1742::programDigitizer ()
   ret |= CAEN_DGTZ_SetAcquisitionMode (digitizerHandle_, CAEN_DGTZ_SW_CONTROLLED) ;
   ret |= CAEN_DGTZ_SetExtTriggerInputMode (digitizerHandle_, digitizerConfiguration_.ExtTriggerMode) ;
 
-  if ( (boardInfo_.FamilyCode == CAEN_DGTZ_XX740_FAMILY_CODE) || (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE))
-    {
-      ret |= CAEN_DGTZ_SetGroupEnableMask (digitizerHandle_, digitizerConfiguration_.EnableMask) ;
-      for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) 
-	{
-	  if (digitizerConfiguration_.EnableMask & (1<<i)) 
-	    {
-	      if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) 
-		{
-		  for (j=0 ; j<8 ; j++) 
-		    {
-		      if (digitizerConfiguration_.DCoffsetGrpCh[i][j] != -1)
-			ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, (i*8)+j, digitizerConfiguration_.DCoffsetGrpCh[i][j]) ;
-		      else
-			ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, (i*8)+j, digitizerConfiguration_.DCoffset[i]) ;
-		    }
-		}
-	      else 
-		{
-		  ret |= CAEN_DGTZ_SetGroupDCOffset (digitizerHandle_, i, digitizerConfiguration_.DCoffset[i]) ;
-		  ret |= CAEN_DGTZ_SetGroupSelfTrigger (digitizerHandle_, digitizerConfiguration_.ChannelTriggerMode[i], (1<<i)) ;
-		  ret |= CAEN_DGTZ_SetGroupTriggerThreshold (digitizerHandle_, i, digitizerConfiguration_.Threshold[i]) ;
-		  ret |= CAEN_DGTZ_SetChannelGroupMask (digitizerHandle_, i, digitizerConfiguration_.GroupTrgEnableMask[i]) ;
-		  ret |= CAEN_DGTZ_SetTriggerPolarity (digitizerHandle_, i, (CAEN_DGTZ_TriggerPolarity_t) digitizerConfiguration_.TriggerEdge) ;
-		}
-	    }
-	}
-    }
-  else 
-    {
-      ret |= CAEN_DGTZ_SetChannelEnableMask (digitizerHandle_, digitizerConfiguration_.EnableMask) ;
-      for (i=0 ; i<digitizerConfiguration_.Nch ; i++) {
-	if (digitizerConfiguration_.EnableMask & (1<<i)) {
-	  ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, i, digitizerConfiguration_.DCoffset[i]) ;
-	  ret |= CAEN_DGTZ_SetChannelSelfTrigger (digitizerHandle_, digitizerConfiguration_.ChannelTriggerMode[i], (1<<i)) ;
-	  ret |= CAEN_DGTZ_SetChannelTriggerThreshold (digitizerHandle_, i, digitizerConfiguration_.Threshold[i]) ;
-	  ret |= CAEN_DGTZ_SetTriggerPolarity (digitizerHandle_, i, (CAEN_DGTZ_TriggerPolarity_t) digitizerConfiguration_.TriggerEdge) ;
-	}
-      }
-    }
-  
-  //  ret |= CAEN_DGTZ_SetDRS4SamplingFrequency(digitizerHandle_, digitizerConfiguration_.DRS4Frequency);
-  
-  if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) 
-    {
-      for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
-	s.str(""); s << "[CAEN_V1742]::[INFO]::Setting DRS4_FREQUENCY_CONFIG for Chip#" << i << " to " << digitizerConfiguration_.DRS4Frequency;
-	Log(s.str(),1);
-	//ret |= CAEN_DGTZ_SetDRS4SamplingFrequency(digitizerHandle_, digitizerConfiguration_.DRS4Frequency);
-	ret |= CAEN_DGTZ_SetGroupFastTriggerDCOffset (digitizerHandle_,i,digitizerConfiguration_.FTDCoffset[i]) ;
-	ret |= CAEN_DGTZ_SetGroupFastTriggerThreshold (digitizerHandle_,i,digitizerConfiguration_.FTThreshold[i]) ;
-      }
-    }
 
+
+  if ( (boardInfo_.FamilyCode == CAEN_DGTZ_XX740_FAMILY_CODE) || (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE)){
+    ret |= CAEN_DGTZ_SetGroupEnableMask (digitizerHandle_, digitizerConfiguration_.EnableMask) ;
+    for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
+      if (digitizerConfiguration_.EnableMask & (1<<i)) {
+	if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
+	  for (j=0 ; j<8 ; j++) {
+	    if (digitizerConfiguration_.DCoffsetGrpCh[i][j] != -1)
+	      ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, (i*8)+j, digitizerConfiguration_.DCoffsetGrpCh[i][j]) ;
+	    else
+	      ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, (i*8)+j, digitizerConfiguration_.DCoffset[i]) ;
+	  }
+	}
+	else {
+	  ret |= CAEN_DGTZ_SetGroupDCOffset (digitizerHandle_, i, digitizerConfiguration_.DCoffset[i]) ;
+	  ret |= CAEN_DGTZ_SetGroupSelfTrigger (digitizerHandle_, digitizerConfiguration_.ChannelTriggerMode[i], (1<<i)) ;
+	  ret |= CAEN_DGTZ_SetGroupTriggerThreshold (digitizerHandle_, i, digitizerConfiguration_.Threshold[i]) ;
+	  ret |= CAEN_DGTZ_SetChannelGroupMask (digitizerHandle_, i, digitizerConfiguration_.GroupTrgEnableMask[i]) ;
+	} 
+	ret |= CAEN_DGTZ_SetTriggerPolarity (digitizerHandle_, i, (CAEN_DGTZ_TriggerPolarity_t) digitizerConfiguration_.TriggerEdge) ;
+                
+      }
+    }
+  } else {
+    ret |= CAEN_DGTZ_SetChannelEnableMask (digitizerHandle_, digitizerConfiguration_.EnableMask) ;
+    for (i=0 ; i<digitizerConfiguration_.Nch ; i++) {
+      if (digitizerConfiguration_.EnableMask & (1<<i)) {
+	ret |= CAEN_DGTZ_SetChannelDCOffset (digitizerHandle_, i, digitizerConfiguration_.DCoffset[i]) ;
+	ret |= CAEN_DGTZ_SetChannelSelfTrigger (digitizerHandle_, digitizerConfiguration_.ChannelTriggerMode[i], (1<<i)) ;
+	ret |= CAEN_DGTZ_SetChannelTriggerThreshold (digitizerHandle_, i, digitizerConfiguration_.Threshold[i]) ;
+	ret |= CAEN_DGTZ_SetTriggerPolarity (digitizerHandle_, i, (CAEN_DGTZ_TriggerPolarity_t) digitizerConfiguration_.TriggerEdge) ;
+      }
+    }
+  }
+  if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
+    for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
+      s.str(""); s << "[CAEN_V1742]::[INFO]::Setting DRS4_FREQUENCY_CONFIG for Chip#" << i << " to " << digitizerConfiguration_.DRS4Frequency;
+      Log(s.str(),1);
+      ret |= CAEN_DGTZ_SetDRS4SamplingFrequency(digitizerHandle_, digitizerConfiguration_.DRS4Frequency);
+      ret |= CAEN_DGTZ_SetGroupFastTriggerDCOffset (digitizerHandle_,i,digitizerConfiguration_.FTDCoffset[i]) ;
+      ret |= CAEN_DGTZ_SetGroupFastTriggerThreshold (digitizerHandle_,i,digitizerConfiguration_.FTThreshold[i]) ;
+    }
+  }
+    
+  
   if (ret)
     {
       s.str(""); s << "[CAEN_V1742]::[ERROR]::Error in Configuration";
