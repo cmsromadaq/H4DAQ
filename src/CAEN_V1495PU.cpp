@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAEN_V1495PU_DEBUG
+//#define CAEN_V1495PU_DEBUG
 
 int CAEN_V1495PU::Init()
 {
@@ -158,31 +158,31 @@ int CAEN_V1495PU::Read(vector<WORD> &v)
   v.push_back(data); //status word (includes internal event counter)
 
 #ifdef CAEN_V1495PU_DEBUG
-  s.str(""); s  << "[CAEN_V1495PU]::[INFO]::STATUS ===> 0x" << std::hex << data << std::dec;
-  Log(s.str(),1);
+  s.str(""); s  << "[CAEN_V1495PU]::[DEBUG]::STATUS ===> 0x" << std::hex << data << std::dec;
+  Log(s.str(),3);
 #endif
   status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_PATTERNA_ADDRESS , &data ,CAEN_V1495PU_ADDRESSMODE,cvD32);
 #ifdef CAEN_V1495PU_DEBUG
-  s.str(""); s  << "[CAEN_V1495PU]::[INFO]::PATTERNA ===> 0x" << std::hex << data << std::dec;
-  Log(s.str(),1);
+  s.str(""); s  << "[CAEN_V1495PU]::[DEBUG]::PATTERNA ===> 0x" << std::hex << data << std::dec;
+  Log(s.str(),3);
 #endif
   v.push_back(data);
   status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_PATTERNB_ADDRESS , &data ,CAEN_V1495PU_ADDRESSMODE,cvD32);
 #ifdef CAEN_V1495PU_DEBUG
-  s.str(""); s  << "[CAEN_V1495PU]::[INFO]::PATTERNB ===> 0x" << std::hex << data << std::dec;
-  Log(s.str(),1);
+  s.str(""); s  << "[CAEN_V1495PU]::[DEBUG]::PATTERNB ===> 0x" << std::hex << data << std::dec;
+  Log(s.str(),3);
 #endif
   v.push_back(data);
   status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_PATTERNE_ADDRESS , &data ,CAEN_V1495PU_ADDRESSMODE,cvD32);
 #ifdef CAEN_V1495PU_DEBUG
-  s.str(""); s  << "[CAEN_V1495PU]::[INFO]::PATTERNE ===> 0x" << std::hex << data << std::dec;
-  Log(s.str(),1);
+  s.str(""); s  << "[CAEN_V1495PU]::[DEBUG]::PATTERNE ===> 0x" << std::hex << data << std::dec;
+  Log(s.str(),3);
 #endif
   v.push_back(data);
   status = CAENVME_ReadCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_PATTERNF_ADDRESS , &data ,CAEN_V1495PU_ADDRESSMODE,cvD32);
 #ifdef CAEN_V1495PU_DEBUG
-  s.str(""); s  << "[CAEN_V1495PU]::[INFO]::PATTERNF ===> 0x" << std::hex << data << std::dec;
-  Log(s.str(),1);
+  s.str(""); s  << "[CAEN_V1495PU]::[DEBUG]::PATTERNF ===> 0x" << std::hex << data << std::dec;
+  Log(s.str(),3);
 #endif
   v.push_back(data);
 
