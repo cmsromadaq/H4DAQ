@@ -102,7 +102,7 @@
         <!--
         # DRS4_Frequency.  Values: 0 = 5 GHz, 1 = 2.5 GHz,  2 = 1 GHz
         -->
-        <DRS4_FREQUENCY>0</DRS4_FREQUENCY>
+        <DRS4_FREQUENCY>1</DRS4_FREQUENCY>
 
         <!--
         # ENABLE_DES_MODE: double edge sampling mode for the models 731 and 751. If enabled, the
