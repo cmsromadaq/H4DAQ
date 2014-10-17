@@ -57,7 +57,6 @@ int CAEN_V560::Init()
 
 int CAEN_V560::Clear()
 {
-  return 0;
   int status=0;
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
@@ -76,6 +75,8 @@ int CAEN_V560::Clear()
 
 int CAEN_V560::BufferClear()
 {
+  return 0;
+
   return Clear();
 }      
 
