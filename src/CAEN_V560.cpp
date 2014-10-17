@@ -75,6 +75,12 @@ int CAEN_V560::Clear()
 
 int CAEN_V560::BufferClear()
 {
+#ifdef CAEN_V560_DEBUG
+    ostringstream s;
+    s << "[CAEN_V560]::[DEBUG]::Clearing buffers";
+    Log(s.str(),3);
+#endif
+
   return 0;
 
   return Clear();
