@@ -75,15 +75,24 @@ int CAEN_V560::Clear()
 
 int CAEN_V560::BufferClear()
 {
-#ifdef CAEN_V560_DEBUG
     ostringstream s;
     s << "[CAEN_V560]::[DEBUG]::Clearing buffers";
     Log(s.str(),3);
-#endif
-
-  return 0;
-
-  return Clear();
+    
+    int status=0;
+    if (handle_<0)
+      return ERR_CONF_NOT_FOUND;
+    
+    WORD data=0xFF;
+    status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V560_REG_CLEAR,&data,CAEN_V560_ADDRESSMODE,cvD16);
+    if (status)
+      {
+	ostringstream s; s << "[CAEN_V560]::[ERROR]::Cannot reset scalers" << status << std::dec; 
+	Log(s.str(),1);
+	return ERR_RESET;
+      }  
+    
+    return 0;
 }      
 
 int CAEN_V560::Config(BoardConfig *bC)
