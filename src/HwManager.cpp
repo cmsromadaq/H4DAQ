@@ -550,5 +550,6 @@ BoardTypes_t HwManager::GetBoardTypeId(string type){
 	else if( type=="CAEN_V1290") return _CAENV1290_;
 	else if( type=="CAEN_V1495PU") return _CAENV1495PU_;
 	else if( type=="CAEN_V560") return _CAENV560_;
+	else if( type=="LECROY_1182" || type == "LECROY1182" ) return _LECROY1182_;
 	else return _UNKWN_;
 }
