@@ -101,7 +101,7 @@
       <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
       <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
       <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
-      <sigDelay>0x0</sigDelay> <!--DELAY 160ns (10 ns steps) -->
+      <sigDelay>0xA</sigDelay> <!--DELAY 160ns (10 ns steps) -->
     </board>
 
     <board>
