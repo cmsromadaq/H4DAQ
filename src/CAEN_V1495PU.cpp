@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-//#define CAEN_V1495PU_DEBUG
+#define CAEN_V1495PU_DEBUG
 
 int CAEN_V1495PU::Init()
 {
