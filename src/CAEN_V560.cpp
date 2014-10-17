@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAEN_V560_DEBUG
+//#define CAEN_V560_DEBUG
 
 int CAEN_V560::Init()
 {
@@ -75,10 +75,6 @@ int CAEN_V560::Clear()
 
 int CAEN_V560::BufferClear()
 {
-    ostringstream s;
-    s << "[CAEN_V560]::[DEBUG]::Clearing buffers";
-    Log(s.str(),3);
-    
     int status=0;
     if (handle_<0)
       return ERR_CONF_NOT_FOUND;
