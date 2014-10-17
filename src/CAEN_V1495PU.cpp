@@ -52,6 +52,9 @@ int CAEN_V1495PU::Init()
   if (userfpgafwMajorVersion>=2 && userfpgafwMinorVersion>=1) //delay implemented from FW version 2.1
     {
       //delay
+      s.str(""); s <<"[CAEN_V1495PU]::[INFO]::Setting signal delay to " << configuration_.sigDelay;
+      Log(s.str(),1);
+
       status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress + CAEN_V1495_PATTERNUNIT_DELAY_ADDRESS , &configuration_.sigDelay ,CAEN_V1495PU_ADDRESSMODE,cvD32);
     }
   if (status  )
