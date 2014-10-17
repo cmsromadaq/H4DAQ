@@ -546,7 +546,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
 
     // Channel Header for this event
      uint32_t ChHeader[2] ;
-     ChHeader[0] = (8<<28) + ( (digitizerConfiguration_.DRS4Frequency & 0x3) << 26 ) + ( (2 + Size) & 3FFFFFF) ; //Number of words written for this channel
+     ChHeader[0] = (8<<28) + ( (digitizerConfiguration_.DRS4Frequency & 0x3) << 26 ) + ( (2 + Size) & 0x3FFFFFF) ; //Number of words written for this channel
      ChHeader[1] = (gr<<16)+ch ;
 
     //Starting pointer
