@@ -112,7 +112,7 @@ int CAEN_V1742::Init ()
   
   // if ( digitizerConfiguration_.useCorrections == -1 ) { // only automatic corrections supported for the moment
 
-  ret |= CAEN_DGTZ_LoadDRS4CorrectionData (digitizerHandle_,CAEN_DGTZ_DRS4_5GHz) ;
+  ret |= CAEN_DGTZ_LoadDRS4CorrectionData (digitizerHandle_,digitizerConfiguration_.DRS4Frequency) ;
   ret |= CAEN_DGTZ_EnableDRS4Correction (digitizerHandle_) ;
   if (ret) 
     {
@@ -289,8 +289,8 @@ int CAEN_V1742::Read (vector<WORD> &v)
     return ErrCode ;
   }    
   // if (digitizerConfiguration_.useCorrections != -1) { // if manual corrections
-  //     ApplyDataCorrection ( 0, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (event_->DataGroup[0]), &Table_gr0) ;
-  //     ApplyDataCorrection ( 1, digitizerConfiguration_.useCorrections, CAEN_DGTZ_DRS4_5GHz, & (event_->DataGroup[1]), &Table_gr1) ;
+  //     ApplyDataCorrection ( 0, digitizerConfiguration_.useCorrections, digitizerConfiguration_.DRS4Frequency, & (event_->DataGroup[0]), &Table_gr0) ;
+  //     ApplyDataCorrection ( 1, digitizerConfiguration_.useCorrections, digitizerConfiguration_.DRS4Frequency, & (event_->DataGroup[1]), &Table_gr1) ;
   //       }
   ret = (CAEN_DGTZ_ErrorCode) writeEventToOutputBuffer (v,&EventInfo,event_) ;
   if (ret) {
@@ -475,6 +475,8 @@ int CAEN_V1742::programDigitizer ()
   }
   if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
     for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
+      //PG FIXME abort run start?
+      ret |= CAEN_DGTZ_SetDRS4SamplingFrequency(digitizerHandle_, digitizerConfiguration_.DRS4Frequency);
       ret |= CAEN_DGTZ_SetGroupFastTriggerDCOffset (digitizerHandle_,i,digitizerConfiguration_.FTDCoffset[i]) ;
       ret |= CAEN_DGTZ_SetGroupFastTriggerThreshold (digitizerHandle_,i,digitizerConfiguration_.FTThreshold[i]) ;
     }
@@ -668,7 +670,6 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     {
       s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DRS4_FREQUENCY not found in board xml node config" << endl ;
       Log(s.str(),1);
-      //PG FIXME abort run start?
     }
 
   // Test Pattern

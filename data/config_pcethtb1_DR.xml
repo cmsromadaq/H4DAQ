@@ -100,6 +100,11 @@
         <TEST_PATTERN>NO</TEST_PATTERN>
 
         <!--
+        # DRS4_Frequency.  Values: 0 = 5 GHz, 1 = 2.5 GHz,  2 = 1 GHz
+        -->
+        <DRS4_FREQUENCY>0</DRS4_FREQUENCY>
+
+        <!--
         # ENABLE_DES_MODE: double edge sampling mode for the models 731 and 751. If enabled, the
         # board interleaves two channels to make one channel running at double sampling frequency.
         # This setting is ignored for the boards that don't support DES mode.
