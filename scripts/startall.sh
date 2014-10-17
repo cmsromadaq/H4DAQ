@@ -62,6 +62,7 @@ mycommand="cd ${daqhome};  \
 		cd DAQ ; \
 		[ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; \
 		cd H4DAQ ;  \
+                rm -rf Makefile;
 		git pull ; \
 		git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
 		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
