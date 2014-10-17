@@ -530,7 +530,7 @@ int CAEN_V1742::writeEventToOutputBuffer (vector<WORD>& CAEN_V1742_eventBuffer, 
   CAEN_V1742_eventBuffer.reserve(5 + digitizerConfiguration_.Nch*(digitizerConfiguration_.RecordLength+2)) ; //allocate once for all channels in a board
   CAEN_V1742_eventBuffer.resize (5) ;
   (CAEN_V1742_eventBuffer)[0]=0xA0000005 ; 
-  (CAEN_V1742_eventBuffer)[1]= ( (eventInfo->BoardId)<<26)+eventInfo->Pattern ;
+  (CAEN_V1742_eventBuffer)[1]= ( (eventInfo->BoardId)<<26) +(eventInfo->Pattern) );
   (CAEN_V1742_eventBuffer)[2]=0 ;
   (CAEN_V1742_eventBuffer)[3]=eventInfo->EventCounter ;
   (CAEN_V1742_eventBuffer)[4]=eventInfo->TriggerTimeTag ;
