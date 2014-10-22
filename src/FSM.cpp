@@ -977,7 +977,7 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
-		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(5000); //DEBUG
+		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(10000); //DEBUG
 			MoveToStatus(READ);
                         }  
 
