@@ -297,7 +297,7 @@
       <patternMask>0x0000FFFF</patternMask>
       <majorityThreshold>0x6</majorityThreshold>
       <outputWidth>0xFF</outputWidth>
-      <commonThreshold>0x7</commonThreshold>
+      <commonThreshold>0x3</commonThreshold>
     </board>
 
   </Hardware>
