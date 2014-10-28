@@ -222,7 +222,7 @@
 
         <CHANNEL>
           <ID>0</ID>
-          <ENABLE_INPUT>YES</ENABLE_INPUT>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
           <DC_OFFSET>-10</DC_OFFSET>
             <!--
             # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -246,7 +246,7 @@
 
         <CHANNEL>
           <ID>1</ID>
-          <ENABLE_INPUT>YES</ENABLE_INPUT>
+          <ENABLE_INPUT>NO</ENABLE_INPUT>
           <DC_OFFSET>-10</DC_OFFSET>
             <!--
             # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
