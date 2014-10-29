@@ -33,7 +33,7 @@ rsync_options="-aRvz --log-file=/tmp/${USER}/h4daq_backup_${id}.log --progress"
 rsync_ssh="-e \"ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\""
 
 [ "${dryrun}" == 0 ] || rsync_options="${rsync_options} --dry-run"
-[ "${ssh}" == 0 ] || rsync_options="${rsync_options} ${rsync_ssh}"
+[ "${ssh}" == 0 ] || rsync_options="${rsync_ssh} ${rsync_options}"
 
 echo "====> H4DAQ LOCAL BACKUP"
 echo "Start copying files from ${input_dir} to ${output_dir} with options ${rsync_options}"
