@@ -4,7 +4,7 @@
 
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
-#define PADE_READOUT
+//#define PADE_READOUT
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
