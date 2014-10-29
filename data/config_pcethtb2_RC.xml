@@ -1,5 +1,5 @@
 <general>
-  <waitForDR>2</waitForDR> <!-- cms-h4-03, pcethtb1, pcpade -->
+  <waitForDR>3</waitForDR> <!-- cms-h4-03, pcethtb1, pcpade -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
