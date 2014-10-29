@@ -4,6 +4,7 @@
 
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
+#define PADE_READOUT
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -822,6 +823,9 @@ while (true) {
 			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
 			    connectionManager_->Send(wweMex,CmdSck);
 			    eventBuilder_->OpenSpill();
+#ifdef PADE_READOUT
+			    sleep(5);
+#endif
 			    MoveToStatus(CLEARED);
 		    }
 		    else if (trgType_==BEAM_TRIG)
