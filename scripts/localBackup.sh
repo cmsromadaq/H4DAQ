@@ -30,10 +30,10 @@ done
 
 #-R preserve folder tree structure
 rsync_options="-aRvz --log-file=/tmp/${USER}/h4daq_backup_${id}.log --progress"
-rsync_ssh="-e \"ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\""
+rsync_ssh=()
 
 [ "${dryrun}" == 0 ] || rsync_options="${rsync_options} --dry-run"
-[ "${ssh}" == 0 ] || rsync_options="${rsync_ssh} ${rsync_options}"
+[ "${ssh}" == 0 ] || rsync_ssh=(-e "ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null")
 
 echo "====> H4DAQ LOCAL BACKUP"
 echo "Start copying files from ${input_dir} to ${output_dir} with options ${rsync_options}"
@@ -42,7 +42,7 @@ cd ${input_dir}
 #Only copy root or raw files keeping the relative folder tree structure
 find . -type f -regex ".*\(root\|raw\)" > /tmp/${USER}/h4daq_backup_${id}.tocopy
 touch /tmp/${USER}/h4daq_backup_${id}.copied
-for file in `cat /tmp/${USER}/h4daq_backup_${id}.tocopy`; do rsync ${rsync_options} ${file} ${output_dir}; [ $? -ne 0 ] || echo "${input_dir}/$file" >> /tmp/${USER}/h4daq_backup_${id}.copied; done
+for file in `cat /tmp/${USER}/h4daq_backup_${id}.tocopy`; do rsync "${rsync_ssh[@]}" ${rsync_options} ${file} ${output_dir}; [ $? -ne 0 ] || echo "${input_dir}/$file" >> /tmp/${USER}/h4daq_backup_${id}.copied; done
 
 #remove duplicated lines
 sort /tmp/${USER}/h4daq_backup_${id}.copied > /tmp/${USER}/h4daq_backup_${id}.copied.sorted
