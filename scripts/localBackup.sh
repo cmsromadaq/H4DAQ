@@ -29,7 +29,7 @@ while true; do
 done
 
 #-R preserve folder tree structure
-rsync_options="-aRvz --log-file=/tmp/${USER}/h4daq_backup_${id}.log --progress"
+rsync_options="-aRvz --files-from=/tmp/${USER}/h4daq_backup_${id}.tocopy --log-file=/tmp/${USER}/h4daq_backup_${id}.log --progress"
 rsync_ssh=()
 
 [ "${dryrun}" == 0 ] || rsync_options="${rsync_options} --dry-run"
@@ -41,11 +41,14 @@ echo "Start copying files from ${input_dir} to ${output_dir} with options ${rsyn
 cd ${input_dir}
 #Only copy root or raw files keeping the relative folder tree structure
 find . -type f -regex ".*\(root\|raw\)" > /tmp/${USER}/h4daq_backup_${id}.tocopy
-touch /tmp/${USER}/h4daq_backup_${id}.copied
-for file in `cat /tmp/${USER}/h4daq_backup_${id}.tocopy`; do rsync "${rsync_ssh[@]}" ${rsync_options} ${file} ${output_dir}; [ $? -ne 0 ] || echo "${input_dir}/$file" >> /tmp/${USER}/h4daq_backup_${id}.copied; done
+#touch /tmp/${USER}/h4daq_backup_${id}.copied
+#for file in `cat /tmp/${USER}/h4daq_backup_${id}.tocopy`; do rsync "${rsync_ssh[@]}" ${rsync_options} ${file} ${output_dir}; [ $? -ne 0 ] || echo "${input_dir}/$file" >> /tmp/${USER}/h4daq_backup_${id}.copied; done
+set -x
+rsync "${rsync_ssh[@]}" ${rsync_options} ${input_dir} ${output_dir}
+set +x
 
 #remove duplicated lines
-sort /tmp/${USER}/h4daq_backup_${id}.copied > /tmp/${USER}/h4daq_backup_${id}.copied.sorted
-uniq /tmp/${USER}/h4daq_backup_${id}.copied.sorted /tmp/${USER}/h4daq_backup_${id}.copied.uniq
-mv -f /tmp/${USER}/h4daq_backup_${id}.copied.uniq /tmp/${USER}/h4daq_backup_${id}.copied
-rm -rf /tmp/${USER}/h4daq_backup_${id}.copied.sorted 
+#sort /tmp/${USER}/h4daq_backup_${id}.copied > /tmp/${USER}/h4daq_backup_${id}.copied.sorted
+#uniq /tmp/${USER}/h4daq_backup_${id}.copied.sorted /tmp/${USER}/h4daq_backup_${id}.copied.uniq
+#mv -f /tmp/${USER}/h4daq_backup_${id}.copied.uniq /tmp/${USER}/h4daq_backup_${id}.copied
+#rm -rf /tmp/${USER}/h4daq_backup_${id}.copied.sorted 
