@@ -69,53 +69,6 @@
       <PulserAStartInput>0</PulserAStartInput> <!--CVIOSources-->
       <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
     </board>
-
-    <board>
-      <type>LECROY_1182</type> <!-- LECROY 1182-->
-      <ID>1</ID>
-      <baseAddress>0x00140000</baseAddress>
-    </board>
-
-    <board>
-      <type>CAEN_V1290</type> <!-- TDC 1290-->
-      <ID>1</ID>
-      <baseAddress>0x00000000</baseAddress>
-      <model>1</model> <!-- V1290N model 16ch -->
-      <triggerTimeSubtraction>1</triggerTimeSubtraction>
-      <triggerMatchMode>1</triggerMatchMode>
-      <emptyEventEnable>1</emptyEventEnable>
-      <edgeDetectionMode>2</edgeDetectionMode>
-      <timeResolution>3</timeResolution>
-      <maxHitsPerEvent>9</maxHitsPerEvent>
-      <enabledChannels>0x00FF</enabledChannels>
-      <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns --> 
-      <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns --> 
-    </board>
-
-    <board>
-      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
-      <ID>1</ID>
-      <baseAddress>0xAAAA0000</baseAddress>
-      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
-      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
-      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
-      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
-      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
-      <sigDelay>0x1F</sigDelay> <!--DELAY 320ns (10 ns steps) -->
-    </board>
-
-    <board>
-      <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
-      <ID>2</ID>
-      <baseAddress>0xBBBB0000</baseAddress>
-      <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
-      <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
-      <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
-      <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
-      <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
-      <sigDelay>0x1F</sigDelay> <!--DELAY 320ns (10ns steps) -->
-    </board>
-
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
