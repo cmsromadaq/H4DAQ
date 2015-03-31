@@ -5,6 +5,7 @@
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
 //#define PADE_READOUT
+#define EMPTY_RC_TEST
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -161,6 +162,10 @@ while (true) {
                         dataType event;
 			eventBuilder_->OpenEvent(event,hwManager_->GetNboards());
 			hwManager_->ReadAll(event);                                 /// DEBUG ME
+#ifdef EMPTY_RC_TEST
+			int sleeptime=50;
+			usleep(sleeptime);
+#endif
 #ifdef SYNC_DEBUG
 			int sleeptime=rand()%5000 +1000;
 			usleep(sleeptime);
