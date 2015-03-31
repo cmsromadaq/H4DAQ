@@ -80,7 +80,7 @@
     <board>
       <type>CAEN_V513</type> <!-- I/O REGISTER -->
       <ID>1</ID>
-      <baseAddress>0x22000000</baseAddress>
+      <baseAddress>0x00111100</baseAddress>
       <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
       <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
       <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->
