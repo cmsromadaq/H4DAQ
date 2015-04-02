@@ -11,13 +11,15 @@ daquser="cmsdaq"
 daqhome="/home/cmsdaq"
 norecompile=0
 ebrecompile=0
+mybranch="master"
 logdir="/tmp"
+vmecontroller=1 # 0=V1718(Usb), 1=V2718(Pci)
 dr=""
 rc=""
 eb=""
 nice=0
 
-TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,eb:,rc:,norecompile,dryrun -n 'startall.sh' -- "$@"`
+TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,eb:,rc:,vmecontroller:,gitbranch:,norecompile,dryrun -n 'startall.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -36,6 +38,10 @@ while true; do
       daquser="$2"; shift 2 ;;
     --daqhome )
       daqhome="$2"; shift 2 ;;
+    --gitbranch )
+      mybranch="$2"; shift 2 ;;
+    --vmecontroller )
+      vmecontroller="$2"; shift 2 ;;
     --logdir )
       logdir="$2"; shift 2 ;;
     --dr )
@@ -60,15 +66,15 @@ echo "=================================================================="
 mycommand="cd ${daqhome};  \
 		mkdir -p DAQ ;  \
 		cd DAQ ; \
-		[ -d H4DAQ ] || git clone git@github.com:cmsromadaq/H4DAQ.git ; \
+		[ -d H4DAQ ] || git clone -b ${mybranch} git@github.com:cmsromadaq/H4DAQ.git ; \
 		cd H4DAQ ;  \
                 rm -rf Makefile;
 		git pull ; \
 		git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
-		git diff origin/master | sed \"s/^.*$/@@@ & @@@/\" ;  \
+		git diff origin/${mybranch} | sed \"s/^.*$/@@@ & @@@/\" ;  \
 		env python configure.py --noroot ; \
 		make -j 4;  \
-		./bin/resetCrate -t 1 -d 0 -l 0 ;  "
+		./bin/resetCrate -t ${vmecontroller} -d 0 -l 0 ;  "
 IFS=','
 
 function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;41m\1\x1b[00m:g' ; done }
