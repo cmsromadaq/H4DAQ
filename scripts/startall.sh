@@ -88,12 +88,12 @@ for machine in $dr ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATAREADOUT on $machine"
 	echo "-----------------------------"
-	ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_{machine}_$(date +%s)_${USER}.log ;
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_{machine}_$(date +%s)_${USER}.log ;
 
 done
 
@@ -103,12 +103,12 @@ for machine in $rc ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myrc" ; continue; }
 #	[ "${start_rc}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
+	[ "${norecompile}" == "1" ] || ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START RUNCONTROL on $machine"
 	echo "-----------------------------"
-	ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${myrc}"\' 2>&1 | tee /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log ;
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${myrc}"\' 2>&1 | tee /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log ;
 
 done
 
@@ -118,12 +118,12 @@ for machine in $eb ; do
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myeb" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
-	[ "${ebrecompile}" == "0" ] || ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
+	[ "${ebrecompile}" == "0" ] || ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START EVENTBUILDER on $machine"
 	echo "-----------------------------"
-	ssh ${daquser}@${machine} /bin/bash --rcfile ~/.bashrc -c \'"${myeb}"\' 2>&1 | tee /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log ;
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${myeb}"\' 2>&1 | tee /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log ;
 
 done
 
