@@ -1,8 +1,8 @@
 INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb -std=gnu++0x -Wall
-LDFLAGS		=-lz -lm
+CXXFLAGS	=-O2 -ggdb -std=gnu++0x -Wall -m64
+LDFLAGS		=-lm -lpthread -lz
 SOFLAGS		=-fPIC -shared 
 SHELL		=bash
 ###
@@ -76,7 +76,7 @@ $(StatLib): $(BINOBJ)
 soLib: $(SoLib)
 
 $(SoLib): $(StatLib)
-	$(LD) $(LDFLAGS) $(SOFLAGS) -o $@ $^
+	$(LD) -o $@ $^ $(SOFLAGS) $(LDFLAGS) 
 
 .PHONY: $(Packages) 
 $(Packages): % : $(BINDIR)/% | $(BINDIR)
@@ -85,7 +85,7 @@ $(Packages): % : $(BINDIR)/% | $(BINDIR)
 #$(BINDIR)/$(Packages): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 $(addprefix $(BINDIR)/,$(Packages)): $(BINDIR)/% : $(BASEDIR)/test/%.$(SrcSuf) $(StatLib) | $(BINDIR)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(StatLib) -I$(INC_DIR) -I$(HDIR)
+	$(CXX) -o $@ $< $(CXXFLAGS)  $(StatLib) -I$(INC_DIR) -I$(HDIR) $(LDFLAGS) 
 
 #make this function of $(Packages)
 #.PHONY: controller
@@ -113,12 +113,12 @@ clean:
 #.o
 $(BINDIR)/%.$(ObjSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $(SRCDIR)/$*.$(SrcSuf) -I$(INC_DIR) -I$(HDIR)
+	$(CXX) -o $@ $(SRCDIR)/$*.$(SrcSuf) $(CXXFLAGS)  -c  -I$(INC_DIR) -I$(HDIR) $(LDFLAGS)
 
 #.d
 $(BINDIR)/%.$(DepSuf): $(SRCDIR)/%.$(SrcSuf) $(HDIR)/%.$(HeadSuf)
 	@echo $(call InfoLine , $@ )
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -M -o $@ $(SRCDIR)/$*.$(SrcSuf) -I$(INC_DIR) -I$(HDIR)
+	$(CXX) -o $@ $(SRCDIR)/$*.$(SrcSuf) $(CXXFLAGS) -M  -I$(INC_DIR) -I$(HDIR) $(LDFLAGS)
 	sed -i'' "s|^.*:|& Makefile $(BINDIR)/&|g" $@
 
 #-include $(Deps)
