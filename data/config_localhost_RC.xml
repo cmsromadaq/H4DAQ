@@ -22,7 +22,7 @@
     <board>
       <type>CAEN_VX718</type> <!-- CONTROLLER -->
       <ID>1</ID>
-      <boardType>0</boardType> <!-- ??? -->
+      <boardType>0</boardType> <!-- V1718=0 (USB), V2718=1 (PCI) -->
       <LinkType>0</LinkType> <!--int32_t-->
       <LinkNum>0</LinkNum> <!--int32_t-->
 
