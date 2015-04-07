@@ -45,9 +45,9 @@ int Daemon::Init(string configFileName){
 		//these 2 are only used for RC
 		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
 		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
-		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_ << "\n";
-		s<<"[Daemon]::[Init] Use EB "<< !noEB_ << "\n";
-		s<<"[Daemon]::[Init] SPS Signals "<< !spillSignalsDisabled_ << "\n";
+		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ << "\n";
+		s<<"[Daemon]::[Init] Use EB: "<< !noEB_ << "\n";
+		s<<"[Daemon]::[Init] Spill Signals: "<< !spillSignalsDisabled_;
 		Log(s.str(),1);
 		printf("%s\n",s.str().c_str());
 
