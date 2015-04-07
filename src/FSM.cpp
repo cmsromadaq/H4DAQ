@@ -868,7 +868,7 @@ while (true) {
 		    weMex.append((void*)"WE\0",3);
 		    dataType guiweMex;
 		    guiweMex.append((void*)"GUI_SPS we",10);
-		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
+		    if ( spillSignalsDisabled_ || trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
@@ -937,14 +937,14 @@ while (true) {
 		    // check end of spill conditions
 		    if (trgType_== BEAM_TRIG ) 
 		   	{
-			if (hwManager_->SignalReceived(EE) )
+			if (!spillSignalsDisabled_ && hwManager_->SignalReceived(EE) )
 			  {
 			    // check for END OF SPILL
 			    dataType eeMex;
 			    eeMex.append((void*)"EE\0",3);
 			    dataType guieeMex;
 			    guieeMex.append((void*)"GUI_SPS ee",10);
-
+			    
 			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			    //				  usleep(10000);
 			    connectionManager_->Send(eeMex,CmdSck);
@@ -957,7 +957,26 @@ while (true) {
 			    SendSpillDuration();
 			    MoveToStatus(ENDSPILL);
 			    break;
-				}
+			  }
+			else if ( trgRead_ >= trgNevents_)
+			  {
+			    // check for END OF SPILL
+			    dataType eeMex;
+			    eeMex.append((void*)"EE\0",3);
+			    dataType guieeMex;
+			    guieeMex.append((void*)"GUI_SPS ee",10);
+			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  //usleep(10000);
+			    connectionManager_->Send(eeMex,CmdSck);
+			    // hwManager_->ClearSignalStatus();
+			    hwManager_->SetBusyOff();
+			    hwManager_->ClearBusy();
+			    hwManager_->TriggerAck();
+			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
+			    SendSpillDuration();
+			    MoveToStatus(ENDSPILL);
+			    break;
+			  }
 		    	}
 		    else if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
 		    	{
@@ -1036,13 +1055,17 @@ while (true) {
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
-	case RECVBUFFER:{
-			
-			// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
-		    	UpdateMex();
-		    	if ( eb_endspill ) MoveToStatus( SENTBUFFER );
-			break;
-			}
+	case RECVBUFFER:
+	  {
+	    if ( noEB_ ) MoveToStatus ( SENTBUFFER );
+	    else
+	      {
+		// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
+		UpdateMex();
+		if ( eb_endspill ) MoveToStatus( SENTBUFFER );
+	      }
+	    break;
+	  }
 	case SENTBUFFER:// Loop over the whole queue of messages
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();

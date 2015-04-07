@@ -42,6 +42,8 @@ const static int CmdSck = 2;
 
 int iLoop;
 int waitForDR_;
+int noEB_;
+int spillSignalsDisabled_;
 
 bool error_;
 
