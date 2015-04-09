@@ -109,7 +109,7 @@ done
 for machine in $eb ; do 
 
 	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydatarc" ; continue; }
+	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataeb" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
 	[ "${ebrecompile}" == "0" ] || ssh ${daquser}@${machine} /bin/bash -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2
