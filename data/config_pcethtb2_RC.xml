@@ -1,11 +1,11 @@
 <general>
-  <waitForDR>1</waitForDR> <!-- pcethtb1 -->
+  <waitForDR>0</waitForDR> <!-- single crate operation -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-    <ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- DR  -->
+    <!--<ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- DR  -->
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
@@ -26,10 +26,10 @@
       <LinkType>0</LinkType> <!--int32_t-->
       <LinkNum>0</LinkNum> <!--int32_t-->
 
-      <clearBusyOutputBit>0x40</clearBusyOutputBit> <!--CVOutputSelect-->
-      <trigAckOutputBit>0x80</trigAckOutputBit> <!--CVOutputSelect-->
-      <daqBusyOutputBit>0x100</daqBusyOutputBit> <!--CVOutputMaskBit-->
-      <triggerInputBit>0</triggerInputBit> <!--CVInputSelect-->
+      <clearBusyOutputBit>0x40</clearBusyOutputBit> <!--CVOutputSelect out0-->
+      <trigAckOutputBit>0x80</trigAckOutputBit> <!--CVOutputSelect out1-->
+      <daqBusyOutputBit>0x100</daqBusyOutputBit> <!--CVOutputMaskBit out2-->
+      <triggerInputBit>0</triggerInputBit> <!--CVInputSelect in0-->
 
       <outputMaskWord>0x700</outputMaskWord> <!--uint32_t Orwell--> 
       <outputMuxWord>0x3FA</outputMuxWord> <!--uint32_t--> 
