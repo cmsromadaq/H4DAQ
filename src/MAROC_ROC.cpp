@@ -354,3 +354,88 @@ int MAROC_ROC::LoadFEBConfiguration()
   Log(s.str(),1);  
   return 0;
 }
+
+
+int MAROC_ROC::SendOnFEBBus(int address, int data)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+  
+  int local_addr = address;
+
+  WORD data_in;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data_in,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data_in,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data_in,2);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= ClockFEBBusPulse();
+  status |= ClockFEBBusPulse();
+
+  //Encode address
+  for (int ibit=0; ibit<16; ibit++) {
+    int xbit = (local_addr >> (15-ibit)) & 0x1;
+    if (xbit==1) {
+      Utility::setbit(&data_in,2);
+      status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+    } else {
+      Utility::clearbit(&data_in,2);
+      status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+    }
+    status |= ClockFEBBusPulse();
+  }
+
+  //Encode data
+  for (int ibit=0; ibit<16; ibit++) {
+    int xbit = (data >> (15-ibit)) & 0x1;
+    if (xbit==1) {
+      Utility::setbit(&data_in,2);
+      status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+    } else {
+      Utility::clearbit(&data_in,2);
+      status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+    }
+    status |= ClockFEBBusPulse();
+  }
+
+  Utility::clearbit(&data_in,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error sending data on FEB bus";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  return 0;
+}
+
+int MAROC_ROC::ClockFEBBusPulse()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+  
+  WORD data_in;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data_in,0);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data_in,0);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data_in,2);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error sending clock pulse on FEB bus";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  return 0;
+
+}

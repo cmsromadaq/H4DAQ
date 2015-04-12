@@ -47,6 +47,7 @@ public:
     ERR_CONFIG,
     ERR_RESET,
     ERR_READ,
+    ERR_FEB_COMM,
     ERR_DUMMY_LAST,
   } ERROR_CODES;
 
