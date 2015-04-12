@@ -14,7 +14,7 @@ int MAROC_ROC::Init()
     return ERR_CONF_NOT_FOUND;
 
   //Load configuration on Maroc FEB (829 bits)
-  LoadFEBConfiguration();
+  status |= LoadFEBConfiguration();
 
   //Clear Conf
   WORD data=0x0;
@@ -243,4 +243,114 @@ int MAROC_ROC::Read(vector<WORD> &v)
   return 0;
 }
 
+int MAROC_ROC::LoadFEBConfiguration()
+{
+  int status=0;
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration ++++++";
+  Log(s.str(),1);
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+  
+  unsigned int mar_mask[MAROC_ROC_FEB_CONFIG_BITSIZE];
+  for (int i=0; i<MAROC_ROC_FEB_CONFIG_BITSIZE; i++) {
+    mar_mask[i] = 0;
+  }
 
+  char config[8300]={0};
+  char* config_val;
+  //Open config file
+  FILE* mfile = fopen(configuration_.configFile.c_str(),"r");
+  if (!mfile)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Cannot find config file " << configuration_.configFile;
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  //fill the configuration
+  char* read=fgets(config,MAROC_ROC_FEB_CONFIG_BITSIZE+1,mfile);
+  if (read == NULL)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error reading from config file " << configuration_.configFile;
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+  config_val=config;
+  for (int i=0; i<MAROC_ROC_FEB_CONFIG_BITSIZE; i++) {
+    sscanf(config_val,"%1u",&mar_mask[i]);
+    ++config_val;
+  }
+
+  fclose(mfile);
+
+  unsigned int bit_local[MAROC_ROC_FEB_CONFIG_BITSIZE];
+  for (int i=0; i<MAROC_ROC_FEB_CONFIG_BITSIZE; i++) {
+    bit_local[i]=mar_mask[i];
+  }
+
+  //Open the serial connection
+  status |= SendOnFEBBus(3,10);
+  WORD data_out;
+  WORD data_in;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_out,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  //Load wanted config
+  for (int iloop = 0; iloop<1; iloop++){
+    for (int ibit=0; ibit<MAROC_ROC_FEB_CONFIG_BITSIZE; ibit++) {
+      /* set data */
+      if (bit_local[ibit] == 1) {
+	status |= RegIn(true);
+      } else if (bit_local[ibit] == 0) {
+	status |= RegIn(false);
+      } else {
+	ostringstream s; s << "[MAROC_ROC]::[INFO]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
+	Log(s.str(),1);
+	return ERR_CONFIG;
+      }
+      ClockReg();
+    }
+  }
+
+  //Resend & check wanted config
+  int badconfig=0;
+  for (int iloop = 0; iloop<1; iloop++){
+    for (int ibit=0; ibit<MAROC_ROC_FEB_CONFIG_BITSIZE; ibit++) {
+      /* set data */
+      if (bit_local[ibit] == 1) {
+	status |= RegIn(true);
+      } else if (bit_local[ibit] == 0) {
+	status |= RegIn(false);
+      } else {
+	ostringstream s; s << "[MAROC_ROC]::[INFO]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
+	Log(s.str(),1);
+	return ERR_CONFIG;
+      }
+      status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_INPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+      ClockReg();
+      unsigned int readback_bit=data_in & 0x1;
+
+      if (readback_bit !=  bit_local[ibit]) 
+	++badconfig;
+    }
+  }
+
+  if (badconfig)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+  
+  status |= SendOnFEBBus(3,1);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error loading configuration";    
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+  
+  s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration OK ++++++";
+  Log(s.str(),1);  
+  return 0;
+}
