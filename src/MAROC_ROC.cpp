@@ -1,35 +1,32 @@
-#include "interface/MAROC_RO.hpp"
+#include "interface/MAROC_ROC.hpp"
 #include <iostream>
 #include <sstream>
 #include <string>
 
-//#define CAENV792_DEBUG 
-
 int MAROC_ROC::Init()
 {
   int status=0;
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++  INIT ++++++";
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++ INIT ++++++";
   Log(s.str(),1);
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
   if (!IsConfigured())
     return ERR_CONF_NOT_FOUND;
 
-
   //Load configuration on Maroc FEB (829 bits)
   LoadFEBConfiguration();
 
   //Clear Conf
   WORD data=0x0;
-  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROCC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
   if (status)
     {
-      s.str(""); s << "[MAROC_ROC]::[ERROR]::Cannot open  board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      s.str(""); s << "[MAROC_ROC]::[ERROR]::Cannot open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec; 
       Log(s.str(),1);
       return ERR_OPEN;
     }    
 
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Open  board @0x" << std::hex << configuration_.baseAddress << std::dec;
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec;
   Log(s.str(),1);
 
   int run_mode = configuration_.debugMode==1 ? 0xd : 0x0; 
@@ -37,33 +34,39 @@ int MAROC_ROC::Init()
   status |= SendOnFEBBus(3,run_mode);
   status |= SendOnFEBBus(8,0);
 
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Board in readout mode";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB in readout mode";
   Log(s.str(),1);
     
+  //Initialize ADC
   status |= InitADC();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Init ADC";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Init MAROC FEB ADC";
   Log(s.str(),1);
 
+  //Config hold values for the MAROC
   status |= ConfigFEBReadoutHold();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::FEB readout configured: hold " << configuration_.holdValue << " hold2 delay " << configuration_.holdDeltaValue;
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB readout configured: hold " << configuration_.holdValue << " hold2 delay " << configuration_.holdDeltaValue;
   Log(s.str(),1);
 
-
+  //Configure trigger mode
   status |= ConfigFEBTrigger();
   status |= ConfigROCTrigger();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Trigger input configured";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Trigger inputs configured";
   Log(s.str(),1);
 
+  //Configure ADC
   status |= SetADCClock(400);
   status |= SetADCEnableDReset();
   status |= SetADCTestOff();
   status |= SetADCNormalReadoutMode();
   status |= SetADCZeroSuppressionMode();
   status |= SetADCSlowHold(20,0);
-  s.str(""); s << "[MAROC_ROC]::[INFO]::ADC configured";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB ADC configured";
   Log(s.str(),1);
 
+  //Reset TimeStamp for the eventInfo
   status |= ResetTimeStamp();
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC TimeStamp reset";
+  Log(s.str(),1);
   
   if (status)
     {
@@ -72,7 +75,7 @@ int MAROC_ROC::Init()
       return ERR_CONFIG;
     } 
 
-  s.str(""); s << "[MAROC_ROC]::[INFO]::++++++  CONFIGURED ++++++";  
+  s.str(""); s << "[MAROC_ROC]::[INFO]::++++++ CONFIGURED - READY FOR DAQ ++++++";  
   Log(s.str(),1);
   return 0;
 } 
@@ -85,6 +88,7 @@ int MAROC_ROC::Clear()
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
 
+  //Issue a GlobalReset
   status |= GlobalReset();
   if (status)
     {
@@ -93,6 +97,7 @@ int MAROC_ROC::Clear()
       return ERR_RESET;
     }
 
+  //Re-initialize and clear buffer
   status=Init();
   status|=BufferClear();
   return status;
@@ -105,6 +110,7 @@ int MAROC_ROC::BufferClear()
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
 
+  //Just clear the buffers and reset the ADC busy
   status |= ResetFIFO();
   status |= SetMemoryMode(true);
   status |= ClearADCBusy();
@@ -126,15 +132,15 @@ int MAROC_ROC::Config(BoardConfig *bC)
   Board::Config(bC);
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
   
-  GetConfiguration()->model=static_cast<MAROC_ROC_Model_t>(Configurator::GetInt( bC->getElementContent("model")));
+  // GetConfiguration()->model=static_cast<MAROC_ROC_Model_t>(Configurator::GetInt( bC->getElementContent("model")));
   
-  GetConfiguration()->blkEnd=static_cast<bool>(Configurator::GetInt( bC->getElementContent("blkEnd")));
-  GetConfiguration()->zeroSuppression=static_cast<bool>(Configurator::GetInt( bC->getElementContent("zeroSuppression")));
-  GetConfiguration()->emptyEnable=static_cast<bool>(Configurator::GetInt( bC->getElementContent("emptyEnable")));
-  GetConfiguration()->overRange=static_cast<bool>(Configurator::GetInt( bC->getElementContent("overRange")));
+  // GetConfiguration()->blkEnd=static_cast<bool>(Configurator::GetInt( bC->getElementContent("blkEnd")));
+  // GetConfiguration()->zeroSuppression=static_cast<bool>(Configurator::GetInt( bC->getElementContent("zeroSuppression")));
+  // GetConfiguration()->emptyEnable=static_cast<bool>(Configurator::GetInt( bC->getElementContent("emptyEnable")));
+  // GetConfiguration()->overRange=static_cast<bool>(Configurator::GetInt( bC->getElementContent("overRange")));
   
-  GetConfiguration()->iped=Configurator::GetInt( bC->getElementContent("iped"));
-  GetConfiguration()->zsThreshold=Configurator::GetInt( bC->getElementContent("zsThreshold"));
+  // GetConfiguration()->iped=Configurator::GetInt( bC->getElementContent("iped"));
+  // GetConfiguration()->zsThreshold=Configurator::GetInt( bC->getElementContent("zsThreshold"));
 
   return 0;
 }
@@ -173,7 +179,7 @@ int MAROC_ROC::Read(vector<WORD> &v)
       return ERR_READ;
     }  
 
-
+  //Prepare memory to be readout
   SetMemoryMode(false);
   for(unsigned int iWord=0;iWord<MAROC_ROC_BOARDDATA_NWORD;++iWord)
     {
@@ -237,38 +243,4 @@ int MAROC_ROC::Read(vector<WORD> &v)
   return 0;
 }
 
-int MAROC_ROC::CheckStatusAfterRead()
-{
-  if (handle_<0)
-    return ERR_CONF_NOT_FOUND;
-
-  int status = 0; 
-  WORD data;
-  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_REG2_STATUS,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
-  if (status)
-    {
-      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot get status after read from  board " << status; 
-      Log(s.str(),1);
-    }  
-
-  int v792_full = data & MAROC_ROC_FULL_BITMASK;
-  int v792_empty = data & MAROC_ROC_EMPTY_BITMASK; 
-  
-
-   if( v792_full || !v792_empty || status!=1 ) 
-     { 
-       status=BufferClear();
-       if (status)
-	   status=Clear();
-     }
-
-   if (status)
-     {
-       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot restore healthy state in  board " << status; 
-      Log(s.str(),1);
-      return ERR_READ;
-     }  
-
-  return 0;
-}
 
