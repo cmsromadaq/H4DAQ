@@ -68,6 +68,7 @@ public:
 
     unsigned int holdValue;
     unsigned int holdDeltaValue;
+
     MAROC_ROC_TriggerType_t triggerType;
 
     //unsigned int numBoard; //for the moment just 1 daughter board
@@ -89,36 +90,25 @@ public:
 
 private:
   int CheckADCStatus(int& status);
-
   int ConfigFEBTrigger();
   int ConfigFEBReadoutHold();
   int ConfigROCTrigger();
-
   int ClearADCBusy();
-
   int ClockFEBBusPulse();
   int ClockReg();
-
   int GlobalReset();
-
   int InitADC();
-
   int LoadFEBConfiguration();
-
-  int RegIn(int up);
-
+  int RegIn(bool upDown);
   int ResetTimeStamp();
   int ResetFIFO();
-
   int SendOnFEBBus(int address, int data);
-
   int SetADCSlowHold(int slowhold,int clock_sel);
   int SetADCClock(int nclk);
   int SetADCTestOff();
   int SetADCEnableDReset();
   int SetADCNormalReadoutMode();
   int SetADCZeroSuppressionMode();
-
   int SetMemoryMode(bool external);
 
   uint32_t handle_;
