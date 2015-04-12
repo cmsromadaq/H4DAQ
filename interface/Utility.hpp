@@ -20,7 +20,11 @@ namespace Utility{
 	string now();
 	void SpaceToNull(int N,void*data,bool first=false);
 	int  FindNull(int N,void*data,int iPos=1);
-
+        
+  void setbit(unsigned int* data,int bit);
+  void setbit(int* data,int bit);
+  void clearbit(unsigned int* data,int bit);
+  void clearbit(int* data,int bit);
 
   int hibit(unsigned int n);
   int lowbit(uint32_t n);
