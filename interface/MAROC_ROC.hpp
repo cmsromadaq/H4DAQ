@@ -51,11 +51,6 @@ public:
   } ERROR_CODES;
 
   typedef enum  {
-    MAROC_ROC_E= 0, //32ch version (IDC inputs)
-    MAROC_ROC_N= 1  //16ch version (LEMO inputs)
-  } MAROC_ROC_Model_t;
-
-  typedef enum  {
     TTL_RISING= 0, 
     TTL_FALLING= 1, 
     FEB=2,     
