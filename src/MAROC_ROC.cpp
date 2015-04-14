@@ -16,8 +16,8 @@ int MAROC_ROC::Init()
   //Load configuration on Maroc FEB (829 bits)
   status |= LoadFEBConfiguration();
 
-  //Clear Conf
-  WORD data=0x0;
+  //Check board is present
+  WORD data;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
   if (status)
     {
@@ -26,14 +26,14 @@ int MAROC_ROC::Init()
       return ERR_OPEN;
     }    
 
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec;
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec << " conf 0x" << std::hex << data << std::dec;
   Log(s.str(),1);
 
   int run_mode = configuration_.debugMode==1 ? 0xd : 0x0; 
+
   //Put the system in readout mode
   status |= SendOnFEBBus(3,run_mode);
   status |= SendOnFEBBus(8,0);
-
   s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB in readout mode";
   Log(s.str(),1);
     
@@ -88,8 +88,8 @@ int MAROC_ROC::Clear()
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
 
-  //Issue a GlobalReset
-  status |= GlobalReset();
+  //Issue a SoftReset
+  status |= SoftwarelReset();
   if (status)
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot reset  board " << status; 
@@ -816,7 +816,7 @@ int MAROC_ROC::ResetTimeStamp()
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error resetting timestamp";
       Log(s.str(),1);
-      return ERR_CONFIG;
+      return ERR_RESET;
     }
 
   ostringstream s; s << "[MAROC_ROC]::[INFO]::Internal timestamp reset";
@@ -843,7 +843,7 @@ int MAROC_ROC::ResetFIFO()
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error resetting FIFO";
       Log(s.str(),1);
-      return ERR_CONFIG;
+      return ERR_RESET;
     }
 
   return 0;
@@ -868,8 +868,58 @@ int MAROC_ROC::ClearADCBusy()
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error clearing ADC Busy";
       Log(s.str(),1);
-      return ERR_CONFIG;
+      return ERR_RESET;
     }
 
+  return 0;
+}
+
+int MAROC_ROC::GetADCStatus(int & mystat)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_INPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error getting ADC status";
+      Log(s.str(),1);
+      mystat=-1;
+      return ERR_READ;
+    }
+
+  mystat = data&0xFFFF;
+  return 0;
+}
+
+int MAROC_ROC::SoftwareReset()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data,1);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error in software reset";
+      Log(s.str(),1);
+      mystat=-1;
+      return ERR_RESET;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC ROC Software reset";
+  Log(s.str(),1);
+  
   return 0;
 }

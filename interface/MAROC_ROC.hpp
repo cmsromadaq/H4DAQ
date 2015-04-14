@@ -104,14 +104,13 @@ public:
   inline MAROC_ROC_Config_t* GetConfiguration() { return &configuration_; };
 
 private:
-  int CheckADCStatus(int& status);
   int ConfigFEBTrigger(); //
   int ConfigFEBReadoutHold(); //
   int ConfigROCTrigger(); //
   int ClearADCBusy();//
   int ClockFEBBusPulse(); //
   int ClockReg(); //
-  int GlobalReset();
+  int GetADCStatus(int& status); //
   int InitADC();//
   int LoadFEBConfiguration(); //
   int RegIn(bool upDown); //
@@ -125,6 +124,7 @@ private:
   int SetADCNormalReadoutMode(); //
   int SetADCZeroSuppressionMode(); //
   int SetMemoryMode(bool external); //
+  int SoftwareReset(); //
 
   uint32_t handle_;
   MAROC_ROC_Config_t configuration_;
