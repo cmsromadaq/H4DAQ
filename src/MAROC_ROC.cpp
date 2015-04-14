@@ -799,3 +799,77 @@ int MAROC_ROC::SetADCSlowHold(int slowhold, int clock_sel)
   
   return 0;
 }
+
+int MAROC_ROC::ResetTimeStamp()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  data=0x0;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_TS_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  data=0x3;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_TS_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error resetting timestamp";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::Internal timestamp reset";
+  Log(s.str(),1);
+  
+  return 0;
+
+}
+
+int MAROC_ROC::ResetFIFO()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  data=0xFF00;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_FIFO_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  data=0x0;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_FIFO_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_FIFO_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error resetting FIFO";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  return 0;
+}
+
+int MAROC_ROC::ClearADCBusy()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data,3);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  Utility::setbit(&data,3);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  Utility::clearbit(&data,3);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error clearing ADC Busy";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  return 0;
+}

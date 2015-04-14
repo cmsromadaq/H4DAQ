@@ -108,17 +108,17 @@ private:
   int ConfigFEBTrigger(); //
   int ConfigFEBReadoutHold(); //
   int ConfigROCTrigger(); //
-  int ClearADCBusy();
+  int ClearADCBusy();//
   int ClockFEBBusPulse(); //
   int ClockReg(); //
   int GlobalReset();
   int InitADC();//
   int LoadFEBConfiguration(); //
   int RegIn(bool upDown); //
-  int ResetTimeStamp();
-  int ResetFIFO();
+  int ResetTimeStamp(); //
+  int ResetFIFO(); //
   int SendOnFEBBus(int address, int data); //
-  int SetADCSlowHold(int slowhold,int clock_sel);
+  int SetADCSlowHold(int slowhold,int clock_sel); //
   int SetADCClock(int nclk); //
   int SetADCTestOff(); //
   int SetADCEnableDReset(); //
