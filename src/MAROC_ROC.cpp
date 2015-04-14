@@ -262,7 +262,7 @@ int MAROC_ROC::LoadFEBConfiguration()
   FILE* mfile = fopen(configuration_.configFile.c_str(),"r");
   if (!mfile)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Cannot find config file " << configuration_.configFile;
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot find config file " << configuration_.configFile;
       Log(s.str(),1);
       return ERR_CONFIG;
     }
@@ -271,7 +271,7 @@ int MAROC_ROC::LoadFEBConfiguration()
   char* read=fgets(config,MAROC_ROC_FEB_CONFIG_BITSIZE+1,mfile);
   if (read == NULL)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error reading from config file " << configuration_.configFile;
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error reading from config file " << configuration_.configFile;
       Log(s.str(),1);
       return ERR_CONFIG;
     }
@@ -303,7 +303,7 @@ int MAROC_ROC::LoadFEBConfiguration()
       } else if (bit_local[ibit] == 0) {
 	status |= RegIn(false);
       } else {
-	ostringstream s; s << "[MAROC_ROC]::[INFO]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
+	ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
 	Log(s.str(),1);
 	return ERR_CONFIG;
       }
@@ -321,7 +321,7 @@ int MAROC_ROC::LoadFEBConfiguration()
       } else if (bit_local[ibit] == 0) {
 	status |= RegIn(false);
       } else {
-	ostringstream s; s << "[MAROC_ROC]::[INFO]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
+	ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error in MAROC FEB configuration " << configuration_.configFile << " @ bit " << ibit;
 	Log(s.str(),1);
 	return ERR_CONFIG;
       }
@@ -336,7 +336,7 @@ int MAROC_ROC::LoadFEBConfiguration()
 
   if (badconfig)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
       Log(s.str(),1);
       return ERR_CONFIG;
     }
@@ -345,7 +345,7 @@ int MAROC_ROC::LoadFEBConfiguration()
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error loading configuration";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error loading configuration";    
       Log(s.str(),1);
       return ERR_CONFIG;
     }
@@ -406,7 +406,7 @@ int MAROC_ROC::SendOnFEBBus(int address, int data)
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error sending data on FEB bus";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error sending data on FEB bus";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -431,7 +431,7 @@ int MAROC_ROC::ClockFEBBusPulse()
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error sending clock pulse on FEB bus";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error sending clock pulse on FEB bus";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -460,7 +460,7 @@ int MAROC_ROC::RegIn(bool up)
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error setting FEB register on output connector";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error setting FEB register on output connector";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -482,7 +482,7 @@ int MAROC_ROC::InitADC()
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error initializing the ADC";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error initializing the ADC";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -514,7 +514,7 @@ int MAROC_ROC::SetMemoryMode(bool external)
   
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error setting memory mode";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error setting memory mode";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -543,7 +543,7 @@ int MAROC_ROC::ConfigFEBReadoutHold()
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error configuring MAROC readout";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error configuring MAROC readout";    
       Log(s.str(),1);
       return ERR_FEB_COMM;
     }
@@ -564,7 +564,7 @@ int MAROC_ROC::ConfigFEBTrigger()
 
   if (configuration_.triggerType == FEB)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger Mode not yet supported";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::MAROC FEB Trigger Mode not yet supported";    
       Log(s.str(),1);
       return ERR_CONFIG;
     }
@@ -574,11 +574,71 @@ int MAROC_ROC::ConfigFEBTrigger()
 
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error configuring MAROC FEB Trigger";          Log(s.str(),1);
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error configuring MAROC FEB Trigger";          Log(s.str(),1);
       return ERR_FEB_COMM;
     }
 
   ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger configured";     
+  Log(s.str(),1);
+
+  return 0;
+}
+
+int MAROC_ROC::ConfigROCTrigger()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  if (configuration_.triggerType == FEB)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::MAROC FEB Trigger Mode not yet supported";    
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  switch(configuration_.triggerType)
+    {
+    case TTL_RISING: //0b000
+      Utility::clearbit(&data,11);
+      Utility::clearbit(&data,10);
+      Utility::clearbit(&data,9);
+      break;
+    case TTL_FALLING: //0b010
+      Utility::clearbit(&data,11);
+      Utility::setbit(&data,10);
+      Utility::clearbit(&data,9);
+      break;
+    case NIM: //0b111
+      Utility::setbit(&data,11);
+      Utility::setbit(&data,10);
+      Utility::setbit(&data,9);
+      break;
+    case INTERNAL: //0b001
+      Utility::clearbit(&data,11);
+      Utility::clearbit(&data,10);
+      Utility::setbit(&data,9);
+      break;
+    default:
+     ostringstream s; s << "[MAROC_ROC]::[ERROR]::Trigger Type not supported";    
+     Log(s.str(),1);
+     return ERR_CONFIG;
+    }
+
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error configuring ROC Trigger Input";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::ROC Trigger Input configured";     
   Log(s.str(),1);
 
   return 0;

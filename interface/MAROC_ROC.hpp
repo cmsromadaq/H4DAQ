@@ -91,9 +91,9 @@ public:
 
 private:
   int CheckADCStatus(int& status);
-  int ConfigFEBTrigger();
+  int ConfigFEBTrigger(); //
   int ConfigFEBReadoutHold(); //
-  int ConfigROCTrigger();
+  int ConfigROCTrigger(); //
   int ClearADCBusy();
   int ClockFEBBusPulse(); //
   int ClockReg(); //
