@@ -669,6 +669,56 @@ int MAROC_ROC::SetADCClock(int nclk)
   return 0;
 }
 
+int MAROC_ROC::SetADCTestOff()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data,MAROC_ROC_CONF_REGISTER_TEST_ON_BIT);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error disabling test";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::test enabled";     
+  Log(s.str(),1);
+  
+  return 0;
+}
+
+int MAROC_ROC::SetADCNormalReadoutMode()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::clearbit(&data,MAROC_ROC_CONF_REGISTER_TEST_MODE_BIT);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error enabing readout mode";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::readout mode enabled ";     
+  Log(s.str(),1);
+  
+  return 0;
+}
+
 int MAROC_ROC::SetADCEnableDReset()
 {
   int status=0;
@@ -688,7 +738,63 @@ int MAROC_ROC::SetADCEnableDReset()
       return ERR_CONFIG;
     }
 
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::DRest enabled ";     
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::dreset enabled ";     
+  Log(s.str(),1);
+  
+  return 0;
+}
+
+int MAROC_ROC::SetADCZeroSuppressionMode()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_MODESUPP_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  data=0x0;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_MODESUPP_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_MODESUPP_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error disabling zero suppression";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::zero suppression disabled";     
+  Log(s.str(),1);
+  
+  return 0;
+}
+
+int MAROC_ROC::SetADCSlowHold(int slowhold, int clock_sel)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  if (slowhold>16383) {
+    ostringstream s; s << "[MAROC_ROC]::[ERROR]::Slowhold value " << slowhold << " too high!";
+    Log(s.str(),1);
+    return ERR_CONFIG;
+  }
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_HOLD_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  data=(((clock_sel<<14)&0xc000) | (slowhold&0x3fff));
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_HOLD_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_HOLD_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error setting ADC slowhold";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::ADC slowhold configured to " << slowhold << " clock_sel " << clock_sel;     
   Log(s.str(),1);
   
   return 0;

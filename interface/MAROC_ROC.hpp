@@ -120,10 +120,10 @@ private:
   int SendOnFEBBus(int address, int data); //
   int SetADCSlowHold(int slowhold,int clock_sel);
   int SetADCClock(int nclk); //
-  int SetADCTestOff();
+  int SetADCTestOff(); //
   int SetADCEnableDReset(); //
-  int SetADCNormalReadoutMode();
-  int SetADCZeroSuppressionMode();
+  int SetADCNormalReadoutMode(); //
+  int SetADCZeroSuppressionMode(); //
   int SetMemoryMode(bool external); //
 
   uint32_t handle_;
