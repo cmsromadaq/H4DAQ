@@ -42,24 +42,24 @@ int MAROC_ROC::Init()
   //Put the system in readout mode
   status |= SendOnFEBBus(3,run_mode);
   status |= SendOnFEBBus(8,0);
-  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB in readout mode";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB in run_mode " << run_mode;
   Log(s.str(),1);
     
   //Initialize ADC
   status |= InitADC();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Init MAROC FEB ADC";
-  Log(s.str(),1);
+  // s.str(""); s << "[MAROC_ROC]::[INFO]::Init MAROC FEB ADC";
+  // Log(s.str(),1);
 
   //Config hold values for the MAROC
   status |= ConfigFEBReadoutHold();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB readout configured: hold " << configuration_.holdValue << " hold2 delay " << configuration_.holdDeltaValue;
-  Log(s.str(),1);
+  // s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB readout configured: hold " << configuration_.holdValue << " hold2 delay " << configuration_.holdDeltaValue;
+  // Log(s.str(),1);
 
   //Configure trigger mode
   status |= ConfigFEBTrigger();
   status |= ConfigROCTrigger();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Trigger inputs configured";
-  Log(s.str(),1);
+  // s.str(""); s << "[MAROC_ROC]::[INFO]::Trigger inputs configured";
+  // Log(s.str(),1);
 
   //Configure ADC
   status |= SetADCClock(400);
@@ -68,13 +68,13 @@ int MAROC_ROC::Init()
   status |= SetADCNormalReadoutMode();
   status |= SetADCZeroSuppressionMode();
   status |= SetADCSlowHold(20,0);
-  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB ADC configured";
-  Log(s.str(),1);
+  // s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB ADC configured";
+  // Log(s.str(),1);
 
   //Reset TimeStamp for the eventInfo
   status |= ResetTimeStamp();
-  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC TimeStamp reset";
-  Log(s.str(),1);
+  // s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC TimeStamp reset";
+  // Log(s.str(),1);
   
   if (status)
     {
@@ -232,7 +232,7 @@ int MAROC_ROC::Read(vector<WORD> &v)
 int MAROC_ROC::LoadFEBConfiguration()
 {
   int status=0;
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration ++++++";
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::Loading FEB configuration";
   Log(s.str(),1);
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
@@ -280,10 +280,6 @@ int MAROC_ROC::LoadFEBConfiguration()
 #endif
   //Put the system in readout
   status |= SendOnFEBBus(3,10);
-// #ifdef MAROC_DEBUG
-//   s.str(""); s << "[MAROC_ROC]::[DEBUG]::SEND ON FEB BUS STATUS " << status;
-//   Log(s.str(),3);
-// #endif
 
   WORD data_out;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_out,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
@@ -317,7 +313,7 @@ int MAROC_ROC::LoadFEBConfiguration()
 #ifdef MAROC_DEBUG
   Log(s.str(),3);
 #endif
-  s.str(""); s << "[MAROC_ROC]::[INFO]::CHECK CONFIG "; 
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Checking configuration "; 
   //Resend & check wanted config
   int badconfig=0;
   for (int iloop = 0; iloop<1; iloop++){
@@ -371,7 +367,7 @@ int MAROC_ROC::LoadFEBConfiguration()
       return ERR_CONFIG;
     }
   
-  s.str(""); s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration OK ++++++";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Load FEB configuration OK";
   Log(s.str(),1);  
   return 0;
 }
@@ -629,7 +625,7 @@ int MAROC_ROC::ConfigFEBTrigger()
       return ERR_FEB_COMM;
     }
 
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger configured";     
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger configured to EXTERNAL mode";     
   Log(s.str(),1);
 
   return 0;
@@ -650,6 +646,7 @@ int MAROC_ROC::ConfigROCTrigger()
 
   WORD data;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  ostringstream s;
 
   switch(configuration_.triggerType)
     {
@@ -657,24 +654,32 @@ int MAROC_ROC::ConfigROCTrigger()
       Utility::clearbit(&data,11);
       Utility::clearbit(&data,10);
       Utility::clearbit(&data,9);
+      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to TTL_RISING";     
+      Log(s.str(),1);
       break;
     case TTL_FALLING: //0b010
       Utility::clearbit(&data,11);
       Utility::setbit(&data,10);
       Utility::clearbit(&data,9);
+      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to TTL_FALLING";     
+      Log(s.str(),1);
       break;
     case NIM: //0b111
       Utility::setbit(&data,11);
       Utility::setbit(&data,10);
       Utility::setbit(&data,9);
+      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to TTL_NIM";     
+      Log(s.str(),1);
       break;
     case INTERNAL: //0b001
       Utility::clearbit(&data,11);
       Utility::clearbit(&data,10);
       Utility::setbit(&data,9);
+      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to INTERNAL";     
+      Log(s.str(),1);
       break;
     default:
-     ostringstream s; s << "[MAROC_ROC]::[ERROR]::Trigger Type not supported";    
+     s.str(""); s << "[MAROC_ROC]::[ERROR]::Trigger Type not supported";    
      Log(s.str(),1);
      return ERR_CONFIG;
     }
@@ -689,7 +694,7 @@ int MAROC_ROC::ConfigROCTrigger()
       return ERR_CONFIG;
     }
 
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::ROC Trigger Input configured";     
+  s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger Input configured";     
   Log(s.str(),1);
 
   return 0;
