@@ -92,25 +92,25 @@ public:
 private:
   int CheckADCStatus(int& status);
   int ConfigFEBTrigger();
-  int ConfigFEBReadoutHold();
+  int ConfigFEBReadoutHold(); //
   int ConfigROCTrigger();
   int ClearADCBusy();
-  int ClockFEBBusPulse();
-  int ClockReg();
+  int ClockFEBBusPulse(); //
+  int ClockReg(); //
   int GlobalReset();
-  int InitADC();
-  int LoadFEBConfiguration();
-  int RegIn(bool upDown);
+  int InitADC();//
+  int LoadFEBConfiguration(); //
+  int RegIn(bool upDown); //
   int ResetTimeStamp();
   int ResetFIFO();
-  int SendOnFEBBus(int address, int data);
+  int SendOnFEBBus(int address, int data); //
   int SetADCSlowHold(int slowhold,int clock_sel);
   int SetADCClock(int nclk);
   int SetADCTestOff();
   int SetADCEnableDReset();
   int SetADCNormalReadoutMode();
   int SetADCZeroSuppressionMode();
-  int SetMemoryMode(bool external);
+  int SetMemoryMode(bool external); //
 
   uint32_t handle_;
   MAROC_ROC_Config_t configuration_;

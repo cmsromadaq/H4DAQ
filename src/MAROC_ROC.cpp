@@ -426,7 +426,7 @@ int MAROC_ROC::ClockFEBBusPulse()
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
   Utility::setbit(&data_in,0);
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
-  Utility::clearbit(&data_in,2);
+  Utility::clearbit(&data_in,0);
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
 
   if (status)
@@ -438,4 +438,148 @@ int MAROC_ROC::ClockFEBBusPulse()
 
   return 0;
 
+}
+
+int MAROC_ROC::RegIn(bool up)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  int bit_reg= 5;
+
+  WORD data_in;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  if (up)
+    Utility::setbit(&data_in,bit_reg);
+  else
+    Utility::clearbit(&data_in,bit_reg);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error setting FEB register on output connector";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  return 0;
+}
+
+
+int MAROC_ROC::InitADC()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+
+  WORD data=0x0;
+  Utility::setbit(&data,3);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error initializing the ADC";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::ADC initialized";    
+  Log(s.str(),1);
+  
+  return 0;
+}
+
+
+int MAROC_ROC::SetMemoryMode(bool external)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (external)
+    Utility::clearbit(&data,0);
+  else
+    Utility::setbit(&data,0);
+
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error setting memory mode";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  return 0;
+}
+
+int MAROC_ROC::ConfigFEBReadoutHold()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  // Hold 1
+  status |= SendOnFEBBus(MAROC_ROC_HOLD1_SUBADD,configuration_.holdValue);
+  // Hold 2 -> hold1 + 20 tick=60ns
+  status |= SendOnFEBBus(MAROC_ROC_HOLD2_SUBADD,configuration_.holdValue+configuration_.holdDeltaValue);
+  /* set start dreset */
+  status |= SendOnFEBBus(6,configuration_.holdValue+300);
+  /* set end dreset */
+  status |= SendOnFEBBus(5,configuration_.holdValue+600);
+  /* set start readout */
+  status |= SendOnFEBBus(4,configuration_.holdValue+900);
+  /* load all the readout config */
+  status |= SendOnFEBBus(0,0);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error configuring MAROC readout";    
+      Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC hold readout configured;HOLD1 " << configuration_.holdValue << " HOLD2 " << configuration_.holdValue+configuration_.holdDeltaValue;    
+  Log(s.str(),1);
+
+  return 0;
+}
+
+int MAROC_ROC::ConfigFEBTrigger()
+{
+  //FEB always in external trigger mode (MAROC trigger generation not supported at the moment
+
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  if (configuration_.triggerType == FEB)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger Mode not yet supported";    
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  //Set MAROC FEB in external trigger mode
+  status |= SendOnFEBBus(MAROC_ROC_FEB_CONFIG_TRIG_SUBADD,0);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[INFO]::Error configuring MAROC FEB Trigger";          Log(s.str(),1);
+      return ERR_FEB_COMM;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::MAROC FEB Trigger configured";     
+  Log(s.str(),1);
+
+  return 0;
 }
