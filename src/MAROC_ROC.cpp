@@ -643,3 +643,53 @@ int MAROC_ROC::ConfigROCTrigger()
 
   return 0;
 }
+
+int MAROC_ROC::SetADCClock(int nclk)
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_ADCCLK_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  data=nclk&0xFFFF;
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_ADCCLK_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_ADCCLK_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error configuring ADC CLOCK";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::ADC Clock set to " << nclk;     
+  Log(s.str(),1);
+  
+  return 0;
+}
+
+int MAROC_ROC::SetADCEnableDReset()
+{
+  int status=0;
+  if (handle_<0)
+    return ERR_CONF_NOT_FOUND;
+
+  WORD data;
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  Utility::setbit(&data,MAROC_ROC_CONF_REGISTER_DRESET_ON_BIT);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
+  status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
+  if (status)
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error enabling dreset";
+      Log(s.str(),1);
+      return ERR_CONFIG;
+    }
+
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::DRest enabled ";     
+  Log(s.str(),1);
+  
+  return 0;
+}
