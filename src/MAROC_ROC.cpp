@@ -290,7 +290,7 @@ int MAROC_ROC::LoadFEBConfiguration()
 
   //Load wanted config
 #ifdef MAROC_DEBUG
-  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB CONFIG "; 
+  s.str(""); s << "[MAROC_ROC]::[DEBUG]::MAROC FEB CONFIG "; 
 #endif
 
   for (int iloop = 0; iloop<1; iloop++){
