@@ -78,7 +78,7 @@ public:
 
     string configFile;
 
-    bool zeroSuppressionMode;
+//    bool zeroSuppressionMode;
     bool debugMode;
 
     unsigned int holdValue;
