@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#define MAROC_DEBUG
+
 int MAROC_ROC::Init()
 {
   int status=0;
@@ -13,9 +15,6 @@ int MAROC_ROC::Init()
   if (!IsConfigured())
     return ERR_CONF_NOT_FOUND;
 
-  //Load configuration on Maroc FEB (829 bits)
-  status |= LoadFEBConfiguration();
-
   //Check board is present
   WORD data;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_CONF_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
@@ -24,6 +23,15 @@ int MAROC_ROC::Init()
       s.str(""); s << "[MAROC_ROC]::[ERROR]::Cannot open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec; 
       Log(s.str(),1);
       return ERR_OPEN;
+    }    
+
+  //Load configuration on Maroc FEB (829 bits)
+  status |= LoadFEBConfiguration();
+  if (status)
+    {
+      s.str(""); s << "[MAROC_ROC]::[ERROR]::Cannot config MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      Log(s.str(),1);
+      return ERR_CONFIG;
     }    
 
   s.str(""); s << "[MAROC_ROC]::[INFO]::Open MAROC board @0x" << std::hex << configuration_.baseAddress << std::dec << " conf 0x" << std::hex << data << std::dec;
@@ -130,9 +138,18 @@ int MAROC_ROC::BufferClear()
 int MAROC_ROC::Config(BoardConfig *bC)
 {
   Board::Config(bC);
+// #ifdef MAROC_DEBUG
+//   ostringstream s; s << "[MAROC_ROC]::[DEBUG]::INIT CONFIG";
+//   Log(s.str(),3);
+// #endif
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
-
-  GetConfiguration()->configFile=bC->getElementContent("triggerType");
+#ifdef MAROC_DEBUG
+ ostringstream s; s << "[MAROC_ROC]::[DEBUG]::BASE ADDRESS 0x" << std::hex << GetConfiguration()->baseAddress << std::dec;
+  Log(s.str(),3);
+#endif
+  GetConfiguration()->configFile=bC->getElementContent("configFile");
+  ostringstream s1; s1 << "[MAROC_ROC]::[INFO]::CONFIG FILE " << std::hex << GetConfiguration()->configFile << std::dec;
+  Log(s1.str(),1);
 
   GetConfiguration()->triggerType=static_cast<MAROC_ROC_TriggerType_t>(Configurator::GetInt( bC->getElementContent("triggerType")));
   
@@ -140,7 +157,10 @@ int MAROC_ROC::Config(BoardConfig *bC)
   
   GetConfiguration()->holdValue=Configurator::GetInt( bC->getElementContent("holdValue"));  
   GetConfiguration()->holdDeltaValue=Configurator::GetInt( bC->getElementContent("holdDeltaValue"));
-
+// #ifdef MAROC_DEBUG
+//   s.str(""); s << "[MAROC_ROC]::[DEBUG]::EXIT CONFIG";
+//   Log(s.str(),3);
+// #endif
   return 0;
 }
 
@@ -254,15 +274,32 @@ int MAROC_ROC::LoadFEBConfiguration()
     bit_local[i]=mar_mask[i];
   }
 
-  //Open the serial connection
+#ifdef MAROC_DEBUG
+  s.str(""); s << "[MAROC_ROC]::[DEBUG]::CONFIG FILE READ";
+  Log(s.str(),3);
+#endif
+  //Put the system in readout
   status |= SendOnFEBBus(3,10);
+// #ifdef MAROC_DEBUG
+//   s.str(""); s << "[MAROC_ROC]::[DEBUG]::SEND ON FEB BUS STATUS " << status;
+//   Log(s.str(),3);
+// #endif
+
   WORD data_out;
-  WORD data_in;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_out,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
 
   //Load wanted config
+#ifdef MAROC_DEBUG
+  s.str(""); s << "[MAROC_ROC]::[INFO]::MAROC FEB CONFIG "; 
+#endif
+
   for (int iloop = 0; iloop<1; iloop++){
     for (int ibit=0; ibit<MAROC_ROC_FEB_CONFIG_BITSIZE; ibit++) {
+
+#ifdef MAROC_DEBUG
+      s << bit_local[ibit];
+#endif
+
       /* set data */
       if (bit_local[ibit] == 1) {
 	status |= RegIn(true);
@@ -273,10 +310,14 @@ int MAROC_ROC::LoadFEBConfiguration()
 	Log(s.str(),1);
 	return ERR_CONFIG;
       }
+
       ClockReg();
     }
   }
-
+#ifdef MAROC_DEBUG
+  Log(s.str(),3);
+#endif
+  s.str(""); s << "[MAROC_ROC]::[INFO]::CHECK CONFIG "; 
   //Resend & check wanted config
   int badconfig=0;
   for (int iloop = 0; iloop<1; iloop++){
@@ -291,14 +332,28 @@ int MAROC_ROC::LoadFEBConfiguration()
 	Log(s.str(),1);
 	return ERR_CONFIG;
       }
+      WORD data_in;
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_INPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+
       ClockReg();
+
       unsigned int readback_bit=data_in & 0x1;
 
       if (readback_bit !=  bit_local[ibit]) 
-	++badconfig;
+	{
+// #ifdef MAROC_DEBUG
+//   s.str(""); s << "[MAROC_ROC]::[DEBUG]::Config bit mismatch @ location " << ibit << " : wanted " << bit_local[ibit] << " read 0x" <<std::hex << data_in<< std::dec; 
+//   Log(s.str(),3);
+// #endif	
+	  s << "X";
+	  ++badconfig;
+	}
+      else
+	s << ".";
     }
   }
+
+  Log(s.str(),1);
 
   if (badconfig)
     {
@@ -316,7 +371,7 @@ int MAROC_ROC::LoadFEBConfiguration()
       return ERR_CONFIG;
     }
   
-  s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration OK ++++++";
+  s.str(""); s << "[MAROC_ROC]::[INFO]::++++++ Load FEB configuration OK ++++++";
   Log(s.str(),1);  
   return 0;
 }
@@ -328,7 +383,7 @@ int MAROC_ROC::SendOnFEBBus(int address, int data)
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
   
-  int local_addr = address;
+  int local_addr = address | ((0 & 0xF) << 8);
 
   WORD data_in;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
@@ -369,6 +424,7 @@ int MAROC_ROC::SendOnFEBBus(int address, int data)
 
   Utility::clearbit(&data_in,1);
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_in,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+  status |= ClockFEBBusPulse();
 
   if (status)
     {
