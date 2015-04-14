@@ -131,16 +131,15 @@ int MAROC_ROC::Config(BoardConfig *bC)
 {
   Board::Config(bC);
   GetConfiguration()->baseAddress=Configurator::GetInt( bC->getElementContent("baseAddress"));
+
+  GetConfiguration()->configFile=bC->getElementContent("triggerType");
+
+  GetConfiguration()->triggerType=static_cast<MAROC_ROC_TriggerType_t>(Configurator::GetInt( bC->getElementContent("triggerType")));
   
-  // GetConfiguration()->model=static_cast<MAROC_ROC_Model_t>(Configurator::GetInt( bC->getElementContent("model")));
+  GetConfiguration()->debugMode=static_cast<bool>(Configurator::GetInt( bC->getElementContent("debugMode")));
   
-  // GetConfiguration()->blkEnd=static_cast<bool>(Configurator::GetInt( bC->getElementContent("blkEnd")));
-  // GetConfiguration()->zeroSuppression=static_cast<bool>(Configurator::GetInt( bC->getElementContent("zeroSuppression")));
-  // GetConfiguration()->emptyEnable=static_cast<bool>(Configurator::GetInt( bC->getElementContent("emptyEnable")));
-  // GetConfiguration()->overRange=static_cast<bool>(Configurator::GetInt( bC->getElementContent("overRange")));
-  
-  // GetConfiguration()->iped=Configurator::GetInt( bC->getElementContent("iped"));
-  // GetConfiguration()->zsThreshold=Configurator::GetInt( bC->getElementContent("zsThreshold"));
+  GetConfiguration()->holdValue=Configurator::GetInt( bC->getElementContent("holdValue"));  
+  GetConfiguration()->holdDeltaValue=Configurator::GetInt( bC->getElementContent("holdDeltaValue"));
 
   return 0;
 }
@@ -183,6 +182,15 @@ int MAROC_ROC::Read(vector<WORD> &v)
   for(unsigned int iWord=0;iWord<MAROC_ROC_BOARDDATA_NWORD;++iWord)
     {
       //Read words one by one
+      status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+iWord*2,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+      dataV[iWord]=(data>>1) & 0xFFFF;
+      v.push_back(dataV[iWord]);
+      //at position 4 add the holdValue recorded in this event
+      if (iWord==3)
+	{
+	  data=(configuration_.holdValue && 0xFFFF);
+	  v.push_back(data);
+	}
     }
   if (status)
     {
@@ -190,51 +198,10 @@ int MAROC_ROC::Read(vector<WORD> &v)
       Log(s.str(),1);
       return ERR_READ;
     }  
-  
-//   int nWordsRead=nbytes_tran/sizeof(WORD);
-//   for (int i=0;i<nWordsRead;++i)
-//     {
-//       int wordType=(dataV[i] & MAROC_ROC_EVENT_WORDTYPE_BITMASK)>>24;
-//       if (wordType == MAROC_ROC_EVENT_DATA ||
-// 	  wordType == MAROC_ROC_EVENT_BOE ||
-// 	  wordType == MAROC_ROC_EVENT_EOE 
-// 	  )
-// 	{
-// 	  v.push_back(dataV[i]); //Filling event buffer
-// #ifdef CAEN_DEBUG
-// 	  if (i==0 && wordType != MAROC_ROC_EVENT_BOE)
-// 	    {
-// 	      ostringstream s; s << "[MAROC_ROC]::[WARNING]::First Word Not BOE " << wordType; 
-// 	      Log(s.str(),1);
-// 	    }
-// 	  if (i==nWordsRead-1 && wordType != MAROC_ROC_EVENT_EOE)
-// 	    {
-// 	      ostringstream s; s << "[MAROC_ROC]::[WARNING]::Last Word Not EOE " << wordType; 
-// 	      Log(s.str(),1);
-// 	    }
-// 	  if (wordType == MAROC_ROC_EVENT_DATA)
-// 	    {
-// 	      short adc_chan = dataV[i]>>16 & 0x1F; //For 792 [bit 16-20]
-// 	      unsigned int adc_value = dataV[i] & 0xFFF; // adc data [bit 0-11]
-// 	      bool adc_overflow = (dataV[i]>>12) & 0x1; // overflow bit [bit 12]
-// 	      bool adc_underthreshold = (dataV[i]>>13) & 0x1; // under threshold bit [bit 13]
-// 	      ostringstream s; s << "[MAROC_ROC]::[INFO]::Read Channel " << "\tchannel " << adc_chan << "\tvalue " << adc_value << "\toverflow " << adc_overflow << "\tunderthreshold " << adc_underthreshold; 
-// 	      Log(s.str(),1);
-// 	    }
-// #endif
-// 	}
-//       else
-// 	{
-// 	  ostringstream s; s << "[MAROC_ROC]::[WARNING]::Invalid data read from  board " << wordType; 
-// 	  Log(s.str(),1);
-// 	}
-//     }
 
-
-//   status |= CheckStatusAfterRead();
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[ERROR]::MEB !Empty or problems reading" << status; 
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Errors while reading" << status; 
       Log(s.str(),1);
       return ERR_READ;
     }  
