@@ -89,7 +89,7 @@ int MAROC_ROC::Clear()
     return ERR_CONF_NOT_FOUND;
 
   //Issue a SoftReset
-  status |= SoftwarelReset();
+  status |= SoftwareReset();
   if (status)
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot reset  board " << status; 
@@ -153,26 +153,25 @@ int MAROC_ROC::Read(vector<WORD> &v)
     return ERR_CONF_NOT_FOUND;
 
   int status = 0; 
-  WORD dataV[MAROC_ROC_BOARDDATA_NWORD]; //each event is composed of max (channels_+2)x32bit words. Reserve space for a single event
+  WORD dataV[MAROC_ROC_BOARDDATA_NWORD]; 
   //Empty event buffer
-  for (unsigned int i=0;i<channels_+2;++i)
+  for (unsigned int i=0;i<MAROC_ROC_BOARDDATA_NWORD;++i)
     dataV[i]=0;
 
   WORD data;
   int adc_rdy=0;
-  int adc_busy=1;
 
-  int ntry = 1000, nt = 0;
+  int ntry = 1000, nt = 0, adcstatus=0;
   //Wait for a valid datum in the ADC
-  while ( (adc_rdy != 1 || adc_busy!=0 ) && nt<ntry )
+  while ( adc_rdy != 1 && nt<ntry )
     {
-      // status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_REG1_STATUS,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
-      // v792_rdy = data & MAROC_ROC_RDY_BITMASK;
-      // v792_busy  = data & MAROC_ROC_BUSY_BITMASK;
+      status |= GetADCStatus(adcstatus);
+      //Assuming only one MAROC FEB
+      adc_rdy = adcstatus & 0x3; 
       ++nt;
     }
 
-  if (status || adc_rdy==0 || adc_busy==1)
+  if (status || adc_rdy==0 )
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot get a valid data from  board " << status; 
       Log(s.str(),1);
@@ -914,7 +913,6 @@ int MAROC_ROC::SoftwareReset()
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error in software reset";
       Log(s.str(),1);
-      mystat=-1;
       return ERR_RESET;
     }
 
