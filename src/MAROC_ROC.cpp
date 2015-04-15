@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define MAROC_DEBUG
+//#define MAROC_DEBUG
 
 int MAROC_ROC::Init()
 {
@@ -215,19 +215,19 @@ int MAROC_ROC::Read(vector<WORD> &v)
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+iWord*2,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
       dataV[iWord]=(data>>1) & 0xFFFF;
       v.push_back(dataV[iWord]);
-
+      
 #ifdef MAROC_DEBUG
       ostringstream s; s << "[MAROC_ROC]::[DEBUG]::DATA @ POS " << iWord << " " << std::hex << dataV[iWord] << std::dec << "," <<  dataV[iWord];
       Log(s.str(),3);
 #endif
       //at position 4 add the holdValue recorded in this event
       if (iWord==3)
-  	{
-  	  data=(configuration_.holdValue && 0xFFFF);
-  	  v.push_back(data);
-  	}
+   	{
+   	  data=(configuration_.holdValue && 0xFFFF);
+   	  v.push_back(data);
+   	}
     }
-
+  
   if (status)
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error while reading data from  board " << status ; 

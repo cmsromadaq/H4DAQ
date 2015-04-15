@@ -1005,7 +1005,7 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
-		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(10000); //DEBUG
+		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  
 
@@ -1057,7 +1057,11 @@ while (true) {
 		    }
 	case RECVBUFFER:
 	  {
-	    if ( noEB_ ) MoveToStatus ( SENTBUFFER );
+	    if ( noEB_ ) 
+	      {
+		eb_endspill=true;
+		MoveToStatus ( SENTBUFFER );
+	      }
 	    else
 	      {
 		// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
