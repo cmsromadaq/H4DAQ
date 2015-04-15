@@ -182,14 +182,21 @@ int MAROC_ROC::Read(vector<WORD> &v)
 
   int ntry = 1000, nt = 0, adcstatus=0;
   //Wait for a valid datum in the ADC
-  while ( adc_rdy != 1 && nt<ntry )
+  while ( adc_rdy == 0 && nt<ntry )
     {
       status |= GetADCStatus(adcstatus);
+#ifdef MAROC_DEBUG
+      ostringstream s; s << "[MAROC_ROC]::[DEBUG]::ADC status " << std::hex << adcstatus << std::dec;
+      Log(s.str(),3);
+#endif
       //Assuming only one MAROC FEB
       adc_rdy = adcstatus & 0x3; 
       ++nt;
     }
-
+#ifdef MAROC_DEBUG
+  ostringstream s; s << "[MAROC_ROC]::[DEBUG]::Got a ready from ADC after " << nt << " ntry";
+  Log(s.str(),3);
+#endif
   if (status || adc_rdy==0 )
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot get a valid data from  board " << status; 
@@ -197,7 +204,7 @@ int MAROC_ROC::Read(vector<WORD> &v)
       return ERR_READ;
     }  
 
-  //Prepare memory to be readout
+  // //Prepare memory to be readout
   SetMemoryMode(false);
   for(unsigned int iWord=0;iWord<MAROC_ROC_BOARDDATA_NWORD;++iWord)
     {
@@ -205,13 +212,19 @@ int MAROC_ROC::Read(vector<WORD> &v)
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+iWord*2,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
       dataV[iWord]=(data>>1) & 0xFFFF;
       v.push_back(dataV[iWord]);
+
+#ifdef MAROC_DEBUG
+      ostringstream s; s << "[MAROC_ROC]::[DEBUG]::DATA @ POS " << iWord << " " << std::hex << dataV[iWord] << std::dec << "," <<  dataV[iWord];
+      Log(s.str(),3);
+#endif
       //at position 4 add the holdValue recorded in this event
       if (iWord==3)
-	{
-	  data=(configuration_.holdValue && 0xFFFF);
-	  v.push_back(data);
-	}
+  	{
+  	  data=(configuration_.holdValue && 0xFFFF);
+  	  v.push_back(data);
+  	}
     }
+
   if (status)
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error while reading data from  board " << status ; 
