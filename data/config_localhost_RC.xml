@@ -100,7 +100,7 @@
       <ID>1</ID>
       <baseAddress>0x00CC0000</baseAddress>
       <configFile>/home/cmsdaq/DAQ/H4DAQ/data/maroc3_calib.dat</configFile> 
-      <triggerType>0</triggerType>
+      <triggerType>3</triggerType>
       <debugMode>0</debugMode>
       <holdValue>606</holdValue>
       <holdDeltaValue>20</holdDeltaValue>
