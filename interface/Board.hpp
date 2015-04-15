@@ -43,6 +43,7 @@ public:
 	virtual int Print()=0;
 	// --- Private members that must exist for each board
 	virtual int BufferClear()=0;
+        virtual int ClearBusy() {return 0;};
 	virtual int Config(BoardConfig *bC)=0;
         inline bool IsConfigured() const {return bC_!=0;};
 	virtual int Read(vector<WORD> &v)=0;

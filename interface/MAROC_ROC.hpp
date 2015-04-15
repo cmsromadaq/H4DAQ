@@ -87,11 +87,11 @@ public:
   virtual int Init();
   virtual int Clear();
   virtual int BufferClear(); //reset the buffers
+  virtual int ClearBusy() { return BufferClear(); };
   virtual int Print() { return 0; }
   virtual int Config(BoardConfig *bC);
   virtual int Read(vector<WORD> &v);
   virtual int SetHandle(int handle) { handle_=handle; return 0;};
-
   // --- FEB Trigger functionalities not yet implemented
 
   inline MAROC_ROC_Config_t* GetConfiguration() { return &configuration_; };

@@ -124,7 +124,10 @@ int MAROC_ROC::BufferClear()
   status |= ClearADCBusy();
   WORD data;
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_INPUT_CONNECTOR_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
-
+#ifdef MAROC_DEBUG
+  ostringstream s; s << "[MAROC_ROC]::[DEBUG]::ADC status after clear " << data;
+  Log(s.str(),3);
+#endif
   if (status)
     {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Cannot clear buffers  board " << status; 
@@ -907,6 +910,10 @@ int MAROC_ROC::ResetFIFO()
   data=0x0;
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+MAROC_ROC_FIFO_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);  
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_FIFO_REGISTER,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
+#ifdef MAROC_DEBUG
+  ostringstream s; s << "[MAROC_ROC]::[DEBUG]::FIFO register after clear " << data;
+  Log(s.str(),3);
+#endif
 
   if (status)
     {

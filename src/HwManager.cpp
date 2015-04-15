@@ -404,6 +404,7 @@ void  HwManager::BufferClearAll(){
 
 
 void HwManager::ClearBusy(){
+
 	if (trigBoard_.boardIndex_<0 ) 
 	  {
 	    ostringstream s;
@@ -411,8 +412,18 @@ void HwManager::ClearBusy(){
 	    Log(s.str(),1);
 	    throw hw_exception();
 	  }
-	
-	int status = dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->ClearBusy();
+	int status = 0;
+	for(int i=0;i< hw_.size();i++)
+	  {
+	    if (i==trigBoard_.boardIndex_)
+	      continue;
+	    else
+	      status |= hw_[i]->ClearBusy();
+	  }
+
+	//Trigger Board should be the last to clear the overall readout BUSY
+	status |= dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->ClearBusy();
+
 	if ( status )
 	  {
 	    ostringstream s;
