@@ -289,27 +289,30 @@ int HwManager::CrateInit()
       CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
       CAEN_V1742::CAEN_V1742_Config_t* digiConfig=((CAEN_V1742*)hw_[digiBoard_.boardIndex_])->GetConfiguration();
 
-      CAEN_DGTZ_ConnectionType linkType=CAEN_DGTZ_USB;
-      if (controllerBoard_.boardIndex_ != cvV1718 )
-	linkType=CAEN_DGTZ_OpticalLink;
+      CAEN_DGTZ_ConnectionType linkType=(CAEN_DGTZ_ConnectionType) 0;
+      if (controllerConfig->boardType != cvV1718 )
+	  linkType=CAEN_DGTZ_OpticalLink;
+
+      ostringstream s; 
+      s << "[HwManager]::[INFO]::Opening Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " LinkType " << linkType << " DeviceNumber "<<controllerConfig->LinkNum ;
+      Log(s.str(),1);
 
       status |= CAEN_DGTZ_OpenDigitizer(linkType, controllerConfig->LinkNum, 0, digiConfig->BaseAddress, &digiBoard_.boardHandle_);
+
       //hack to get VME Handle (normally this handle is 0, can be also hardcoded...)
       CAEN_DGTZ_BoardInfo_t myBoardInfo;
       status |= CAEN_DGTZ_GetInfo(digiBoard_.boardHandle_, &myBoardInfo);  
       status |= CAENComm_Info(myBoardInfo.CommHandle, CAENComm_VMELIB_handle ,&controllerBoard_.boardHandle_);
 
-      ostringstream s;
-      s << "Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " & VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum ;
-
       if (status)
 	{
-	  ostringstream s1; s1 << "[HwManager]::[ERROR]::" << s << " cannot be initialized"  ;
+	  ostringstream s1; s1 << "[HwManager]::[ERROR]::Cannot initialize VME Crate"  ;
 	  Log(s1.str(),1);
 	  throw config_exception();
 	}
-      ostringstream s1; s1 << "[HwManager]::[INFO]::" << s << " initialized"  ;
+      ostringstream s1; s1 << "[HwManager]::[INFO]::VME Crate initialized"  ;
       Log(s1.str(),1);
+
       if (digiBoard_.boardHandle_<0)
 	{
 	  Log("[HwManager]::[ERROR]::VME Crate Controller Handle is wrong",1);

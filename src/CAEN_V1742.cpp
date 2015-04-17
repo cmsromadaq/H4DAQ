@@ -217,7 +217,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=50000;
+  int TIMEOUT=100000;
 
   while (1 > NumEvents && itry<TIMEOUT)
     {
@@ -245,7 +245,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	  return ErrCode ;
 	}
       }
-      usleep(50);
+      usleep(10);
     }
 
   if (itry == TIMEOUT)
