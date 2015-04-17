@@ -161,6 +161,7 @@ int CAEN_V1742::Clear (){
     return ERR_RESTART ;
   }
 
+  // usleep(1000);
   return 0 ;
 } ;
 
@@ -168,7 +169,7 @@ int CAEN_V1742::Clear (){
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-int CAEN_V1742::BufferClear (){ 
+int CAEN_V1742::BufferClear (){
   int ret = 0 ;
   ostringstream s;
   /* clear the digitizer buffers */
@@ -180,10 +181,16 @@ int CAEN_V1742::BufferClear (){
     Log(s.str(),1);
     return ERR_CLEARBUFFER ;
   }
-  
+  usleep(1000);
   return 0;
 } ;
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+int CAEN_V1742::ClearBusy (){  
+  //  return BufferClear();
+  return 0;
+} ;
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -217,7 +224,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=100000;
+  int TIMEOUT=10000;
 
   while (1 > NumEvents && itry<TIMEOUT)
     {
@@ -244,8 +251,13 @@ int CAEN_V1742::Read (vector<WORD> &v)
 	  ErrCode = ERR_READOUT ;
 	  return ErrCode ;
 	}
+	if (NumEvents == 0)
+	  {
+	  s.str(""); s << "[CAEN_V1742]::[WARNING]::NO EVENTS BUT BUFFERSIZE !=0" << endl ;
+	  Log(s.str(),1);
+	  }
       }
-      usleep(10);
+      usleep(50);
     }
 
   if (itry == TIMEOUT)
@@ -300,8 +312,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
     ErrCode = ERR_EVENT_BUILD ;
     return ErrCode ;
   }    
-  // } //close cycle over events
-    
+  // } //close cycle over events    
   return 0 ;
 
 } ;
