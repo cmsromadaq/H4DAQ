@@ -102,6 +102,10 @@ int CAEN_V792::Clear()
     }
 
   status=Init();
+
+  ostringstream s; s << "[CAEN_V792]::[INFO]::V792 Board software reset" << status; 
+  Log(s.str(),1);
+
   return status;
 }      
 
@@ -115,6 +119,7 @@ int CAEN_V792::BufferClear()
   WORD data=CAEN_V792_DATARESET_BITMASK; //Software reset. Clear registers
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_BIT_SET2,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_BIT_CLEAR2,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_EVENTCOUNTER_RESET,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
 
   if (status)
     {
@@ -122,6 +127,9 @@ int CAEN_V792::BufferClear()
       Log(s.str(),1);
       return ERR_RESET;
     }  
+
+  ostringstream s; s << "[CAEN_V792]::[INFO]::V792 Buffers has been cleared"; 
+  Log(s.str(),1);
 
   return 0;
 }      
@@ -264,8 +272,10 @@ int CAEN_V792::CheckStatusAfterRead()
   int v792_empty = data & CAEN_V792_EMPTY_BITMASK; 
   
 
-   if( v792_full || !v792_empty || status!=1 ) 
-     { 
+   if( v792_full || !v792_empty || status ) 
+     {
+       ostringstream s; s << "[CAEN_V792]::[ERROR]::Need to send a reset board to restore healthy state: full " << v792_full << " empty " << v792_empty << " status " << status;
+       Log(s.str(),1);			   
        status=BufferClear();
        if (status)
 	   status=Clear();
