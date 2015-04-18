@@ -26,10 +26,10 @@ int CAEN_VX718::Init()
   status |= CAENVME_SetOutputConf(handle_,cvOutput2,configuration_.Output2Polarity,configuration_.Output2LedPolarity,configuration_.Output2Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput3,configuration_.Output3Polarity,configuration_.Output3LedPolarity,configuration_.Output3Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput4,configuration_.Output4Polarity,configuration_.Output4LedPolarity,configuration_.Output4Source);
-  status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
+  // status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
   /* setting which output line must be pulsed  */
-  outputRegister_=configuration_.outputMaskWord;
-  status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
+  // outputRegister_=configuration_.outputMaskWord;
+  // status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
   //setting the input lines
   status |= CAENVME_SetInputConf(handle_,cvInput0,configuration_.Input0Polarity,configuration_.Input0LedPolarity);
   status |= CAENVME_SetInputConf(handle_,cvInput1,configuration_.Input1Polarity,configuration_.Input1LedPolarity);
@@ -254,13 +254,13 @@ int CAEN_VX718::SendSignal(VX718_DAQ_Signals sig)
     status |= CAENVME_PulseOutputRegister(handle_,configuration_.trigAckOutputBit);
   else if(sig==DAQ_BUSY_ON)
     {
-    outputRegister_ |= configuration_.daqBusyOutputBit;
-    status |= CAENVME_SetOutputRegister(handle_,outputRegister_);
+    // outputRegister_ |= configuration_.daqBusyOutputBit;
+    status |= CAENVME_SetOutputRegister(handle_,configuration_.daqBusyOutputBit);
     }
   else if(sig==DAQ_BUSY_OFF)
     {
-    outputRegister_ &= (~configuration_.daqBusyOutputBit);
-    status |= CAENVME_SetOutputRegister(handle_,outputRegister_);
+      //    outputRegister_ &= (~configuration_.daqBusyOutputBit);
+    status |= CAENVME_ClearOutputRegister(handle_,configuration_.daqBusyOutputBit);
     }
   else
     return ERR_DAQ_SIGNAL_UNKNOWN;

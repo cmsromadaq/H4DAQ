@@ -950,9 +950,9 @@ while (true) {
 			    connectionManager_->Send(eeMex,CmdSck);
 			    connectionManager_->Send(guieeMex,StatusSck);
 			    hwManager_->ClearSignalStatus();
-			    // hwManager_->SetBusyOff();
-			    // hwManager_->ClearBusy();
-			    // hwManager_->TriggerAck();
+			    hwManager_->SetBusyOff();
+			    hwManager_->ClearBusy();
+			    hwManager_->TriggerAck();
 			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 			    SendSpillDuration();
 			    MoveToStatus(ENDSPILL);
@@ -966,12 +966,12 @@ while (true) {
 			    dataType guieeMex;
 			    guieeMex.append((void*)"GUI_SPS ee",10);
 			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-			    //usleep(10000);
+				  //usleep(10000);
 			    connectionManager_->Send(eeMex,CmdSck);
 			    // hwManager_->ClearSignalStatus();
-			    // hwManager_->SetBusyOff();
-			    // hwManager_->ClearBusy();
-			    // hwManager_->TriggerAck();
+			    hwManager_->SetBusyOff();
+			    hwManager_->ClearBusy();
+			    hwManager_->TriggerAck();
 			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 			    SendSpillDuration();
 			    MoveToStatus(ENDSPILL);
@@ -991,9 +991,9 @@ while (true) {
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  // hwManager_->ClearSignalStatus();
-				  // hwManager_->SetBusyOff();
-				  // hwManager_->ClearBusy();
-			          // hwManager_->TriggerAck();
+				  hwManager_->SetBusyOff();
+				  hwManager_->ClearBusy();
+			          hwManager_->TriggerAck();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -1004,9 +1004,8 @@ while (true) {
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
-			// hwManager_->TriggerAck();
-		        // if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
-			//usleep(100); //DEBUG
+			hwManager_->TriggerAck();
+		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  
 
