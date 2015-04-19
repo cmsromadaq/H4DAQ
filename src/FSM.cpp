@@ -748,7 +748,10 @@ while (true) {
 				   Log(s2.str(),3);
 				   }
 #endif
-						   trgType_=PED_TRIG;
+				   ostringstream s;
+				   s << "[RunControlFSM]::[Loop]::Starting new run of type PEDESTAL. Spill size " << trgNevents_;
+				   Log(s.str(),1);
+				   trgType_=PED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"LED")) // pedestal run
 						   {
@@ -768,10 +771,30 @@ while (true) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
+						   ostringstream s;
+						   s << "[RunControlFSM]::[Loop]::Starting new run of type LED. Spill size " << trgNevents_;
+						   Log(s.str(),1);
+
 						   trgType_=LED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"PHYSICS"))
 						   {
+				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
+						   if (shift >0 ) 
+						     {
+						       //only used if ignored spill signals
+						       char*ptr2= (char*)myCmd.data + shift;
+						       if ( sscanf(ptr2,"%ld",&trgNevents_) <1 )
+							 {
+							   Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							   break;
+							 }						       
+						     }
+						   ostringstream s;
+						   s << "[RunControlFSM]::[Loop]::Starting new run of type BEAM";  
+						   if (spillSignalsDisabled_ && trgNevents_>0)
+						     s << ". Spill size " << trgNevents_;
+						   Log(s.str(),1);
 						   trgType_=BEAM_TRIG;
 						   }
 				   else {
@@ -823,7 +846,7 @@ while (true) {
 		    wweMex.append((void*)"WWE\0",4);
 		    dataType guiwweMex;
 		    guiwweMex.append((void*)"GUI_SPS wwe",11);
-		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
+		    if (spillSignalsDisabled_ || trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -839,19 +862,18 @@ while (true) {
 			 if (
 #define RC_DEBUG
 #ifndef RC_DEBUG
-					 hwManager_->SignalReceived(WWE)
+			     hwManager_->SignalReceived(WWE)
 #else
-					 true
+			     true
 #endif
-					 )
+			     )
 			 {
-			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
-			    connectionManager_->Send(wweMex,CmdSck);
-			    connectionManager_->Send(guiwweMex,StatusSck);
-			    eventBuilder_->OpenSpill();
-			    MoveToStatus(CLEARED);
+			   hwManager_->ClearSignalStatus(); // acknowledge receival of status
+			   connectionManager_->Send(wweMex,CmdSck);
+			   connectionManager_->Send(guiwweMex,StatusSck);
+			   eventBuilder_->OpenSpill();
+			   MoveToStatus(CLEARED);
 			 }
-
 		    }
 
 		    break;
@@ -935,9 +957,9 @@ while (true) {
 		    UpdateMex();
 
 		    // check end of spill conditions
-		    if (trgType_== BEAM_TRIG ) 
+		    if (!spillSignalsDisabled_ && trgType_== BEAM_TRIG ) 
 		   	{
-			if (!spillSignalsDisabled_ && hwManager_->SignalReceived(EE) )
+			if (hwManager_->SignalReceived(EE) )
 			  {
 			    // check for END OF SPILL
 			    dataType eeMex;
@@ -958,27 +980,9 @@ while (true) {
 			    MoveToStatus(ENDSPILL);
 			    break;
 			  }
-			else if ( trgRead_ >= trgNevents_)
-			  {
-			    // check for END OF SPILL
-			    dataType eeMex;
-			    eeMex.append((void*)"EE\0",3);
-			    dataType guieeMex;
-			    guieeMex.append((void*)"GUI_SPS ee",10);
-			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
-				  //usleep(10000);
-			    connectionManager_->Send(eeMex,CmdSck);
-			    // hwManager_->ClearSignalStatus();
-			    hwManager_->SetBusyOff();
-			    hwManager_->ClearBusy();
-			    hwManager_->TriggerAck();
-			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
-			    SendSpillDuration();
-			    MoveToStatus(ENDSPILL);
-			    break;
-			  }
 		    	}
-		    else if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
+		    else 
+		      //if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
