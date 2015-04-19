@@ -252,13 +252,6 @@ int MAROC_ROC::Read(vector<WORD> &v)
   
   if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error while reading data from  board " << status ; 
-      Log(s.str(),1);
-      return ERR_READ;
-    }  
-
-  if (status)
-    {
       ostringstream s; s << "[MAROC_ROC]::[ERROR]::Errors while reading" << status; 
       Log(s.str(),1);
       return ERR_READ;

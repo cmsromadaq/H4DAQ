@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-//#define CAENV265_DEBUG 
+#define CAENV265_DEBUG
 
 int CAEN_V265::Init()
 {
@@ -142,6 +142,31 @@ int CAEN_V265::Read(vector<WORD> &v)
   ostringstream s; s << "[CAEN_V265]::[DEBUG]::RDY " << v265_rdy << " NTRY " << nt;
   Log(s.str(),3);
 #endif
+
+  int iChannel=0;
+  for(unsigned int iWord=0;iWord<2*CAEN_V265_CHANNELS;++iWord)
+    {
+      //Read words one by one
+      status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V265_OUTPUT_BUFFER,&data,CAEN_V265_ADDRESSMODE,CAEN_V265_DATAWIDTH);
+      if ((data&CAEN_V265_RANGE_BITMASK))
+	continue;
+      else
+	dataV[iChannel]=(data&0XFFFF);
+
+#ifdef CAENV265_DEBUG
+      ostringstream s; s << "[CAEN_V265_ROC]::[DEBUG]::DATA @ POS " << iChannel << std::hex << dataV[iChannel] << std::dec << "," <<  (dataV[iChannel]&CAEN_V265_ADCDATUM_BITMASK);
+      Log(s.str(),3);
+#endif
+      v.push_back(dataV[iChannel]);
+      ++iChannel;
+    }
+  
+  if (status)
+    {
+      ostringstream s; s << "[CAEN_V265]::[ERROR]::Errors while reading" << status; 
+      Log(s.str(),1);
+      return ERR_READ;
+    }  
 
   return 0;
 }
