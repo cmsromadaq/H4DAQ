@@ -209,17 +209,39 @@ int MAROC_ROC::Read(vector<WORD> &v)
 
   // //Prepare memory to be readout
   SetMemoryMode(false);
+  int xor_data=0XAAAA;
   for(unsigned int iWord=0;iWord<MAROC_ROC_BOARDDATA_NWORD;++iWord)
     {
       //Read words one by one
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+iWord*2,&data,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
-      dataV[iWord]=(data>>1) & 0xFFFF;
-      v.push_back(dataV[iWord]);
-      
+      if (iWord<5)
+	{
+	  //Event Header values
+	  dataV[iWord]=(data>>1) & 0xFFFF;
+	}
+      else if (iWord<MAROC_ROC_BOARDDATA_NWORD-1)
+	{
+	  //ADC data
+	  dataV[iWord]=(data>>1) & 0x1FFF;
+	  xor_data=(xor_data^dataV[iWord])&0xFFFF;
+	}
+      else
+	{
+	  //Last word is ADC data XOR values, checking consistency
+	  dataV[iWord]=(data>>1) & 0x1FFF;
+	  if (dataV[iWord] != (xor_data&0x1FFF) )
+	    {
+	      ostringstream s; s << "[MAROC_ROC]::[WARNING]::Event XOR data not consistent " << std::hex << dataV[iWord] << "," << (xor_data&0x1FFF) << std::dec;
+	      Log(s.str(),1);
+	    }
+	}
+
 #ifdef MAROC_DEBUG
       ostringstream s; s << "[MAROC_ROC]::[DEBUG]::DATA @ POS " << iWord << " " << std::hex << dataV[iWord] << std::dec << "," <<  dataV[iWord];
       Log(s.str(),3);
 #endif
+      v.push_back(dataV[iWord]);
+      
       //at position 4 add the holdValue recorded in this event
       if (iWord==3)
    	{
