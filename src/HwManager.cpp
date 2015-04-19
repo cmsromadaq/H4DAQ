@@ -11,6 +11,7 @@
 #include "interface/CAEN_V513.hpp"
 #include "interface/LECROY_1182.hpp"
 #include "interface/MAROC_ROC.hpp"
+#include "interface/CAEN_V265.hpp"
 #include "interface/TimeBoard.hpp"
 
 #include "interface/EventBuilder.hpp" // boardId
@@ -124,6 +125,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a MAROC ROC
 			  hw_.push_back( new MAROC_ROC() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V265")
+			{
+			  //constructing a MAROC ROC
+			  hw_.push_back( new CAEN_V265() );
 			}
 		else
 		  {
@@ -573,5 +579,6 @@ BoardTypes_t HwManager::GetBoardTypeId(string type){
 	else if( type=="CAEN_V814") return _CAENV814_;
 	else if( type=="LECROY_1182" || type == "LECROY1182" ) return _LECROY1182_;
 	else if( type=="MAROC_ROC") return _MAROCROC_;
+	else if( type=="CAEN_V265") return _CAENV265_;
 	else return _UNKWN_;
 }
