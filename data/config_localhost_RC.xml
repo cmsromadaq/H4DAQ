@@ -110,6 +110,12 @@
     </board>
 
     <board>
+      <type>CAEN_V265</type> <!-- ADC 792-->
+      <ID>2</ID>
+      <baseAddress>0x00222200</baseAddress>
+    </board>
+
+    <board>
         <type>CAEN_V1742</type>
         <ID>1</ID>
         <OPEN>USB 0 0x33330000</OPEN>
