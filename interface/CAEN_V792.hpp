@@ -61,6 +61,7 @@
 #define CAEN_V792_EVENT_DATA 0x0
 #define CAEN_V792_EVENT_BOE 0x2
 #define CAEN_V792_EVENT_EOE 0x4
+#define CAEN_V792_EVENT_NOT_VALID_DATUM 0x6
 
 class CAEN_V792: public Board 
 {
