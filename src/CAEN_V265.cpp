@@ -7,6 +7,7 @@
 
 int CAEN_V265::Init()
 {
+  return 0;
   int status=0;
   ostringstream s; s << "[CAEN_V265]::[INFO]::++++++ CAEN V265 INIT ++++++";
   Log(s.str(),1);
@@ -45,7 +46,7 @@ int CAEN_V265::Init()
 
 int CAEN_V265::Clear()
 {
-
+  return 0;
   //Send a software reset. Module has to be re-initialized after this
   int status=0;
   if (handle_<0)
@@ -71,6 +72,7 @@ int CAEN_V265::Clear()
 
 int CAEN_V265::BufferClear()
 {
+  return 0;
   //Send a data reset. Clear event buffer and counters 
   int status=0;
   if (handle_<0)
@@ -94,6 +96,7 @@ int CAEN_V265::BufferClear()
 
 int CAEN_V265::ClearBusy()
 {
+  return 0;
   return BufferClear();
 }      
 
@@ -109,6 +112,7 @@ int CAEN_V265::Config(BoardConfig *bC)
 int CAEN_V265::Read(vector<WORD> &v)
 {
   v.clear();
+  return 0;
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
 

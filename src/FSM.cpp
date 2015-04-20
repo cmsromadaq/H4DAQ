@@ -4,6 +4,7 @@
 
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
+//#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
 
@@ -681,6 +682,21 @@ while (true) {
 			    break;
 		    } 
 	case INIT:  {   // not in the LOOP
+#ifdef BUSY_DEBUG
+	  int idebug=0;
+	  while (idebug<3000)
+	    {
+	      hwManager_->ClearBusy();
+	      hwManager_->TriggerAck();
+	      hwManager_->SetBusyOn();
+	      hwManager_->BufferClearAll();
+	      usleep(1000);
+	      hwManager_->SetBusyOff();
+	      usleep(5000);
+	      ++idebug;
+	    }
+	  Log("[RunControlFSM]::[Loop]::DEBUG Busy done",1);
+#endif 
 			    MoveToStatus(INITIALIZED);
 			    break;
 		    } 
@@ -897,7 +913,7 @@ while (true) {
 		      //usleep(100000); //Wait acknowledge from DR
 		      // hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 		      hwManager_->BufferClearAll();
-		      hwManager_->SetBusyOff();
+		      // hwManager_->SetBusyOff();
 		      hwManager_->ClearBusy(); //Clearing BUSY
 		      hwManager_->TriggerAck(); //Send RESET for DAQ_TRCG_ACK to be sure it's off 
 		      readyDR_=0;
@@ -913,7 +929,7 @@ while (true) {
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
-		           hwManager_->SetBusyOff();
+		           // hwManager_->SetBusyOff();
 		           hwManager_->ClearBusy();
 			   hwManager_->TriggerAck();
 			   readyDR_=0;
@@ -941,13 +957,13 @@ while (true) {
 		      	 gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 			 ResetMex();
-		   	 MoveToStatus(WAITTRIG);
+		   	 MoveToStatus(CLEARBUSY);
 		    }
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->SetBusyOff();
 		        hwManager_->ClearBusy();
+		        // hwManager_->SetBusyOff();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -972,9 +988,9 @@ while (true) {
 			    connectionManager_->Send(eeMex,CmdSck);
 			    connectionManager_->Send(guieeMex,StatusSck);
 			    hwManager_->ClearSignalStatus();
-			    hwManager_->SetBusyOff();
-			    hwManager_->ClearBusy();
-			    hwManager_->TriggerAck();
+			    // hwManager_->SetBusyOff();
+			    // hwManager_->ClearBusy();
+			    // hwManager_->TriggerAck();
 			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 			    SendSpillDuration();
 			    MoveToStatus(ENDSPILL);
@@ -995,9 +1011,9 @@ while (true) {
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  // hwManager_->ClearSignalStatus();
-				  hwManager_->SetBusyOff();
-				  hwManager_->ClearBusy();
-			          hwManager_->TriggerAck();
+				  // hwManager_->SetBusyOff();
+				  // hwManager_->ClearBusy();
+			          // hwManager_->TriggerAck();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -1007,8 +1023,8 @@ while (true) {
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
-			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
+			hwManager_->SetBusyOn();
 		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  

@@ -110,9 +110,14 @@
     </board>
 
     <board>
-      <type>CAEN_V265</type> <!-- ADC 792-->
-      <ID>2</ID>
-      <baseAddress>0x00222200</baseAddress>
+      <type>MAROC_ROC</type> <!-- MAROC FEB -->
+      <ID>1</ID>
+      <baseAddress>0x00CC0000</baseAddress>
+      <configFile>/home/cmsdaq/DAQ/H4DAQ/data/maroc3_gain1_ss.dat</configFile> 
+      <triggerType>3</triggerType>
+      <debugMode>0</debugMode>
+      <holdValue>5</holdValue>
+      <holdDeltaValue>20</holdDeltaValue>
     </board>
 
     <board>
