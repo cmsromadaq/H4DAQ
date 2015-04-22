@@ -232,9 +232,13 @@ int CAEN_V792::Read(vector<WORD> &v)
 	{
 	  ++nValidData;
 
-	  //read more then 1 event, throwing the second. Should not happen, but avoid counfusion in the unpacker
+	  //read more then 1 event, throwing the next ones. Should not happen, but avoid counfusion in the unpacker
 	  if (nValidData>channels_+2)
-	    break;
+	    {
+	      ostringstream s; s << "[CAEN_V792]::[WARNING]::>1 event in V792 buffer"; 
+	      Log(s.str(),1);
+	      break;
+	    }
 
 	  v.push_back(dataV[i]); //Filling event buffer
 
