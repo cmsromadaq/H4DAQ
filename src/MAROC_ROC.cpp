@@ -8,7 +8,7 @@
 int MAROC_ROC::Init()
 {
   int status=0;
-  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++ INIT ++++++";
+  ostringstream s; s << "[MAROC_ROC]::[INFO]::++++++ MAROC READOUT & CONTROL INIT ++++++";
   Log(s.str(),1);
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
