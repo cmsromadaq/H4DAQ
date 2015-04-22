@@ -113,8 +113,8 @@ int CAEN_VX718::Config(BoardConfig *bC)
   GetConfiguration()->daqBusyOutputBit= static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("daqBusyOutputBit")) ); 
   GetConfiguration()->trigAckOutputBit  = static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("trigAckOutputBit")) ); 
   GetConfiguration()->triggerInputBit   = static_cast<CVInputSelect> (Configurator::GetInt( bC->getElementContent("triggerInputBit")) ); 
-      GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
-      GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
+      // GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
+      // GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
       GetConfiguration()->scalerConfWord 		= Configurator::GetInt(bC->getElementContent("scalerConfWord"));	// uint32_t--> 
       GetConfiguration()->controlRegWord 		= Configurator::GetInt(bC->getElementContent("controlRegWord"));	// uint32_t-->
       GetConfiguration()->Output0Polarity 	= static_cast<CVIOPolarity>(Configurator::GetInt(bC->getElementContent("Output0Polarity")) );	// CVIOPolarity-->
