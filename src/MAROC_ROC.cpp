@@ -316,7 +316,7 @@ int MAROC_ROC::LoadFEBConfiguration()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_out,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
 
   //Load wanted config
-  s.str(""); s << "[MAROC_ROC]::[INFO]::Writing configuration to MAROC "; 
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Writing configuration "; 
   for (int iloop = 0; iloop<1; iloop++){
     for (int ibit=0; ibit<MAROC_ROC_FEB_CONFIG_BITSIZE; ibit++) {
 
@@ -354,6 +354,7 @@ int MAROC_ROC::LoadFEBConfiguration()
       s << " 100% OK";
       Log(s.str(),1);
     }
+
   s.str(""); s << "[MAROC_ROC]::[INFO]::Checking configuration "; 
   //Resend & check wanted config
   int badconfig=0;
@@ -392,24 +393,16 @@ int MAROC_ROC::LoadFEBConfiguration()
 	}
     }
   }
-  if (status)
-    {
-      if (!badconfig)
-	s << " 100% OK";
-      else
-	s << " ERROR";
-      Log(s.str(),1);
-      
-      if (badconfig)
-	{
-	  ostringstream s; s << "[MAROC_ROC]::[ERROR]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
-	  Log(s.str(),1);
-	  return ERR_CONFIG;
-	}
-    }
+
+  if (!badconfig)
+    s << " 100% OK";
   else
+    s << " ERROR";
+  Log(s.str(),1);
+  
+  if (badconfig)
     {
-      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error loading configuration";    
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
       Log(s.str(),1);
       return ERR_CONFIG;
     }
