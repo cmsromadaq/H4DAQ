@@ -316,10 +316,7 @@ int MAROC_ROC::LoadFEBConfiguration()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+MAROC_ROC_OUTPUT_CONNECTOR_REGISTER,&data_out,MAROC_ROC_ADDRESSMODE,MAROC_ROC_DATAWIDTH);
 
   //Load wanted config
-#ifdef MAROC_DEBUG
-  s.str(""); s << "[MAROC_ROC]::[DEBUG]::MAROC FEB CONFIG "; 
-#endif
-
+  s.str(""); s << "[MAROC_ROC]::[INFO]::Writing configuration to MAROC "; 
   for (int iloop = 0; iloop<1; iloop++){
     for (int ibit=0; ibit<MAROC_ROC_FEB_CONFIG_BITSIZE; ibit++) {
 
@@ -338,12 +335,25 @@ int MAROC_ROC::LoadFEBConfiguration()
 	return ERR_CONFIG;
       }
 
-      ClockReg();
+      status |= ClockReg();
+
+      if ((ibit%(MAROC_ROC_FEB_CONFIG_BITSIZE/20))==0)
+	s << "#";
     }
   }
-#ifdef MAROC_DEBUG
-  Log(s.str(),3);
-#endif
+
+
+  if (status)
+    {
+      ostringstream s1; s1 << "[MAROC_ROC]::[ERROR]::Error writing configuration";    
+      Log(s1.str(),1);
+      return ERR_CONFIG;
+    }
+  else
+    {
+      s << " 100% OK";
+      Log(s.str(),1);
+    }
   s.str(""); s << "[MAROC_ROC]::[INFO]::Checking configuration "; 
   //Resend & check wanted config
   int badconfig=0;
@@ -376,19 +386,34 @@ int MAROC_ROC::LoadFEBConfiguration()
 	  ++badconfig;
 	}
       else
-	s << ".";
+	{
+	  if ((ibit%(MAROC_ROC_FEB_CONFIG_BITSIZE/20))==0)
+	    s << "#";
+	}
     }
   }
-
-  Log(s.str(),1);
-
-  if (badconfig)
+  if (status)
     {
-      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
+      if (!badconfig)
+	s << " 100% OK";
+      else
+	s << " ERROR";
+      Log(s.str(),1);
+      
+      if (badconfig)
+	{
+	  ostringstream s; s << "[MAROC_ROC]::[ERROR]::Load configuration DO NOT match wanted configuration @" << configuration_.configFile;
+	  Log(s.str(),1);
+	  return ERR_CONFIG;
+	}
+    }
+  else
+    {
+      ostringstream s; s << "[MAROC_ROC]::[ERROR]::Error loading configuration";    
       Log(s.str(),1);
       return ERR_CONFIG;
     }
-  
+
   status |= SendOnFEBBus(3,1);
 
   if (status)
