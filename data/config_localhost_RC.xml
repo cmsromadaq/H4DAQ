@@ -114,7 +114,7 @@
       <configFile>/home/cmsdaq/DAQ/H4DAQ/data/maroc3_gain1_ss.dat</configFile> 
       <triggerType>3</triggerType> <!-- 3 is for LEMO input, 0 for positive TTL -->
       <debugMode>0</debugMode> <!-- 0 is standard RUN MODE -->
-      <holdValue>56</holdValue> <!-- Delay to be set ~180ns after signal (1 thick=3.3ns)-->
+      <holdValue>58</holdValue> <!-- Delay to be set ~180ns after signal (1 thick=3.3ns)-->
       <holdDeltaValue>20</holdDeltaValue> <!-- Not used -->
     </board>
 
