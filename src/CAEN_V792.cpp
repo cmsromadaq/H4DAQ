@@ -221,6 +221,7 @@ int CAEN_V792::Read(vector<WORD> &v)
   }
 #endif
 
+  int nValidData=0;
   for (int i=0;i<nWordsRead;++i)
     {
       int wordType=(dataV[i] & CAEN_V792_EVENT_WORDTYPE_BITMASK)>>24;
@@ -229,6 +230,12 @@ int CAEN_V792::Read(vector<WORD> &v)
 	  wordType == CAEN_V792_EVENT_EOE 
 	  )
 	{
+	  ++nValidData;
+
+	  //read more then 1 event, throwing the second. Should not happen, but avoid counfusion in the unpacker
+	  if (nValidData>channels_+2)
+	    break;
+
 	  v.push_back(dataV[i]); //Filling event buffer
 
 	  if ((i%(channels_+2))==0 && wordType != CAEN_V792_EVENT_BOE)
