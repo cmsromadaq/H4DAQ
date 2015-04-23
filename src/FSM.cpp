@@ -953,11 +953,10 @@ while (true) {
 			    }
 		    if (readyDR_ >= waitForDR_)
 		    {
-		      
-		      	 gettimeofday(&spillduration_stopwatch_start_time,NULL);
-		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-			 ResetMex();
-		   	 MoveToStatus(CLEARBUSY);
+		      gettimeofday(&spillduration_stopwatch_start_time,NULL);
+		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		      ResetMex();
+		      MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
