@@ -717,7 +717,7 @@ int MAROC_ROC::ConfigROCTrigger()
       Utility::setbit(&data,11);
       Utility::setbit(&data,10);
       Utility::setbit(&data,9);
-      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to TTL_NIM";     
+      s.str(""); s << "[MAROC_ROC]::[INFO]::ROC Trigger set to NIM";     
       Log(s.str(),1);
       break;
     case INTERNAL: //0b001
