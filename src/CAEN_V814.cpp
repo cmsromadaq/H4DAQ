@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define CAEN_V814_DEBUG
+#define CAEN_V814_VERBOSE
 
 int CAEN_V814::Init()
 {
@@ -33,38 +33,38 @@ int CAEN_V814::Init()
 
   status |= SetPatternInhibit();
 
-#ifdef CAEN_V814_DEBUG
-  s.str(""); s << "[CAEN_V814]::[DEBUG]::Pattern Mask has been set";
-  Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+  s.str(""); s << "[CAEN_V814]::[INFO]::Pattern Mask has been set to " << configuration_.patternMask;
+  Log(s.str(),1);
 #endif
   status |= SetThreshold(-1);
-#ifdef CAEN_V814_DEBUG
-  s.str(""); s << "[CAEN_V814]::[DEBUG]::All Thresholds have been set";
-  Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+  s.str(""); s << "[CAEN_V814]::[INFO]::All Thresholds have been set";
+  Log(s.str(),1);
 #endif
 
   for (unsigned i=0;i<CAEN_V814_CHANNELS;++i)
     if (configuration_.chThreshold[i]>0)
       {
 	status |= SetThreshold(i);
-#ifdef CAEN_V814_DEBUG
-	s.str(""); s << "[CAEN_V814]::[DEBUG]::Set specific threshold for Ch" <<i;
-	Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+	s.str(""); s << "[CAEN_V814]::[INFO]::Set specific threshold for Ch" <<i << " to 0x" << configuration_.chThreshold[i];
+	Log(s.str(),1);
 #endif
       }
 
   status|=SetMajorityThreshold(); // single 0x6 double 0x13 triple 0x1F
 
-#ifdef CAEN_V814_DEBUG
-  s.str(""); s << "[CAEN_V814]::[DEBUG]::Majority Threshold has been set";
-  Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+  s.str(""); s << "[CAEN_V814]::[INFO]::Majority Threshold has been set to 0x" << configuration_.majorityThreshold;
+  Log(s.str(),1);
 #endif
 
   status|=SetOutputWidth();
 
-#ifdef CAEN_V814_DEBUG
-  s.str(""); s << "[CAEN_V814]::[DEBUG]::Output Width has been set";
-  Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+  s.str(""); s << "[CAEN_V814]::[INFO]::Output Width has been set to 0x" << configuration_.outputWidth;
+  Log(s.str(),1);
 #endif
 
   if (status)
@@ -129,7 +129,7 @@ int CAEN_V814::Read(vector<WORD> &v)
 int CAEN_V814::SetThreshold(int channel)
 {
   int status=0;
-#ifdef CAEN_V814_DEBUG
+#ifdef CAEN_V814_VERBOSE
   ostringstream s;
 #endif
   if (channel<0)
@@ -138,9 +138,9 @@ int CAEN_V814::SetThreshold(int channel)
       for (unsigned int i=0;i<CAEN_V814_CHANNELS;++i)
 	{
 	  status |= CAENVME_WriteCycle(handle_, configuration_.baseAddress +  CAEN_V814_THRESHOLD_ADD + i*0x2 , &data, CAEN_V814_ADDRESSMODE,CAEN_V814_DATAWIDTH);
-#ifdef CAEN_V814_DEBUG
-	  s.str(""); s << "[CAEN_V814]::[DEBUG]::Set common threshold for channel " << i << " to " << configuration_.commonThreshold;
-	  Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+	  s.str(""); s << "[CAEN_V814]::[INFO]::Set common threshold for channel " << i << " to " << configuration_.commonThreshold;
+	  Log(s.str(),1);
 #endif
 
 	}
@@ -149,9 +149,9 @@ int CAEN_V814::SetThreshold(int channel)
     {
       WORD data=configuration_.chThreshold[channel];
       status |= CAENVME_WriteCycle(handle_, configuration_.baseAddress +  CAEN_V814_THRESHOLD_ADD + channel*0x2 , &data, CAEN_V814_ADDRESSMODE,CAEN_V814_DATAWIDTH);
-#ifdef CAEN_V814_DEBUG
-      s.str(""); s << "[CAEN_V814]::[DEBUG]::Set threshold for channel " << channel << " to " << configuration_.chThreshold[channel];
-      Log(s.str(),3);
+#ifdef CAEN_V814_VERBOSE
+      s.str(""); s << "[CAEN_V814]::[INFO]::Set threshold for channel " << channel << " to " << configuration_.chThreshold[channel];
+      Log(s.str(),1);
 #endif
 
     }
