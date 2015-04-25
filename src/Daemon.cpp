@@ -241,9 +241,15 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	// -- WORD myStatus=(WORD)newStatus;
 	// -- myMex.append((void*)&myStatus,WORDSIZE);
 	// -- connectionManager_->Send(myMex,StatusSck);
+
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
-	Log(s.str(),3);
+#ifndef FSM_DEBUG
+	if (newStatus<CLEARBUSY || newStatus>READ)
+	  Log(s.str(),3);
+#else
+	  Log(s.str(),3);
+#endif
 	std::cout << s.str() << std::endl;
 	STATUS_t oldStatus = myStatus_;
 	myStatus_=newStatus;
