@@ -9,7 +9,7 @@ for machine in localhost pcethtb2; do
 	ssh ${machine} "killall eventbuilder"
 done
 
-for machine in localhost pcethtb1; do 
+for machine in localhost; do 
 	echo "Killing runcontrol on $machine"
 	ssh ${machine} "killall -9 runcontrol"
 	echo "Killing eventbuilder on $machine"
