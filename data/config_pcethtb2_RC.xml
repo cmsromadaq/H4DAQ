@@ -31,18 +31,16 @@
       <daqBusyOutputBit>0x100</daqBusyOutputBit> <!--CVOutputMaskBit out2-->
       <triggerInputBit>0</triggerInputBit> <!--CVInputSelect in0-->
 
-      <outputMaskWord>0x700</outputMaskWord> <!--uint32_t Orwell--> 
-      <outputMuxWord>0x3FA</outputMuxWord> <!--uint32_t--> 
       <scalerConfWord>0xFFF</scalerConfWord> <!--uint32_t--> 
       <controlRegWord>0x200</controlRegWord> <!--uint32_t-->
       
       <Output0Polarity>0</Output0Polarity> <!--CVIOPolarity-->
       <Output0LedPolarity>0</Output0LedPolarity> <!--CVLEDPolarity-->
-      <Output0Source>0</Output0Source> <!--CVIOSources-->
+      <Output0Source>6</Output0Source> <!--CVIOSources-->
 
       <Output1Polarity>0</Output1Polarity> <!--CVIOPolarity-->
       <Output1LedPolarity>0</Output1LedPolarity> <!--CVLEDPolarity-->
-      <Output1Source>0</Output1Source> <!--CVIOSources-->
+      <Output1Source>6</Output1Source> <!--CVIOSources-->
 
       <Output2Polarity>0</Output2Polarity> <!--CVIOPolarity-->
       <Output2LedPolarity>0</Output2LedPolarity> <!--CVLEDPolarity-->
