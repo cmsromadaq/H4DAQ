@@ -1,4 +1,9 @@
-#include "StandardIncludes.hpp"
+#define LINUX
+#include "CAENVMElib.h"
+#include "CAENVMEtypes.h" 
+#include "CAENVMEoslib.h"
+#include "CAENComm.h"
+#include <CAENDigitizer.h>
 
 int main(int argc, char** argv)
 {

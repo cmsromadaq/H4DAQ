@@ -843,7 +843,9 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		if (childpid == 0 ) // child
 			{
 			Log("[EventBuilder]::[MergeSpill]::[DEBUG] Executing command:"+myCmd,3);
-			system(myCmd.c_str());
+			int ret=system(myCmd.c_str());
+			ostringstream s; s<< "[EventBuilder]::[MergeSpill]::[DEBUG] DQM return status " << ret;
+			Log(s.str(),3);
 			_exit(0);
 			}
 		else if (childpid <0 ) {

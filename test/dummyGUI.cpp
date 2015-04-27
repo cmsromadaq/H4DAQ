@@ -10,7 +10,7 @@ int main(int argc,char**argv){
 string logFileName="/dev/stdout";
  int portPub=5566;
  int portSub=6002;
-string ConnectTo="pcethtb2";
+string ConnectTo="localhost";
 
 printf("usage: PubPort SubAddress SubPort\n    @->'0'\n    !XXXX->NUM\n");
 

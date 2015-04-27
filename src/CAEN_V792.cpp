@@ -102,6 +102,10 @@ int CAEN_V792::Clear()
     }
 
   status=Init();
+
+  ostringstream s; s << "[CAEN_V792]::[INFO]::V792 Board software reset" << status; 
+  Log(s.str(),1);
+
   return status;
 }      
 
@@ -115,6 +119,7 @@ int CAEN_V792::BufferClear()
   WORD data=CAEN_V792_DATARESET_BITMASK; //Software reset. Clear registers
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_BIT_SET2,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
   status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_BIT_CLEAR2,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
+  status |= CAENVME_WriteCycle(handle_,configuration_.baseAddress+CAEN_V792_EVENTCOUNTER_RESET,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
 
   if (status)
     {
@@ -123,6 +128,10 @@ int CAEN_V792::BufferClear()
       return ERR_RESET;
     }  
 
+  ostringstream s; s << "[CAEN_V792]::[INFO]::V792 Buffers has been cleared"; 
+  Log(s.str(),1);
+  
+  usleep(300);
   return 0;
 }      
 
@@ -152,7 +161,7 @@ int CAEN_V792::Read(vector<WORD> &v)
     return ERR_CONF_NOT_FOUND;
 
   int status = 0; 
-  WORD dataV[channels_+2]; //each event is composed of max (channels_+2)x32bit words. Reserve space for a single event
+  WORD dataV[10*(channels_+2)]; //each event is composed of max (channels_+2)x32bit words. Reserve space for a single event
   //Empty event buffer
   for (unsigned int i=0;i<channels_+2;++i)
     dataV[i]=0;
@@ -184,18 +193,35 @@ int CAEN_V792::Read(vector<WORD> &v)
 #endif
 
   int wr=(channels_+2)*sizeof(WORD); //number of expected words to read
-  int nbytes_tran=0; //transferred bytes
-
-  status |= CAENVME_BLTReadCycle(handle_,configuration_.baseAddress+CAEN_V792_OUTPUT_BUFFER,dataV,wr,CAEN_V792_ADDRESSMODE,cvD32,&nbytes_tran);
-
-  if (status || nbytes_tran<=0 )
-    {
-      ostringstream s; s << "[CAEN_V792]::[ERROR]::Error while reading data from V792 board " << status ; 
-      Log(s.str(),1);
-      return ERR_READ;
-    }  
+  int v792_empty=0;
+  int nWordsRead=0;
   
-  int nWordsRead=nbytes_tran/sizeof(WORD);
+  nt=0;
+  while (!v792_empty)
+    {
+      int nbytes_tran=0; //transferred bytes
+      status |= CAENVME_BLTReadCycle(handle_,configuration_.baseAddress+CAEN_V792_OUTPUT_BUFFER,&dataV[nWordsRead],wr,CAEN_V792_ADDRESSMODE,cvD32,&nbytes_tran);
+      nWordsRead+=nbytes_tran/sizeof(WORD);  
+      status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V792_REG2_STATUS,&data,CAEN_V792_ADDRESSMODE,CAEN_V792_DATAWIDTH);
+      v792_empty = data & CAEN_V792_EMPTY_BITMASK; 
+     
+      if (status || nbytes_tran<=0 )
+	{
+	  ostringstream s; s << "[CAEN_V792]::[ERROR]::Error while reading data from V792 board " << status ; 
+	  Log(s.str(),1);
+	  return ERR_READ;
+	}  
+      ++nt;
+    }
+
+#ifdef CAENV792_DEBUG
+  {
+    ostringstream s; s << "[CAEN_V792]::[DEBUG]::Read " << nt << " times " << " to transfer " << nWordsRead;   
+    Log(s.str(),3);
+  }
+#endif
+
+  int nValidData=0;
   for (int i=0;i<nWordsRead;++i)
     {
       int wordType=(dataV[i] & CAEN_V792_EVENT_WORDTYPE_BITMASK)>>24;
@@ -204,30 +230,45 @@ int CAEN_V792::Read(vector<WORD> &v)
 	  wordType == CAEN_V792_EVENT_EOE 
 	  )
 	{
+	  ++nValidData;
+
+	  //read more then 1 event, throwing the next ones. Should not happen, but avoid counfusion in the unpacker
+	  if (nValidData>channels_+2)
+	    {
+	      ostringstream s; s << "[CAEN_V792]::[WARNING]::>1 event in V792 buffer"; 
+	      Log(s.str(),1);
+	      break;
+	    }
+
 	  v.push_back(dataV[i]); //Filling event buffer
-#ifdef CAENV792_DEBUG
-	  if (i==0 && wordType != CAEN_V792_EVENT_BOE)
+
+	  if ((i%(channels_+2))==0 && wordType != CAEN_V792_EVENT_BOE)
 	    {
 	      ostringstream s; s << "[CAEN_V792]::[WARNING]::First Word Not BOE " << wordType; 
 	      Log(s.str(),1);
 	    }
-	  if (i==nWordsRead-1 && wordType != CAEN_V792_EVENT_EOE)
+	  else if ((i%(channels_+2))==channels_+1 && wordType != CAEN_V792_EVENT_EOE)
 	    {
 	      ostringstream s; s << "[CAEN_V792]::[WARNING]::Last Word Not EOE " << wordType; 
 	      Log(s.str(),1);
 	    }
-	  if (wordType == CAEN_V792_EVENT_DATA)
+#ifdef CAENV792_DEBUG
+	  else if (wordType == CAEN_V792_EVENT_DATA)
 	    {
 	      short adc_chan = dataV[i]>>16 & 0x1F; //For 792 [bit 16-20]
 	      unsigned int adc_value = dataV[i] & 0xFFF; // adc data [bit 0-11]
 	      bool adc_overflow = (dataV[i]>>12) & 0x1; // overflow bit [bit 12]
 	      bool adc_underthreshold = (dataV[i]>>13) & 0x1; // under threshold bit [bit 13]
-	      ostringstream s; s << "[CAEN_V792]::[INFO]::Read Channel " << "\tchannel " << adc_chan << "\tvalue " << adc_value << "\toverflow " << adc_overflow << "\tunderthreshold " << adc_underthreshold; 
-	      Log(s.str(),1);
+	      ostringstream s; s << "[CAEN_V792]::[DEBUG]::Read Channel " << "\tchannel " << adc_chan << "\tvalue " << adc_value << "\toverflow " << adc_overflow << "\tunderthreshold " << adc_underthreshold; 
+	      Log(s.str(),3);
 	    }
 #endif
 	}
-      else
+      else if (wordType == CAEN_V792_EVENT_NOT_VALID_DATUM)
+	{
+	  continue;
+	}
+      else 
 	{
 	  ostringstream s; s << "[CAEN_V792]::[WARNING]::Invalid data read from V792 board " << wordType; 
 	  Log(s.str(),1);
@@ -264,8 +305,10 @@ int CAEN_V792::CheckStatusAfterRead()
   int v792_empty = data & CAEN_V792_EMPTY_BITMASK; 
   
 
-   if( v792_full || !v792_empty || status!=1 ) 
-     { 
+   if( v792_full || !v792_empty || status ) 
+     {
+       ostringstream s; s << "[CAEN_V792]::[ERROR]::Need to send a reset board to restore healthy state: full " << v792_full << " empty " << !v792_empty << " status " << status;
+       Log(s.str(),1);			   
        status=BufferClear();
        if (status)
 	   status=Clear();

@@ -4,6 +4,7 @@
 
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
+//#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
 
@@ -43,6 +44,7 @@ while (true) {
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -63,6 +65,13 @@ while (true) {
 				 }
 			     else if (myCmd.cmd == DIE ) 
 				MoveToStatus(BYE);
+			     else if (myCmd.cmd == RECONFIG ) 
+			       {
+				 Daemon::Reconfigure();
+				 ostringstream s;
+				 s << "[DataReadoutFSM]::[INFO]::Reconfig OK";
+				 Log(s.str(),1);
+			       }
 			    }
 		    break;
 		    }
@@ -424,6 +433,7 @@ while (true) {
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -445,6 +455,13 @@ while (true) {
 				MoveToStatus(INITIALIZED);
 			    else if(myCmd.cmd == DIE)
 				MoveToStatus(BYE);
+			     else if (myCmd.cmd == RECONFIG ) 
+			       {
+				 Daemon::Reconfigure();
+				 ostringstream s;
+				 s << "[EventBuilderFSM]::[INFO]::Reconfig OK";
+				 Log(s.str(),1);
+			       }
 			    }
 		    break;
 		    }
@@ -495,6 +512,7 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
+		      usleep(500);
 		     // check network  -- wait for EE
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
@@ -681,11 +699,27 @@ while (true) {
 			    break;
 		    } 
 	case INIT:  {   // not in the LOOP
+#ifdef BUSY_DEBUG
+	  int idebug=0;
+	  while (idebug<3000)
+	    {
+	      hwManager_->ClearBusy();
+	      hwManager_->TriggerAck();
+	      hwManager_->SetBusyOn();
+	      hwManager_->BufferClearAll();
+	      usleep(1000);
+	      hwManager_->SetBusyOff();
+	      usleep(5000);
+	      ++idebug;
+	    }
+	  Log("[RunControlFSM]::[Loop]::DEBUG Busy done",1);
+#endif 
 			    MoveToStatus(INITIALIZED);
 			    break;
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for gui start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -748,7 +782,10 @@ while (true) {
 				   Log(s2.str(),3);
 				   }
 #endif
-						   trgType_=PED_TRIG;
+				   ostringstream s;
+				   s << "[RunControlFSM]::[Loop]::Starting new run of type PEDESTAL. Spill size " << trgNevents_;
+				   Log(s.str(),1);
+				   trgType_=PED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"LED")) // pedestal run
 						   {
@@ -768,10 +805,30 @@ while (true) {
 					   		Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
 							break;
 						  	}
+						   ostringstream s;
+						   s << "[RunControlFSM]::[Loop]::Starting new run of type LED. Spill size " << trgNevents_;
+						   Log(s.str(),1);
+
 						   trgType_=LED_TRIG;
 						   }
 				   else if (!strcmp(ptr,"PHYSICS"))
 						   {
+				   		   shift=Utility::FindNull(myCmd.N,myCmd.data,2);
+						   if (shift >0 ) 
+						     {
+						       //only used if ignored spill signals
+						       char*ptr2= (char*)myCmd.data + shift;
+						       if ( sscanf(ptr2,"%ld",&trgNevents_) <1 )
+							 {
+							   Log("[RunControlFSM]::[Loop] GUI command has wrong spelling. Ignored.",1);
+							   break;
+							 }						       
+						     }
+						   ostringstream s;
+						   s << "[RunControlFSM]::[Loop]::Starting new run of type BEAM";  
+						   if (spillSignalsDisabled_ && trgNevents_>0)
+						     s << ". Spill size " << trgNevents_;
+						   Log(s.str(),1);
 						   trgType_=BEAM_TRIG;
 						   }
 				   else {
@@ -808,6 +865,17 @@ while (true) {
 					connectionManager_->Send(myMex,CmdSck);
 				        MoveToStatus(BYE);
 				}
+				else if( myCmd.cmd ==  GUI_RECONFIG) 
+				{
+					dataType myMex;
+					myMex.append((void*)"RECONFIG\0",4);
+					connectionManager_->Send(myMex,CmdSck);
+					Daemon::Reconfigure();
+					sleep(5); //wait for all reconfiguration
+					ostringstream s;
+					s << "[RunControlFSM]::[INFO]:: *** Reconfig completed ***";
+					Log(s.str(),1);
+				}
 			    }
 		    break;
 		    }
@@ -823,7 +891,7 @@ while (true) {
 		    wweMex.append((void*)"WWE\0",4);
 		    dataType guiwweMex;
 		    guiwweMex.append((void*)"GUI_SPS wwe",11);
-		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
+		    if (spillSignalsDisabled_ || trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
 			    connectionManager_->Send(wweMex,CmdSck);
@@ -839,19 +907,18 @@ while (true) {
 			 if (
 #define RC_DEBUG
 #ifndef RC_DEBUG
-					 hwManager_->SignalReceived(WWE)
+			     hwManager_->SignalReceived(WWE)
 #else
-					 true
+			     true
 #endif
-					 )
+			     )
 			 {
-			    hwManager_->ClearSignalStatus(); // acknowledge receival of status
-			    connectionManager_->Send(wweMex,CmdSck);
-			    connectionManager_->Send(guiwweMex,StatusSck);
-			    eventBuilder_->OpenSpill();
-			    MoveToStatus(CLEARED);
+			   hwManager_->ClearSignalStatus(); // acknowledge receival of status
+			   connectionManager_->Send(wweMex,CmdSck);
+			   connectionManager_->Send(guiwweMex,StatusSck);
+			   eventBuilder_->OpenSpill();
+			   MoveToStatus(CLEARED);
 			 }
-
 		    }
 
 		    break;
@@ -868,14 +935,14 @@ while (true) {
 		    weMex.append((void*)"WE\0",3);
 		    dataType guiweMex;
 		    guiweMex.append((void*)"GUI_SPS we",10);
-		    if (trgType_==PED_TRIG || trgType_==LED_TRIG ) 
+		    if ( spillSignalsDisabled_ || trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 		      connectionManager_->Send(weMex,CmdSck);
 		      trgRead_=0;
 		      //usleep(100000); //Wait acknowledge from DR
 		      // hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 		      hwManager_->BufferClearAll();
-		      hwManager_->SetBusyOff();
+		      // hwManager_->SetBusyOff();
 		      hwManager_->ClearBusy(); //Clearing BUSY
 		      hwManager_->TriggerAck(); //Send RESET for DAQ_TRCG_ACK to be sure it's off 
 		      readyDR_=0;
@@ -891,7 +958,7 @@ while (true) {
 			   //usleep(100000); //Wait acknowledge from DR
 			   hwManager_->ClearSignalStatus(); //Acknowledge receive of WE
 			   hwManager_->BufferClearAll();
-		           hwManager_->SetBusyOff();
+		           // hwManager_->SetBusyOff();
 		           hwManager_->ClearBusy();
 			   hwManager_->TriggerAck();
 			   readyDR_=0;
@@ -915,17 +982,16 @@ while (true) {
 			    }
 		    if (readyDR_ >= waitForDR_)
 		    {
-		      
-		      	 gettimeofday(&spillduration_stopwatch_start_time,NULL);
-		         hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
-			 ResetMex();
-		   	 MoveToStatus(WAITTRIG);
+		      gettimeofday(&spillduration_stopwatch_start_time,NULL);
+		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
+		      ResetMex();
+		      MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
 	case CLEARBUSY: {
-		        hwManager_->SetBusyOff();
 		        hwManager_->ClearBusy();
+		        // hwManager_->SetBusyOff();
 			MoveToStatus(WAITTRIG);
 			}
 	case WAITTRIG:
@@ -935,7 +1001,7 @@ while (true) {
 		    UpdateMex();
 
 		    // check end of spill conditions
-		    if (trgType_== BEAM_TRIG ) 
+		    if (!spillSignalsDisabled_ && trgType_== BEAM_TRIG ) 
 		   	{
 			if (hwManager_->SignalReceived(EE) )
 			  {
@@ -944,22 +1010,23 @@ while (true) {
 			    eeMex.append((void*)"EE\0",3);
 			    dataType guieeMex;
 			    guieeMex.append((void*)"GUI_SPS ee",10);
-
+			    
 			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
 			    //				  usleep(10000);
 			    connectionManager_->Send(eeMex,CmdSck);
 			    connectionManager_->Send(guieeMex,StatusSck);
 			    hwManager_->ClearSignalStatus();
-			    hwManager_->SetBusyOff();
-			    hwManager_->ClearBusy();
-			    hwManager_->TriggerAck();
+			    // hwManager_->SetBusyOff();
+			    // hwManager_->ClearBusy();
+			    // hwManager_->TriggerAck();
 			    gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 			    SendSpillDuration();
 			    MoveToStatus(ENDSPILL);
 			    break;
-				}
+			  }
 		    	}
-		    else if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
+		    else 
+		      //if (trgType_ == PED_TRIG || trgType_==LED_TRIG) 
 		    	{
 				if (trgRead_ >= trgNevents_)
 				{
@@ -972,9 +1039,9 @@ while (true) {
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  // hwManager_->ClearSignalStatus();
-				  hwManager_->SetBusyOff();
-				  hwManager_->ClearBusy();
-			          hwManager_->TriggerAck();
+				  // hwManager_->SetBusyOff();
+				  // hwManager_->ClearBusy();
+			          // hwManager_->TriggerAck();
 				  gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 				  SendSpillDuration();
 				MoveToStatus(ENDSPILL);
@@ -984,9 +1051,9 @@ while (true) {
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
 			cout<<"TRIGGER RECEIVED"<<endl;
-			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
-		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(2000); //DEBUG
+			hwManager_->SetBusyOn();
+		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  
 
@@ -1036,13 +1103,22 @@ while (true) {
 			MoveToStatus(RECVBUFFER);
 		    break;
 		    }
-	case RECVBUFFER:{
-			
-			// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
-		    	UpdateMex();
-		    	if ( eb_endspill ) MoveToStatus( SENTBUFFER );
-			break;
-			}
+	case RECVBUFFER:
+	  {
+	    usleep(500);
+	    if ( noEB_ ) 
+	      {
+		eb_endspill=true;
+		MoveToStatus ( SENTBUFFER );
+	      }
+	    else
+	      {
+		// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
+		UpdateMex();
+		if ( eb_endspill ) MoveToStatus( SENTBUFFER );
+	      }
+	    break;
+	  }
 	case SENTBUFFER:// Loop over the whole queue of messages
 		    { // wait for EB_SPILLCOMPLETED
 		    UpdateMex();

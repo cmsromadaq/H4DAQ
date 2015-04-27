@@ -22,12 +22,14 @@ enum CMD_t {	NOP=0,
 		ENDRUN,
 		DIE,
 		ERRORCMD,
+		RECONFIG,
 		// GUI Commands 100 - 199: Parsed only by the RunControl
 		GUI_STARTRUN= 100, // run# type#(PEDESTAL,LED,PHYSICS) #trig/spill (int)
 		GUI_RESTARTRUN,
 		GUI_STOPRUN,
 		GUI_PAUSERUN,
 		GUI_DIE,
+		GUI_RECONFIG,
 		// EB Commands
 		EB_SPILLCOMPLETED= 200,
 		DR_READY // DR are ready to take data

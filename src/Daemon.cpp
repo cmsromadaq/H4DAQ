@@ -18,6 +18,8 @@ Daemon::Daemon(){
 	gettimeofday(&start_time,NULL);
 	iLoop=0;
 	waitForDR_=0;
+	noEB_=0;
+	spillSignalsDisabled_=0;
 	srand((unsigned)time(NULL));
 }
 
@@ -38,9 +40,14 @@ int Daemon::Init(string configFileName){
 		// Set Configurator ; and Init it
 		configurator_->xmlFileName=configFileName;
 		configurator_->Init();
-
+		//these is used for RC & EB (number of DR to be waited)
 		waitForDR_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"waitForDR",configurator_->root_element) ); // move to Config
-		ostringstream s; s<<"[Daemon]::[Init] Wait For DR "<< waitForDR_;
+		//these 2 are only used for RC
+		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
+		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
+		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ << "\n";
+		s<<"[Daemon]::[Init] Use EB: "<< !noEB_ << "\n";
+		s<<"[Daemon]::[Init] Spill Signals: "<< !spillSignalsDisabled_;
 		Log(s.str(),1);
 		printf("%s\n",s.str().c_str());
 
@@ -147,6 +154,8 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
+	else if (N >=9  and !strcmp( (char*) mex.data(), "RECONFIG")  )
+		myCmd.cmd=RECONFIG;
 	else if (N >=6  and !strcmp( (char*) mex.data(), "ERROR")  )
 		{
 		//It doesn't matter wherever you are, if this happens FSM are de-sync, so move immediately to status error
@@ -219,6 +228,10 @@ Command Daemon::ParseData(dataType &mex)
 		   {
 		   myCmd.cmd=GUI_DIE;
 		   }
+		else if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_RECONFIG")  )
+		   {
+		   myCmd.cmd=GUI_RECONFIG;
+		   }
 		if (myCmd.data != NULL)mex2.release();
 		} // ENDGUI
 
@@ -234,9 +247,15 @@ void Daemon::MoveToStatus(STATUS_t newStatus){
 	// -- WORD myStatus=(WORD)newStatus;
 	// -- myMex.append((void*)&myStatus,WORDSIZE);
 	// -- connectionManager_->Send(myMex,StatusSck);
+
 	ostringstream s;
 	s << "[Daemon]::[DEBUG]::Moving to status " << newStatus;
-	Log(s.str(),3);
+#ifndef FSM_DEBUG
+	if (newStatus<CLEARBUSY || newStatus>READ)
+	  Log(s.str(),3);
+#else
+	  Log(s.str(),3);
+#endif
 	std::cout << s.str() << std::endl;
 	STATUS_t oldStatus = myStatus_;
 	myStatus_=newStatus;
@@ -359,4 +378,12 @@ void Daemon::ErrorStatus(){
 			}
 		}
 	return;			
+}
+
+void Daemon::Reconfigure(){
+  //Reset Members
+  if(eventBuilder_) eventBuilder_->Reset();
+  if(hwManager_) hwManager_->Clear(); 
+  MoveToStatus(INITIALIZED);
+  return;			
 }

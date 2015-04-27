@@ -95,6 +95,7 @@ public:
   virtual int Init () ;
   virtual int Clear () ;
   virtual int BufferClear () ;
+  virtual int ClearBusy () ;
   virtual int Config (BoardConfig *bC) ;
   // --- Actually the size in bit of int is 16/32 on 32 bit and 64 on 64bit machines
   virtual int Read (vector<WORD> &v) ;

@@ -26,7 +26,7 @@ int CAEN_V1742::Init ()
 
   ostringstream s;
 
-  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++" << endl ;
+  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 INIT ++++++";
   Log(s.str(),1);
   if (bC_ == NULL )
     {
@@ -43,7 +43,7 @@ int CAEN_V1742::Init ()
 
   s.str(""); s << "[CAEN_V1742]::[INFO]::Connected to CAEN Digitizer Model "<< boardInfo_.ModelName       << endl ;
   s << "[CAEN_V1742]::[INFO]::ROC FPGA Release is "              << boardInfo_.ROC_FirmwareRel << endl ;
-  s << "[CAEN_V1742]::[INFO]::AMC FPGA Release is "              << boardInfo_.AMC_FirmwareRel << endl ;
+  s << "[CAEN_V1742]::[INFO]::AMC FPGA Release is "              << boardInfo_.AMC_FirmwareRel;
   Log(s.str(),1);
 
   // Check firmware rivision (DPP firmwares cannot be used with WaveDump */
@@ -51,7 +51,8 @@ int CAEN_V1742::Init ()
   sscanf (boardInfo_.AMC_FirmwareRel, "%d", &MajorNumber) ;
   if (MajorNumber >= 128) 
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]::This digitizer has a DPP firmware" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]::This digitizer has a DPP firmware";
+      Log(s.str(),1);
       ErrCode = ERR_INVALID_BOARD_TYPE ;
       return ErrCode ;
     }
@@ -138,8 +139,7 @@ int CAEN_V1742::Init ()
   }
   
   CAEN_DGTZ_SWStartAcquisition (digitizerHandle_) ;
-  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++" << endl ;
-  s << "**************************************************************" << endl ;
+  s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++";
   Log(s.str(),1);
 
   return 0 ;
@@ -156,11 +156,12 @@ int CAEN_V1742::Clear (){
   ret |= CAEN_DGTZ_Reset (digitizerHandle_) ;
 
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program";
     Log(s.str(),1);
     return ERR_RESTART ;
   }
 
+  // usleep(1000);
   return 0 ;
 } ;
 
@@ -168,7 +169,7 @@ int CAEN_V1742::Clear (){
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
 
-int CAEN_V1742::BufferClear (){ 
+int CAEN_V1742::BufferClear (){
   int ret = 0 ;
   ostringstream s;
   /* clear the digitizer buffers */
@@ -176,14 +177,20 @@ int CAEN_V1742::BufferClear (){
   ret |= CAEN_DGTZ_ClearData(digitizerHandle_); 
 
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to clear buffers" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to clear buffers";
     Log(s.str(),1);
     return ERR_CLEARBUFFER ;
   }
-  
+  usleep(1000);
   return 0;
 } ;
 
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+int CAEN_V1742::ClearBusy (){  
+  //  return BufferClear();
+  return 0;
+} ;
 
 
 // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
@@ -217,7 +224,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   BufferSize = 0 ;
   NumEvents = 0 ;
   int itry=0;
-  int TIMEOUT=50000;
+  int TIMEOUT=10000;
 
   while (1 > NumEvents && itry<TIMEOUT)
     {
@@ -228,7 +235,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
       
       if (ret) {
 	
-	s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!" << endl ;
+	s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!";
 	Log(s.str(),1);
 	
 	ErrCode = ERR_READOUT ;
@@ -238,19 +245,24 @@ int CAEN_V1742::Read (vector<WORD> &v)
       if (BufferSize != 0) {
 	ret = CAEN_DGTZ_GetNumEvents (digitizerHandle_, buffer_, BufferSize, &NumEvents) ;
 	if (ret) {
-	  s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!" << endl ;
+	  s.str(""); s << "[CAEN_V1742]::[ERROR]::READOUT ERROR!!!";
 	  Log(s.str(),1);
 
 	  ErrCode = ERR_READOUT ;
 	  return ErrCode ;
 	}
+	if (NumEvents == 0)
+	  {
+	  s.str(""); s << "[CAEN_V1742]::[WARNING]::NO EVENTS BUT BUFFERSIZE !=0";
+	  Log(s.str(),1);
+	  }
       }
       usleep(50);
     }
 
   if (itry == TIMEOUT)
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]::READ TIMEOUT!!!";
       Log(s.str(),1);
 
       int status=BufferClear();
@@ -261,7 +273,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   //For the moment empty the buffers one by one
   if (NumEvents != 1)
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]::MISMATCHED EVENTS!!!" << NumEvents << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]::MISMATCHED EVENTS!!!" << NumEvents;
       Log(s.str(),1);
 
       ErrCode = ERR_MISMATCH_EVENTS ;
@@ -274,7 +286,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
     /* Get one event from the readout buffer */
   ret = CAEN_DGTZ_GetEventInfo (digitizerHandle_, buffer_, BufferSize, 0, &EventInfo, &eventPtr_) ;
   if (ret) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!";
     Log(s.str(),1);
 
     ErrCode = ERR_EVENT_BUILD ;
@@ -282,7 +294,7 @@ int CAEN_V1742::Read (vector<WORD> &v)
   }
   ret = CAEN_DGTZ_DecodeEvent (digitizerHandle_, eventPtr_, (void**)&event_) ;
   if (ret) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!";
     Log(s.str(),1);
 
     ErrCode = ERR_EVENT_BUILD ;
@@ -294,14 +306,13 @@ int CAEN_V1742::Read (vector<WORD> &v)
   //       }
   ret = (CAEN_DGTZ_ErrorCode) writeEventToOutputBuffer (v,&EventInfo,event_) ;
   if (ret) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::EVENT BUILD ERROR!!!";
     Log(s.str(),1);
 
     ErrCode = ERR_EVENT_BUILD ;
     return ErrCode ;
   }    
-  // } //close cycle over events
-    
+  // } //close cycle over events    
   return 0 ;
 
 } ;
@@ -402,7 +413,7 @@ int CAEN_V1742::programDigitizer ()
   /* reset the digitizer */
   ret |= CAEN_DGTZ_Reset (digitizerHandle_) ;
   if (ret != 0) {
-    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program" << endl ;
+    s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to reset digitizer.Please reset digitizer manually then restart the program";
     Log(s.str(),1);
     return ERR_RESTART ;
   }
@@ -598,7 +609,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
         else if (linkType == "PCI") digitizerConfiguration_.LinkType = CAEN_DGTZ_PCI_OpticalLink ;
         else 
           {
-            s.str(""); s << "[CAEN_V1742]::[ERROR]::Invalid connection type: " << linkType << endl ;
+            s.str(""); s << "[CAEN_V1742]::[ERROR]::Invalid connection type: " << linkType;
 	    Log(s.str(),1);
             return ERR_CONF_INVALID ; 
           }
@@ -611,7 +622,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field OPEN not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field OPEN not found in board xml node config";
       Log(s.str(),1);
       return ERR_CONF_INVALID;
     }
@@ -625,7 +636,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
         {
           if (digitizerConfiguration_.GWn >= MAX_GW) 
             {
-              s.str(""); s << "[CAEN_V1742]::[WARNING]:: not all the WRITE_REGISTER fields have been acquired" << endl ;
+              s.str(""); s << "[CAEN_V1742]::[WARNING]:: not all the WRITE_REGISTER fields have been acquired";
 	      Log(s.str(),1);
               break ;
             }
@@ -644,7 +655,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field RECORD_LENGTH not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field RECORD_LENGTH not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -661,7 +672,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field CORRECTION_LEVEL not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field CORRECTION_LEVEL not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -676,7 +687,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DRS4_FREQUENCY not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DRS4_FREQUENCY not found in board xml node config";
       Log(s.str(),1);
     }
 
@@ -690,14 +701,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       if (dummy == "YES") digitizerConfiguration_.TestPattern = 1 ;
       else if (dummy != "NO")
         {
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: TEST_PATTERN " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: TEST_PATTERN " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TEST_PATTERN not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TEST_PATTERN not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -712,14 +723,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       if (dummy == "FALLING") digitizerConfiguration_.TriggerEdge = 1 ;
       else if (dummy != "RISING")
         {
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: TRIGGER_EDGE " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: TRIGGER_EDGE " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TRIGGER_EDGE not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TRIGGER_EDGE not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -736,14 +747,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       else if (dummy == "ACQUISITION_AND_TRGOUT") digitizerConfiguration_.ExtTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_AND_EXTOUT ;
       else
         {
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: EXTERNAL_TRIGGER " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: EXTERNAL_TRIGGER " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field EXTERNAL_TRIGGER not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field EXTERNAL_TRIGGER not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -757,7 +768,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field MAX_NUM_EVENTS_BLT not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field MAX_NUM_EVENTS_BLT not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -778,7 +789,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field POST_TRIGGER not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field POST_TRIGGER not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -793,14 +804,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       if (dummy == "YES") digitizerConfiguration_.DesMode = 1 ;
       else if (dummy != "NO")
         {
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_DES_MODE " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_DES_MODE " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLE_DES_MODE not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLE_DES_MODE not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -837,7 +848,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field USE_INTERRUPT not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field USE_INTERRUPT not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -852,14 +863,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       if (dummy == "ACQUISITION_ONLY") digitizerConfiguration_.FastTriggerMode = CAEN_DGTZ_TRGMODE_ACQ_ONLY ;
       else if (dummy != "NO")
         {
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: FAST_TRIGGER " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: FAST_TRIGGER " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field FAST_TRIGGER not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field FAST_TRIGGER not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -874,14 +885,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       else if (dummy != "NO")
         {
            s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLED_FAST_TRIGGER_DIGITIZING " << dummy 
-                << " is an invalid option" << endl ;
+                << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLED_FAST_TRIGGER_DIGITIZING not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLED_FAST_TRIGGER_DIGITIZING not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -898,7 +909,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DC_OFFSET not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field DC_OFFSET not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -914,7 +925,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TRIGGER_THRESHOLD not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field TRIGGER_THRESHOLD not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -934,7 +945,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       else
         {  
            ok = 0 ;
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
@@ -945,7 +956,7 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field CHANNEL_TRIGGER not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field CHANNEL_TRIGGER not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -960,14 +971,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       if (dummy == "TTL") digitizerConfiguration_.FPIOtype = 1 ;
       else if (dummy != "NIM")
         {  
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: FPIO_LEVEL " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: FPIO_LEVEL " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field FPIO_LEVEL not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field FPIO_LEVEL not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -983,14 +994,14 @@ int CAEN_V1742::ParseConfiguration (BoardConfig * bC)
       else if (dummy == "NO") digitizerConfiguration_.EnableMask = 0x00 ;
       else 
         {  
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
     }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLE_INPUT not found in board xml node config" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[WARNING]:: Field ENABLE_INPUT not found in board xml node config";
       Log(s.str(),1);
       //PG FIXME abort run start?
     }
@@ -1034,7 +1045,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
       }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field ID not found in board xml node config for a channel";
       Log(s.str(),1);
       return ERR_CONF_INVALID ;
       //PG FIXME abort run start?
@@ -1042,7 +1053,7 @@ CAEN_V1742::ParseConfigForTriggers (BoardConfig * bC, const xmlNode * node)
 
   if (tr < 0 || tr > 3)
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]:: ID = " << tr << " out of range" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]:: ID = " << tr << " out of range";
       Log(s.str(),1);
       return ERR_CONF_INVALID ;
     }
@@ -1090,7 +1101,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
       }
   else 
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field ID not found in board xml node config for a channel" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]:: Field ID not found in board xml node config for a channel";
       Log(s.str(),1);
       return ERR_CONF_INVALID ;
       //PG FIXME abort run start?
@@ -1098,7 +1109,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
 
   if (ch < 0 || ch > 3)
     {
-      s.str(""); s << "[CAEN_V1742]::[ERROR]:: ID = " << ch << " out of range" << endl ;
+      s.str(""); s << "[CAEN_V1742]::[ERROR]:: ID = " << ch << " out of range";
       Log(s.str(),1);
       return ERR_CONF_INVALID ;
     }
@@ -1113,7 +1124,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
       else if (dummy == "NO") digitizerConfiguration_.EnableMask &= ~ (1 << ch) ;
       else 
         {  
-           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option" << endl ;
+           s.str(""); s << "[CAEN_V1742]::[WARNING]:: ENABLE_INPUT " << dummy << " is an invalid option";
 	   Log(s.str(),1);
            //PG FIXME abort run start?
         }
@@ -1166,7 +1177,7 @@ CAEN_V1742::ParseConfigForGroups (BoardConfig * bC, const xmlNode * node)
       else
         {  
           ok = 0 ;
-          s.str(""); s << "[CAEN_V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option" << endl ;
+          s.str(""); s << "[CAEN_V1742]::[WARNING]:: CHANNEL_TRIGGER " << dummy << " is an invalid option";
 	  Log(s.str(),1);
           //PG FIXME abort run start?
         }

@@ -118,3 +118,19 @@ int Utility::FindNull(int N,void*data,int iPos)
 	printf("[Utility]::[FindNull] End\n");
 	return -1;
 }
+
+/* Set one bit */
+void Utility::setbit(unsigned int *dataptr, int mode_bit){
+  *dataptr = *dataptr | (1<<mode_bit); 
+}
+void Utility::setbit(int *dataptr, int mode_bit){
+  *dataptr = *dataptr | (1<<mode_bit); 
+}
+
+/* Clear one bit */
+void Utility::clearbit(unsigned int *dataptr, int mode_bit){
+  *dataptr = *dataptr & (~(1<<mode_bit)); 
+}
+void Utility::clearbit(int *dataptr, int mode_bit){
+  *dataptr = *dataptr & (~(1<<mode_bit)); 
+}

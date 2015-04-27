@@ -42,6 +42,8 @@ const static int CmdSck = 2;
 
 int iLoop;
 int waitForDR_;
+int noEB_;
+int spillSignalsDisabled_;
 
 bool error_;
 
@@ -67,7 +69,8 @@ public:
 	//
 	void LogInit(Logger*l);
 	//
-	virtual void ErrorStatus();
+        virtual void ErrorStatus();
+        virtual void Reconfigure(); 
         virtual void PublishStatusWithTimeInterval();
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 	

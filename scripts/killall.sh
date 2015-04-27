@@ -1,28 +1,18 @@
 #!/bin/bash
 
 
-# DATA RO 
-for machine in pcethtb1 cms-h4-03 ; do 
-	echo "Terminating datareadout on $machine"
-	ssh ${machine}.cern.ch "killall datareadout"
-done
 # RC/EB
-for machine in pcethtb2 ; do 
+for machine in localhost ; do 
 	echo "Terminating runcontrol on $machine"
-	ssh ${machine}.cern.ch "killall runcontrol"
+	ssh ${machine} "killall runcontrol"
 	echo "Terminating eventbuilder on $machine"
-	ssh ${machine}.cern.ch "killall eventbuilder"
+	ssh ${machine} "killall eventbuilder"
 done
 
-# SLEEP IMPLICIT  kill -9
-for machine in pcethtb1 cms-h4-03 ; do 
-	echo "Killing datareadout on $machine"
-	ssh ${machine}.cern.ch "killall -9 datareadout"
-done
-for machine in pcethtb2 ; do 
+for machine in localhost ; do 
 	echo "Killing runcontrol on $machine"
-	ssh ${machine}.cern.ch "killall -9 runcontrol"
+	ssh ${machine} "killall -9 runcontrol"
 	echo "Killing eventbuilder on $machine"
-	ssh ${machine}.cern.ch "killall -9 eventbuilder"
+	ssh ${machine} "killall -9 eventbuilder"
 done
 

@@ -10,6 +10,8 @@
 #include "interface/CAEN_V560.hpp"
 #include "interface/CAEN_V513.hpp"
 #include "interface/LECROY_1182.hpp"
+#include "interface/MAROC_ROC.hpp"
+#include "interface/CAEN_V265.hpp"
 #include "interface/TimeBoard.hpp"
 
 #include "interface/EventBuilder.hpp" // boardId
@@ -118,6 +120,16 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a CAEN_V792 board
 			  hw_.push_back( new LECROY_1182() );
+			}
+		else if( getElementContent(c,"type",board_node) == "MAROC_ROC")
+			{
+			  //constructing a MAROC ROC
+			  hw_.push_back( new MAROC_ROC() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V265")
+			{
+			  //constructing a MAROC ROC
+			  hw_.push_back( new CAEN_V265() );
 			}
 		else
 		  {
@@ -283,27 +295,30 @@ int HwManager::CrateInit()
       CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
       CAEN_V1742::CAEN_V1742_Config_t* digiConfig=((CAEN_V1742*)hw_[digiBoard_.boardIndex_])->GetConfiguration();
 
-      CAEN_DGTZ_ConnectionType linkType=CAEN_DGTZ_USB;
-      if (controllerBoard_.boardIndex_ != cvV1718 )
-	linkType=CAEN_DGTZ_OpticalLink;
+      CAEN_DGTZ_ConnectionType linkType=(CAEN_DGTZ_ConnectionType) 0;
+      if (controllerConfig->boardType != cvV1718 )
+	  linkType=CAEN_DGTZ_OpticalLink;
+
+      ostringstream s; 
+      s << "[HwManager]::[INFO]::Opening Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " LinkType " << linkType << " DeviceNumber "<<controllerConfig->LinkNum ;
+      Log(s.str(),1);
 
       status |= CAEN_DGTZ_OpenDigitizer(linkType, controllerConfig->LinkNum, 0, digiConfig->BaseAddress, &digiBoard_.boardHandle_);
+
       //hack to get VME Handle (normally this handle is 0, can be also hardcoded...)
       CAEN_DGTZ_BoardInfo_t myBoardInfo;
       status |= CAEN_DGTZ_GetInfo(digiBoard_.boardHandle_, &myBoardInfo);  
       status |= CAENComm_Info(myBoardInfo.CommHandle, CAENComm_VMELIB_handle ,&controllerBoard_.boardHandle_);
 
-      ostringstream s;
-      s << "Digitizer@0x " << std::hex << digiConfig->BaseAddress << std::dec <<  " & VME Crate Type "<<controllerConfig->boardType<<" LinkType "<<controllerConfig->LinkType<<" DeviceNumber "<<controllerConfig->LinkNum ;
-
       if (status)
 	{
-	  ostringstream s1; s1 << "[HwManager]::[ERROR]::" << s << " cannot be initialized"  ;
+	  ostringstream s1; s1 << "[HwManager]::[ERROR]::Cannot initialize VME Crate"  ;
 	  Log(s1.str(),1);
 	  throw config_exception();
 	}
-      ostringstream s1; s1 << "[HwManager]::[INFO]::" << s << " initialized"  ;
+      ostringstream s1; s1 << "[HwManager]::[INFO]::VME Crate initialized"  ;
       Log(s1.str(),1);
+
       if (digiBoard_.boardHandle_<0)
 	{
 	  Log("[HwManager]::[ERROR]::VME Crate Controller Handle is wrong",1);
@@ -398,6 +413,7 @@ void  HwManager::BufferClearAll(){
 
 
 void HwManager::ClearBusy(){
+
 	if (trigBoard_.boardIndex_<0 ) 
 	  {
 	    ostringstream s;
@@ -405,8 +421,18 @@ void HwManager::ClearBusy(){
 	    Log(s.str(),1);
 	    throw hw_exception();
 	  }
-	
-	int status = dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->ClearBusy();
+	int status = 0;
+	for(int i=0;i< hw_.size();i++)
+	  {
+	    if (i==trigBoard_.boardIndex_)
+	      continue;
+	    else
+	      status |= hw_[i]->ClearBusy();
+	  }
+
+	//Trigger Board should be the last to clear the overall readout BUSY
+	status |= dynamic_cast<TriggerBoard*>(hw_[trigBoard_.boardIndex_])->ClearBusy();
+
 	if ( status )
 	  {
 	    ostringstream s;
@@ -552,5 +578,7 @@ BoardTypes_t HwManager::GetBoardTypeId(string type){
 	else if( type=="CAEN_V560") return _CAENV560_;
 	else if( type=="CAEN_V814") return _CAENV814_;
 	else if( type=="LECROY_1182" || type == "LECROY1182" ) return _LECROY1182_;
+	else if( type=="MAROC_ROC") return _MAROCROC_;
+	else if( type=="CAEN_V265") return _CAENV265_;
 	else return _UNKWN_;
 }
