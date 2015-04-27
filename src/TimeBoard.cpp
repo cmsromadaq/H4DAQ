@@ -22,6 +22,7 @@ int TimeBoard::Print(){
 }
 
 int TimeBoard::Config(BoardConfig *bC){
+
 	Board::Config(bC);	
 	//to be configured
 	tm ref_date;
@@ -32,7 +33,7 @@ int TimeBoard::Config(BoardConfig *bC){
   	ref_date.tm_mon = 8; // start from 0 ?
   	ref_date.tm_mday = 29;
   	ref=mktime(&ref_date);
-
+  Log("[TimeBoard]::[INFO]::Configured",1);
 	return 0;
 }
 int TimeBoard::Read(vector<WORD> &v)

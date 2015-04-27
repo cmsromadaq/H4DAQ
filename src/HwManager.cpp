@@ -138,7 +138,7 @@ void HwManager::Config(Configurator &c){
 		    continue; 
 		  }
 		// else if ( ... ==... ) ... TODO
-		
+
 		//Initialize Board Logger
 		if (this->GetLogger() != NULL)
 		  hw_[bIdx]->LogInit(this->GetLogger());
@@ -148,8 +148,10 @@ void HwManager::Config(Configurator &c){
 		// construct a board configurator and ask the board to configure itself
 		BoardConfig bC;
 		bC.Init(c);
+
 		bC.SetBoardNode(board_node);
 		hw_[bIdx]->Config(&bC);
+
 		}
 	}
 

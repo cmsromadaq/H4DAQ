@@ -14,15 +14,15 @@
 
     <crateId>2</crateId>
 
-    <board><!-- Time Board --> 
+    <board> <!-- TIME board always as first -->
       <ID>1</ID>
-      <type>TIME</type> <!-- Remember to put always TIMEBOARD at the first location among boards -->
+      <type>TIME</type>
     </board>
 
     <board>
-      <type>CAEN_VX718</type> <!-- CONTROLLER -->
-      <ID>1</ID>
-      <boardType>1</boardType> <!-- ??? -->
+      <ID>1</ID> 
+      <type>CAEN_VX718</type> <!-- CRATE Controller -->  
+      <boardType>1</boardType> <!-- USB=0, PCI Optical=1 -->
       <LinkType>0</LinkType> <!--int32_t-->
       <LinkNum>0</LinkNum> <!--int32_t-->
 
@@ -92,6 +92,7 @@
       <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
       <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
     </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
