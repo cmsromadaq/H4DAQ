@@ -20,6 +20,7 @@ Daemon::Daemon(){
 	waitForDR_=0;
 	noEB_=0;
 	spillSignalsDisabled_=0;
+	pedestalTriggerDuringBeam_=-1;
 	srand((unsigned)time(NULL));
 }
 

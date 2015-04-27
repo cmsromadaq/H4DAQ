@@ -985,15 +985,35 @@ while (true) {
 		      gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      ResetMex();
+		      if (trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
+			lastPedTrigger_=false;
 		      MoveToStatus(WAITTRIG);
 		    }
 		    break;
 		    }
-	case CLEARBUSY: {
-		        hwManager_->ClearBusy();
-		        // hwManager_->SetBusyOff();
-			MoveToStatus(WAITTRIG);
+	case CLEARBUSY: 
+	            {
+		      //handling of pedestals during beam
+		      if ( trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
+			{
+			  if (lastPedTrigger_=true)
+			    {
+			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_OFF );
+			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
+			      lastPedTrigger_=true;
+			    }
+			  else if ((trgRead_%pedestalTriggerDuringBeam_)==1)
+			    {
+			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
+			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_ON );
+			      lastPedTrigger_=true;
+			    }
 			}
+		      //Clear Busy also sets the busy signal OFF
+		      hwManager_->ClearBusy();
+		      // hwManager_->SetBusyOff();
+		      MoveToStatus(WAITTRIG);
+		    }
 	case WAITTRIG:
 		    {
 			// something went in error ? -> check
