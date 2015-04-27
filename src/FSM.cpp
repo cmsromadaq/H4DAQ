@@ -44,6 +44,7 @@ while (true) {
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -64,6 +65,13 @@ while (true) {
 				 }
 			     else if (myCmd.cmd == DIE ) 
 				MoveToStatus(BYE);
+			     else if (myCmd.cmd == RECONFIG ) 
+			       {
+				 Daemon::Reconfigure();
+				 ostringstream s;
+				 s << "[DataReadoutFSM]::[INFO]::Reconfig OK";
+				 Log(s.str(),1);
+			       }
 			    }
 		    break;
 		    }
@@ -425,6 +433,7 @@ while (true) {
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -446,6 +455,13 @@ while (true) {
 				MoveToStatus(INITIALIZED);
 			    else if(myCmd.cmd == DIE)
 				MoveToStatus(BYE);
+			     else if (myCmd.cmd == RECONFIG ) 
+			       {
+				 Daemon::Reconfigure();
+				 ostringstream s;
+				 s << "[EventBuilderFSM]::[INFO]::Reconfig OK";
+				 Log(s.str(),1);
+			       }
 			    }
 		    break;
 		    }
@@ -496,6 +512,7 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
+		      usleep(500);
 		     // check network  -- wait for EE
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
@@ -702,6 +719,7 @@ while (true) {
 		    } 
 	case INITIALIZED:
 		    {
+		      usleep(500);
 		    // wait for gui start run
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -846,6 +864,17 @@ while (true) {
 					myMex.append((void*)"DIE\0",4);
 					connectionManager_->Send(myMex,CmdSck);
 				        MoveToStatus(BYE);
+				}
+				else if( myCmd.cmd ==  GUI_RECONFIG) 
+				{
+					dataType myMex;
+					myMex.append((void*)"RECONFIG\0",4);
+					connectionManager_->Send(myMex,CmdSck);
+					Daemon::Reconfigure();
+					sleep(5); //wait for all reconfiguration
+					ostringstream s;
+					s << "[RunControlFSM]::[INFO]:: *** Reconfig completed ***";
+					Log(s.str(),1);
 				}
 			    }
 		    break;
@@ -1076,6 +1105,7 @@ while (true) {
 		    }
 	case RECVBUFFER:
 	  {
+	    usleep(500);
 	    if ( noEB_ ) 
 	      {
 		eb_endspill=true;

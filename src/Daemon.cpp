@@ -154,6 +154,8 @@ Command Daemon::ParseData(dataType &mex)
 		myCmd.cmd=ENDRUN;
 	else if (N >=4  and !strcmp( (char*) mex.data(), "DIE")  )
 		myCmd.cmd=DIE;
+	else if (N >=9  and !strcmp( (char*) mex.data(), "RECONFIG")  )
+		myCmd.cmd=RECONFIG;
 	else if (N >=6  and !strcmp( (char*) mex.data(), "ERROR")  )
 		{
 		//It doesn't matter wherever you are, if this happens FSM are de-sync, so move immediately to status error
@@ -225,6 +227,10 @@ Command Daemon::ParseData(dataType &mex)
 		else if (N >=7  and !strcmp( (char*) mex2.data(), "GUI_DIE")  )
 		   {
 		   myCmd.cmd=GUI_DIE;
+		   }
+		else if (N >=12  and !strcmp( (char*) mex2.data(), "GUI_RECONFIG")  )
+		   {
+		   myCmd.cmd=GUI_RECONFIG;
 		   }
 		if (myCmd.data != NULL)mex2.release();
 		} // ENDGUI
@@ -372,4 +378,12 @@ void Daemon::ErrorStatus(){
 			}
 		}
 	return;			
+}
+
+void Daemon::Reconfigure(){
+  //Reset Members
+  if(eventBuilder_) eventBuilder_->Reset();
+  if(hwManager_) hwManager_->Clear(); 
+  MoveToStatus(INITIALIZED);
+  return;			
 }

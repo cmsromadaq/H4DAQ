@@ -69,7 +69,8 @@ public:
 	//
 	void LogInit(Logger*l);
 	//
-	virtual void ErrorStatus();
+        virtual void ErrorStatus();
+        virtual void Reconfigure(); 
         virtual void PublishStatusWithTimeInterval();
         virtual void SendStatus(STATUS_t oldStatus, STATUS_t newStatus);
 	
