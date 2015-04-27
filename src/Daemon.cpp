@@ -47,9 +47,9 @@ int Daemon::Init(string configFileName){
 		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
 		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
 		pedestalTriggerDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"pedestalTriggerDuringBeam",configurator_->root_element) ); // move to Config
-		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ << "\n";
+		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
-		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_ << "\n";
+		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Spill Signals: "<< !spillSignalsDisabled_;
 		Log(s.str(),1);
