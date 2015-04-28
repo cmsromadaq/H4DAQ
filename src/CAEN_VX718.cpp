@@ -26,10 +26,10 @@ int CAEN_VX718::Init()
   status |= CAENVME_SetOutputConf(handle_,cvOutput2,configuration_.Output2Polarity,configuration_.Output2LedPolarity,configuration_.Output2Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput3,configuration_.Output3Polarity,configuration_.Output3LedPolarity,configuration_.Output3Source);
   status |= CAENVME_SetOutputConf(handle_,cvOutput4,configuration_.Output4Polarity,configuration_.Output4LedPolarity,configuration_.Output4Source);
-  // status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
+  status |= CAENVME_WriteRegister(handle_,cvOutMuxRegSet,configuration_.outputMuxWord);
   /* setting which output line must be pulsed  */
-  // outputRegister_=configuration_.outputMaskWord;
-  // status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
+  outputRegister_=configuration_.outputMaskWord;
+  status |= CAENVME_SetOutputRegister(handle_,configuration_.outputMaskWord);
   //setting the input lines
   status |= CAENVME_SetInputConf(handle_,cvInput0,configuration_.Input0Polarity,configuration_.Input0LedPolarity);
   status |= CAENVME_SetInputConf(handle_,cvInput1,configuration_.Input1Polarity,configuration_.Input1LedPolarity);
@@ -113,8 +113,8 @@ int CAEN_VX718::Config(BoardConfig *bC)
   GetConfiguration()->daqBusyOutputBit= static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("daqBusyOutputBit")) ); 
   GetConfiguration()->trigAckOutputBit  = static_cast<CVOutputRegisterBits>(Configurator::GetInt( bC->getElementContent("trigAckOutputBit")) ); 
   GetConfiguration()->triggerInputBit   = static_cast<CVInputSelect> (Configurator::GetInt( bC->getElementContent("triggerInputBit")) ); 
-      // GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
-      // GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
+  GetConfiguration()->outputMaskWord 		= Configurator::GetInt(bC->getElementContent("outputMaskWord"));	// uint32_t--> 
+  GetConfiguration()->outputMuxWord 		= Configurator::GetInt(bC->getElementContent("outputMuxWord"));	// uint32_t--> 
       GetConfiguration()->scalerConfWord 		= Configurator::GetInt(bC->getElementContent("scalerConfWord"));	// uint32_t--> 
       GetConfiguration()->controlRegWord 		= Configurator::GetInt(bC->getElementContent("controlRegWord"));	// uint32_t-->
       GetConfiguration()->Output0Polarity 	= static_cast<CVIOPolarity>(Configurator::GetInt(bC->getElementContent("Output0Polarity")) );	// CVIOPolarity-->

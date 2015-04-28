@@ -40,8 +40,8 @@ public:
     CVOutputRegisterBits trigAckOutputBit;
     CVInputSelect  triggerInputBit;
 
-    // uint32_t outputMaskWord; 
-    // uint32_t outputMuxWord; 
+    uint32_t outputMaskWord; 
+    uint32_t outputMuxWord; 
     uint32_t scalerConfWord; 
     uint32_t controlRegWord;
     
