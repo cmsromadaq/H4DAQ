@@ -7,6 +7,7 @@
 //#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
+//#define PEDINBEAM_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -987,7 +988,9 @@ while (true) {
 		      ResetMex();
 		      if (trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
 			{
+#ifdef PEDINBEAM_DEBUG
 			  Log("[RunControlFSM]::[DEBUG]::Resetting PedTrigger Bool",3);
+#endif
 			  lastPedTrigger_=false;
 			}
 		      MoveToStatus(WAITTRIG);
@@ -999,19 +1002,25 @@ while (true) {
 		      //handling of pedestals during beam
 		      if ( trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
 			{
+#ifdef PEDINBEAM_DEBUG
 			  ostringstream s;
 			  s << "[RunControlFSM]::[DEBUG]::Checking pedestalTriggerDuringBeam; lastPedTrigger " << lastPedTrigger_;
 			  Log(s.str(),3);
+#endif
 			  if (lastPedTrigger_==true)
 			    {
+#ifdef PEDINBEAM_DEBUG
 			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
+#endif
 			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_OFF );
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
 			      lastPedTrigger_=false;
 			    }
 			  else if (lastPedTrigger_==false && (trgRead_%pedestalTriggerDuringBeam_)==1)
 			    {
+#ifdef PEDINBEAM_DEBUG
 			      Log("[RunControlFSM]::[DEBUG]::Enabling PED_TRIG",3);
+#endif
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
 			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_ON );
 			      lastPedTrigger_=true;
