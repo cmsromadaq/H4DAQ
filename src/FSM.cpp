@@ -996,14 +996,17 @@ while (true) {
 		      //handling of pedestals during beam
 		      if ( trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
 			{
+			  Log("[RunControlFSM]::[DEBUG]::Checking pedestalTriggerDuringBeam",3);
 			  if (lastPedTrigger_=true)
 			    {
+			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
 			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_OFF );
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
 			      lastPedTrigger_=true;
 			    }
 			  else if ((trgRead_%pedestalTriggerDuringBeam_)==1)
 			    {
+			      Log("[RunControlFSM]::[DEBUG]::Enabling PED_TRIG",3);
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
 			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_ON );
 			      lastPedTrigger_=true;
