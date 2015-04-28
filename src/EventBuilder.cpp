@@ -500,12 +500,12 @@ Command EventBuilder::CloseSpill()
 
 	if( dumpEvent_ && !recvEvent_) 
 	{
-		Log("[EventBuilder]::[CloseSpill] File Closed",2) ;
+		Log("[EventBuilder]::[CloseSpill] File Closed",1) ;
 		Dump(mySpill_);
 		dump_->Close();
 	}
 	if (recvEvent_) { 
-		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",2) ;
+		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",1) ;
 		// For recv event, Close Spill should do nothing.
 		// MergeSpills will dump in case
 		//
@@ -520,7 +520,7 @@ Command EventBuilder::CloseSpill()
 	} 
 	if (sendEvent_) {//TODO -- also do the merging if recv
 		// --- Instruct Daemon to send them through the connection manager
-		Log("[EventBuilder]::[CloseSpill] File In Send Mode",2) ;
+		Log("[EventBuilder]::[CloseSpill] File In Send Mode",1) ;
 		myCmd.cmd=SEND;
 		dataType myMex;
 		myMex.append((void*)"DATA\0",5);

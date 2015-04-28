@@ -550,21 +550,24 @@ while (true) {
 		    {                                                                     
 			    Command myNewCmd = ParseData( myMex); 
 			    if ( myNewCmd.cmd == DATA ) {
-				    // pass the structure to a dataType
-				    dataType myData(myNewCmd.N,myNewCmd.data);
-				    // release the destruction from Command
-				    myNewCmd.release();
-				    //Merge Spills
-				    eventStarted= true;
-				    // 
-				    //DEBUG
-				    //   string buf=Utility::AsciiDataReadable( myData.data(), myData.size());
-				    //   if (buf.size() >100)
+			      ostringstream s;
+			      s << "[EventBuilderFSM]::[INFO]::received " << myNewCmd.N << " bytes";
+			      Log(s.str(),1);
+			      // pass the structure to a dataType
+			      dataType myData(myNewCmd.N,myNewCmd.data);
+			      // release the destruction from Command
+			      myNewCmd.release();
+			      //Merge Spills
+			      eventStarted= true;
+			      // 
+			      //DEBUG
+			      //   string buf=Utility::AsciiDataReadable( myData.data(), myData.size());
+			      //   if (buf.size() >100)
 				    //       buf.erase(101,string::npos);
 				    //   Log(buf,3);
-				    transrate_size+=myData.size();
-				    eventBuilder_->MergeSpills(myData);
-
+			      transrate_size+=myData.size();
+			      eventBuilder_->MergeSpills(myData);
+			      
 			    }
 		    }
 		    if ( eventBuilder_->AreSpillsMerged() && eventStarted) { // enter here only if you merged something
