@@ -4,12 +4,12 @@
     <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6504</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-    <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data  -->
+    <ConnectTo>pcethtb2.cern.ch:6500</ConnectTo>  <!-- EB Data  -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
     <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
   </Network>
   <Hardware>
-    <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
+    <crateId>11</crateId> <!-- In case it configure it. But it is empty-->
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
