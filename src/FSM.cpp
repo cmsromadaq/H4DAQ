@@ -702,7 +702,7 @@ while (true) {
 	case INIT:  {   // not in the LOOP
 #ifdef BUSY_DEBUG
 	  int idebug=0;
-	  while (idebug<3000)
+	  while (idebug<30000)
 	    {
 	      hwManager_->ClearBusy();
 	      usleep(10);
