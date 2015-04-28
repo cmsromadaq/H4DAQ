@@ -94,6 +94,60 @@
       <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
     </board>
 
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>1</ID>
+       <baseAddress>0x00110000</baseAddress>
+     </board>
+
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>2</ID>
+       <baseAddress>0x00120000</baseAddress>
+     </board>
+
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>3</ID>
+       <baseAddress>0x00130000</baseAddress>
+     </board>
+
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>4</ID>
+       <baseAddress>0x00140000</baseAddress>
+     </board>
+
+     <board>
+       <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+       <ID>1</ID>
+       <baseAddress>0xAAAA0000</baseAddress>
+       <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+       <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+       <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+       <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+       <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+       <sigDelay>0x1F</sigDelay> <!--DELAY 320ns (10 ns steps) -->
+     </board>
+     <board>
+       <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
+       <ID>2</ID>
+       <baseAddress>0xBBBB0000</baseAddress>
+       <ctrlRegWord>0x00001010</ctrlRegWord> <!--CTRL REG WORD -->
+       <maskA>0xFFFFFFFF</maskA> <!--MASKA WORD -->
+       <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
+       <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
+       <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
+       <sigDelay>0x1F</sigDelay> <!--DELAY 320ns (10ns steps) -->
+     </board>
+     
+     <board>
+       <type>CAEN_V560</type> <!-- SCALER -->
+       <ID>1</ID>
+       <baseAddress>0x00999900</baseAddress>
+       <enabledChannels>0x00FF</enabledChannels>
+     </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
