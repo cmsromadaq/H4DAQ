@@ -986,7 +986,10 @@ while (true) {
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      ResetMex();
 		      if (trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
-			lastPedTrigger_=false;
+			{
+			  Log("[RunControlFSM]::[DEBUG]::Resetting PedTrigger Bool",3);
+			  lastPedTrigger_=false;
+			}
 		      MoveToStatus(WAITTRIG);
 		    }
 		    break;
@@ -1002,7 +1005,7 @@ while (true) {
 			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
 			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_OFF );
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
-			      lastPedTrigger_=true;
+			      lastPedTrigger_=false;
 			    }
 			  else if ((trgRead_%pedestalTriggerDuringBeam_)==1)
 			    {
