@@ -1000,7 +1000,7 @@ while (true) {
 		      if ( trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
 			{
 			  ostringstream s;
-			  s << "[RunControlFSM]::[DEBUG]::Checking pedestalTriggerDuringBeam; lastPedTrigger " << lastPedTrigger;
+			  s << "[RunControlFSM]::[DEBUG]::Checking pedestalTriggerDuringBeam; lastPedTrigger " << lastPedTrigger_;
 			  Log(s.str(),3);
 			  if (lastPedTrigger_==true)
 			    {
