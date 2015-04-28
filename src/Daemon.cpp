@@ -164,8 +164,9 @@ Command Daemon::ParseData(dataType &mex)
 	else if (N >=6  and !strcmp( (char*) mex.data(), "ERROR")  )
 		{
 		//It doesn't matter wherever you are, if this happens FSM are de-sync, so move immediately to status error
-		myCmd.cmd=ERRORCMD;
-		MoveToStatus(ERROR);
+		  Log("[Daemon]::[ParseCommand]::[INFO]::Received ERROR COMMAND!",1);
+		  myCmd.cmd=ERRORCMD;
+		  MoveToStatus(ERROR);
 		}
 	// GUI CMD are not NULL Terminated
 	else 	{ // GUI --- I'M changing the mex
