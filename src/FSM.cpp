@@ -4,7 +4,7 @@
 
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
-//#define BUSY_DEBUG
+#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
 //#define PEDINBEAM_DEBUG
@@ -705,7 +705,9 @@ while (true) {
 	  while (idebug<3000)
 	    {
 	      hwManager_->ClearBusy();
+	      usleep(10);
 	      hwManager_->TriggerAck();
+	      usleep(30);
 	      hwManager_->SetBusyOn();
 	      hwManager_->BufferClearAll();
 	      usleep(1000);
