@@ -5,7 +5,8 @@ enum TRG_t {
   UNK_TRIG=0,
   BEAM_TRIG=1,
   PED_TRIG=2,
-  LED_TRIG=3
+  LED_TRIG=3,
+  LAST_TRIG
 };
 
 enum TRG_STATUS_t {

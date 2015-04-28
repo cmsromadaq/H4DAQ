@@ -1047,8 +1047,8 @@ while (true) {
 			    eeMex.append((void*)"EE\0",3);
 			    dataType guieeMex;
 			    guieeMex.append((void*)"GUI_SPS ee",10);
-			    
-			    hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+			    for (int itrig=int(BEAM_TRIG);itrig<int(LAST_TRIG);++itrig)
+			      hwManager_->SetTriggerStatus(TRG_t(itrig),TRIG_OFF );
 			    //				  usleep(10000);
 			    connectionManager_->Send(eeMex,CmdSck);
 			    connectionManager_->Send(guieeMex,StatusSck);
@@ -1072,7 +1072,8 @@ while (true) {
 				  eeMex.append((void*)"EE\0",3);
 				  dataType guieeMex;
 				  guieeMex.append((void*)"GUI_SPS ee",10);
-				  hwManager_->SetTriggerStatus(trgType_,TRIG_OFF );
+				  for (int itrig=int(BEAM_TRIG);itrig<int(LAST_TRIG);++itrig)
+				    hwManager_->SetTriggerStatus(TRG_t(itrig),TRIG_OFF );
 				  //usleep(10000);
 				  connectionManager_->Send(eeMex,CmdSck);
 				  // hwManager_->ClearSignalStatus();
