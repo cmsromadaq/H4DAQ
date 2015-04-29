@@ -81,7 +81,7 @@ public:
 	inline int 	GetRecvEvent() { return recvEvent_;};
 	inline void*	GetStream(){ return mySpill_.data();};
 	inline int  	GetSize(){return mySpill_.size();};
-	inline bool 	AreSpillsMerged(){ return mySpill_.size() == 0 ; };
+	inline bool 	AreSpillsMerged(){ return merged_ == 0 ; };
 	inline WORD 	GetLastNeventMerged(){ return lastNeventMerged_;};
 	inline string 	GetDirName()const {return dirName_;}
 	inline EventId  GetEventId() const { return lastEvent_;}

@@ -489,46 +489,51 @@ Command EventBuilder::CloseSpill()
 #endif
 	Command myCmd; myCmd.cmd=NOP;
 	isSpillOpen_=false;	
-	dataType  spillT;  SpillTrailer(spillT);
-	mySpill_.append(spillT);
-	// ack the position and the n.of.events
-	WORD *nEvents=((WORD*)mySpill_.data()) + SpillNeventPos();
-	WORD *spillSize=((WORD*)mySpill_.data()) + SpillSizePos();
-	(*spillSize)= (WORD)mySpill_.size();
-	(*nEvents)  = (WORD)lastEvent_.eventInSpill_-1; // 
+	if (!recvEvent_)
+	  {
+	    //Only if not merged spills
+	    dataType  spillT;  SpillTrailer(spillT);
+	    mySpill_.append(spillT);
+	    // ack the position and the n.of.events
+	    WORD *nEvents=((WORD*)mySpill_.data()) + SpillNeventPos();
+	    WORD *spillSize=((WORD*)mySpill_.data()) + SpillSizePos();
+	    (*spillSize)= (WORD)mySpill_.size();
+	    (*nEvents)  = (WORD)lastEvent_.eventInSpill_-1; // 
 
-
-	if( dumpEvent_ && !recvEvent_) 
-	{
+	    if( dumpEvent_ )
+	      {
 		Log("[EventBuilder]::[CloseSpill] File Closed",1) ;
 		Dump(mySpill_);
 		dump_->Close();
-	}
+	      }
+	  }
+	
 	if (recvEvent_) { 
-		Log("[EventBuilder]::[CloseSpill] File In Recv Mode",1) ;
-		// For recv event, Close Spill should do nothing.
-		// MergeSpills will dump in case
-		//
-
-		//WORD spillNum=ReadSpillNum(mySpill_);
-		// --- if ( spills_.find(spillNum) == spills_.end() ) 
-		// --- 	{
-		// --- 	spills_[spillNum] = pair<int,dataType>(1, mySpill_ ); // spills_[] take ownership of the structuer -- copy constructor + release
-		// --- 	mySpill_.release();
-		// --- 	}
-		// --- else MergeSpills(spills_[spillNum].second,mySpill_);
+	  Log("[EventBuilder]::[CloseSpill] File In Recv Mode",1) ;
+	  // For recv event, Close Spill should do nothing.
+	  // MergeSpills will dump in case
+	  //
+	  
+	  //WORD spillNum=ReadSpillNum(mySpill_);
+	  // --- if ( spills_.find(spillNum) == spills_.end() ) 
+	  // --- 	{
+	  // --- 	spills_[spillNum] = pair<int,dataType>(1, mySpill_ ); // spills_[] take ownership of the structuer -- copy constructor + release
+	  // --- 	mySpill_.release();
+	  // --- 	}
+	  // --- else MergeSpills(spills_[spillNum].second,mySpill_);
 	} 
+
 	if (sendEvent_) {//TODO -- also do the merging if recv
-		// --- Instruct Daemon to send them through the connection manager
-		Log("[EventBuilder]::[CloseSpill] File In Send Mode",1) ;
-		myCmd.cmd=SEND;
-		dataType myMex;
-		myMex.append((void*)"DATA\0",5);
-		myMex.append(mySpill_);
-		myCmd.data=myMex.data();
-		myCmd.N=myMex.size();
-		myMex.release();
-		} 
+	  // --- Instruct Daemon to send them through the connection manager
+	  Log("[EventBuilder]::[CloseSpill] File In Send Mode",1) ;
+	  myCmd.cmd=SEND;
+	  dataType myMex;
+	  myMex.append((void*)"DATA\0",5);
+	  myMex.append(mySpill_);
+	  myCmd.data=myMex.data();
+	  myCmd.N=myMex.size();
+	  myMex.release();
+	} 
 	mySpill_.clear();
 #ifdef EB_DEBUG_VERBOSE
 	Log("[EventBuilder]::[DEBUG] Close Spill - Done",3);
@@ -829,7 +834,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Going To Clear",3);
 		usleep(1000);
 #endif
-		mySpill_.clear();
+		// mySpill_.clear(); //wait for the spill close
 		merged_=0;
 		// Spill is completed and written to file	
 		string myCmd= postBuiltCmd_;

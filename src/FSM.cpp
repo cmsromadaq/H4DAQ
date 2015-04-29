@@ -571,6 +571,15 @@ while (true) {
 			    }
 		    }
 		    if ( eventBuilder_->AreSpillsMerged() && eventStarted) { // enter here only if you merged something
+		      
+			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
+			if (myCmd.cmd == SEND)
+			{
+				dataType myMex;
+				myMex.append(myCmd.data,myCmd.N);
+				connectionManager_->Send(myMex,DataSck);
+			}
+
 			// SENT STATUS BUFFER COMPLETED
 			 dataType myMex;
 			 myMex.append((void*)"STATUS SPILLCOMPL\0\0\0",18);
