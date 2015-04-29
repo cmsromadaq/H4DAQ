@@ -640,6 +640,7 @@ while (true) {
 } // end while
 } // end Loop
 
+
 void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_t transrate_size){
   dataType myMex;
   myMex.append((void*)"TRANSFER ",9);
@@ -680,6 +681,130 @@ void EventBuilderFSM::ReportTransferPerformance(long transferTime, dataTypeSize_
   myMex.append((void*)mybuffer,n);
   connectionManager_->Send(myMex,StatusSck);
 }
+
+
+// ------------------- Data Receiver
+DataReceiverFSM::DataReceiverFSM(): Daemon() {
+
+}
+bool DataReceiverFSM::IsOk(){
+	if( eventBuilder_->GetRecvEvent() <= 0) {
+		Log("[DataReceiverFSM]::[IsOk] Machine is not configured to receive events",1);
+		return false;
+		}
+	return true;
+}
+
+void DataReceiverFSM::Loop()
+{
+  if ( !IsOk() ) throw config_exception();
+
+  while (true) {
+    try{
+      PublishStatusWithTimeInterval();
+      // check source that can populate the commands -- Connection and HW
+      // check Connection Manager
+      // if cmds not empty do something
+      switch (myStatus_ ) {
+      case START: {// not in the LOOP
+	MoveToStatus(INIT);
+	break;
+      } 
+      case INIT:  {   // not in the LOOP
+	MoveToStatus(INITIALIZED);
+	break;
+      } 
+      case INITIALIZED:
+	{
+	  MoveToStatus(RECVBUFFER);
+	  break;
+	}
+      case RECVBUFFER:
+	{ // wait for ALL the BUFFERS
+	  usleep(500);
+	  dataType myMex;
+	  if (connectionManager_->Recv(myMex) ==0 )    
+	    {                                                                     
+	      Command myNewCmd = ParseData( myMex); 
+	      if ( myNewCmd.cmd == DATA ) {
+		gettimeofday(&transrate_stopwatch_start,NULL);
+			    
+		ostringstream s;
+		s << "[DataReceiverFSM]::[INFO]::received " << myNewCmd.N << " bytes";
+		Log(s.str(),1);
+		// pass the structure to a dataType
+		dataType myData(myNewCmd.N,myNewCmd.data);
+		// release the destruction from Command
+		myNewCmd.release();
+		//Merge Spills
+		eventStarted= true;
+		// 
+		//DEBUG
+		//   string buf=Utility::AsciiDataReadable( myData.data(), myData.size());
+		//   if (buf.size() >100)
+		//       buf.erase(101,string::npos);
+		//   Log(buf,3);
+		transrate_size+=myData.size();
+		eventBuilder_->MergeSpills(myData);
+			    
+	      }
+	      else if (myNewCmd.cmd == DIE){
+		MoveToStatus(BYE);
+	      }
+	    }
+	  if ( eventBuilder_->AreSpillsMerged() && eventStarted) 
+	    MoveToStatus(SENTBUFFER);
+	  break;
+	}
+      case SENTBUFFER:
+	{ 
+	  Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
+	  if (myCmd.cmd == SEND)
+	    {
+	      dataType myMex;
+	      myMex.append(myCmd.data,myCmd.N);
+	      connectionManager_->Send(myMex,DataSck);
+	    }
+	  
+	  // SENT STATUS BUFFER COMPLETED
+	  dataType myMex;
+	  myMex.append((void*)"STATUS DATARECV\0\0\0",18);
+	  connectionManager_->Send(myMex,StatusSck);
+	  myMex.clear();
+	  
+	  // Transfer
+	  gettimeofday(&transrate_stopwatch_stop,NULL);
+	  ostringstream rate;
+	  long transferTime=Utility::timevaldiff(&transrate_stopwatch_start,&transrate_stopwatch_stop);
+	  rate<<"[DataReceiverFSM]::[RECVBUFFER]::[TransferTime]="<<
+	    transferTime<<"usec "<<
+	    "Size="<<transrate_size<<"bytes "<<
+	    "Rate="<< (transrate_size>>20)/(double(transferTime)/1.e6) <<"MB/s" ;
+	  // received EE NOT Open Close Spill
+	  eventStarted=false;
+	  transrate_size=0;
+	  MoveToStatus(RECVBUFFER);
+	  break;
+	}
+      case ERROR: 
+	{
+	  ErrorStatus();
+	  break;
+	}
+      case BYE:
+	{
+	  exit(0); // return is not working correctly
+	  return;
+	}
+	  
+      } // end switch
+    } //end try
+    catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
+    catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
+
+  } // end while
+} // end Loop
+
 
 // ----------------------- RUN CONTROL FSM -----------
 RunControlFSM::RunControlFSM(): Daemon() {

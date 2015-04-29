@@ -29,6 +29,21 @@ public:
         void ReportTransferPerformance(long transferTime, dataTypeSize_t transrate_size);
 };
 
+class DataReceiverFSM : public Daemon{
+bool eventStarted;
+timeval transrate_stopwatch_start;
+timeval transrate_stopwatch_stop;
+dataTypeSize_t transrate_size;
+public:
+	// constructor
+	DataReceiverFSM();
+	void Loop();
+	inline void Clear(){Daemon::Clear();}
+	inline int Init(string configFileName="data/config.xml"){return Daemon::Init(configFileName);};
+	bool IsOk();
+        void ReportTransferPerformance(long transferTime, dataTypeSize_t transrate_size);
+};
+
 class DummyRunControlFSM : public Daemon{
 
 public:
