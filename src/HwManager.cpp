@@ -7,6 +7,7 @@
 #include "interface/CAEN_V1290.hpp"
 #include "interface/CAEN_V814.hpp"
 #include "interface/CAEN_V792.hpp"
+#include "interface/CAEN_V785.hpp"
 #include "interface/CAEN_V560.hpp"
 #include "interface/CAEN_V513.hpp"
 #include "interface/LECROY_1182.hpp"
@@ -130,6 +131,11 @@ void HwManager::Config(Configurator &c){
 			{
 			  //constructing a MAROC ROC
 			  hw_.push_back( new CAEN_V265() );
+			}
+		else if( getElementContent(c,"type",board_node) == "CAEN_V785")
+			{
+			  //constructing a CAEN V785
+			  hw_.push_back( new CAEN_V785() );
 			}
 		else
 		  {
@@ -582,5 +588,6 @@ BoardTypes_t HwManager::GetBoardTypeId(string type){
 	else if( type=="LECROY_1182" || type == "LECROY1182" ) return _LECROY1182_;
 	else if( type=="MAROC_ROC") return _MAROCROC_;
 	else if( type=="CAEN_V265") return _CAENV265_;
+	else if( type=="CAEN_V785") return _CAENV785_;
 	else return _UNKWN_;
 }
