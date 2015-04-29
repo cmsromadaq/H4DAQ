@@ -21,7 +21,7 @@ rc=""
 eb=""
 nice=0
 
-TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,rc:,vmecontroller:,gitbranch:,norecompile,dryrun -n 'startall.sh' -- "$@"`
+TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,rc:,vmecontroller:,gitbranch:,norecompile,ebrecompile,drcvrecompile,dryrun -n 'startall.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
