@@ -140,7 +140,7 @@ done
 
 for machine in $drcv ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
+	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydrcv" ; continue; }
 #	[ "${start_drcv}" == "0" ] && continue;
 	## compile

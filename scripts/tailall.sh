@@ -64,7 +64,7 @@ for machine in cms-h4-04 ; do
 	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_start_drcv_${machine}_*.log | tail -1 ) " & echo "$!" >/tmp/myfifo_pids & } | while read line ; do echo  "($machine|drcv_std): ${line}" ; done >  /tmp/myfifo  &
 	pids="$pids $!"
 	pids="$pids $( cat /tmp/myfifo_pids)"
-	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_eventbuilder_*.log | tail -1 ) " & echo "$!">/tmp/myfifo_pids & } | while read line ; do echo  "($machine|drcv_log): ${line}" ; done >  /tmp/myfifo  &
+	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_datareceiver_*.log | tail -1 ) " & echo "$!">/tmp/myfifo_pids & } | while read line ; do echo  "($machine|drcv_log): ${line}" ; done >  /tmp/myfifo  &
 	pids="$pids $!"
 	pids="$pids $( cat /tmp/myfifo_pids)"
 done
