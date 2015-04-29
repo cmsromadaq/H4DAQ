@@ -30,14 +30,14 @@ mkfifo /tmp/myfifo_pids
 
 
 # DATA RO 
-for machine in pcethtb1 cms-h4-03 ; do 
-	{  ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr  /tmp/log_h4daq_start_dr_${machine}_*.log | tail -1 ) " &   echo "$!" >/tmp/myfifo_pids&  }  |  while read line ; do echo  "($machine|dr_std): ${line}" ; done >  /tmp/myfifo & 
-	pids="$pids $!"
-	pids="$pids $( cat /tmp/myfifo_pids)"
-	#echo "PIDS ARE 2: $pids"
-	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr  /tmp/log_h4daq_datareadout_*.log | tail -1 ) " | while read line ; do echo  "($machine|dr_log): ${line}" ; done >  /tmp/myfifo ; } &
-	pids="$pids $!"
-done
+#for machine in pcethtb1 cms-h4-03 ; do 
+#	{  ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr  /tmp/log_h4daq_start_dr_${machine}_*.log | tail -1 ) " &   echo "$!" >/tmp/myfifo_pids&  }  |  while read line ; do echo  "($machine|dr_std): ${line}" ; done >  /tmp/myfifo & 
+#	pids="$pids $!"
+#	pids="$pids $( cat /tmp/myfifo_pids)"
+#	#echo "PIDS ARE 2: $pids"
+#	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr  /tmp/log_h4daq_datareadout_*.log | tail -1 ) " | while read line ; do echo  "($machine|dr_log): ${line}" ; done >  /tmp/myfifo ; } &
+#	pids="$pids $!"
+#done
 
 ## RC
 for machine in pcethtb2 ; do 
@@ -55,6 +55,16 @@ for machine in pcethtb2 ; do
 	pids="$pids $!"
 	pids="$pids $( cat /tmp/myfifo_pids)"
 	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_eventbuilder_*.log | tail -1 ) " & echo "$!">/tmp/myfifo_pids & } | while read line ; do echo  "($machine|eb_log): ${line}" ; done >  /tmp/myfifo  &
+	pids="$pids $!"
+	pids="$pids $( cat /tmp/myfifo_pids)"
+done
+
+## DRCV
+for machine in cms-h4-04 ; do 
+	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_start_drcv_${machine}_*.log | tail -1 ) " & echo "$!" >/tmp/myfifo_pids & } | while read line ; do echo  "($machine|drcv_std): ${line}" ; done >  /tmp/myfifo  &
+	pids="$pids $!"
+	pids="$pids $( cat /tmp/myfifo_pids)"
+	{ ${SSH} ${machine}.cern.ch " tail -f \$(ls -tr /tmp/log_h4daq_eventbuilder_*.log | tail -1 ) " & echo "$!">/tmp/myfifo_pids & } | while read line ; do echo  "($machine|drcv_log): ${line}" ; done >  /tmp/myfifo  &
 	pids="$pids $!"
 	pids="$pids $( cat /tmp/myfifo_pids)"
 done
