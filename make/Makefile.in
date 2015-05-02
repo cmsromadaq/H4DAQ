@@ -1,7 +1,13 @@
 INC_DIR = ./
 CXX		=g++
 LD		=g++
-CXXFLAGS	=-O2 -ggdb -std=gnu++0x -Wall -m64
+ARCH            =$(shell getconf LONG_BIT)
+CXXFLAGS_COMMON	=-O2 -ggdb -std=gnu++0x
+CXXFLAGS_64	=-m$(ARCH)
+CXXFLAGS        = $(CXXFLAGS_COMMON) 
+ifeq ($(ARCH),64)
+	CXXFLAGS        = $(CXXFLAGS_COMMON)  $(CXXFLAGS_64)
+endif	
 LDFLAGS		=-lm -lpthread -lz
 SOFLAGS		=-fPIC -shared 
 SHELL		=bash
