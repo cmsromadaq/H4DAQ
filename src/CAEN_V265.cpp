@@ -7,7 +7,6 @@
 
 int CAEN_V265::Init()
 {
-  return 0;
   int status=0;
   ostringstream s; s << "[CAEN_V265]::[INFO]::++++++ CAEN V265 INIT ++++++";
   Log(s.str(),1);
@@ -46,7 +45,6 @@ int CAEN_V265::Init()
 
 int CAEN_V265::Clear()
 {
-  return 0;
   //Send a software reset. Module has to be re-initialized after this
   int status=0;
   if (handle_<0)
@@ -63,16 +61,15 @@ int CAEN_V265::Clear()
   usleep(500);
 
   status=Init();
-
+#ifdef CAENV265_DEBUG
   ostringstream s; s << "[CAEN_V265]::[INFO]::V265 Board software reset" << status; 
-  Log(s.str(),1);
-
+  Log(s.str(),3);
+#endif
   return status;
 }      
 
 int CAEN_V265::BufferClear()
 {
-  return 0;
   //Send a data reset. Clear event buffer and counters 
   int status=0;
   if (handle_<0)
@@ -86,17 +83,16 @@ int CAEN_V265::BufferClear()
       Log(s.str(),1);
       return ERR_RESET;
     }
-  usleep(50);
 
+#ifdef CAENV265_DEBUG
   ostringstream s; s << "[CAEN_V265]::[INFO]::V265 Buffers has been cleared"; 
-  Log(s.str(),1);
-
+  Log(s.str(),3);
+#endif
   return 0;
 }      
 
 int CAEN_V265::ClearBusy()
 {
-  return 0;
   return BufferClear();
 }      
 
@@ -112,7 +108,7 @@ int CAEN_V265::Config(BoardConfig *bC)
 int CAEN_V265::Read(vector<WORD> &v)
 {
   v.clear();
-  return 0;
+
   if (handle_<0)
     return ERR_CONF_NOT_FOUND;
 
@@ -152,13 +148,15 @@ int CAEN_V265::Read(vector<WORD> &v)
     {
       //Read words one by one
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V265_OUTPUT_BUFFER,&data,CAEN_V265_ADDRESSMODE,CAEN_V265_DATAWIDTH);
-      if ((data&CAEN_V265_RANGE_BITMASK))
-	continue;
+      if ( ((data&CAEN_V265_RANGE_BITMASK) >> 12 ) == 0 )
+	dataV[iChannel]=(data&0xFFFF);
       else
-	dataV[iChannel]=(data&0XFFFF);
-
+	{
+	  continue;
+	}
+      
 #ifdef CAENV265_DEBUG
-      ostringstream s; s << "[CAEN_V265_ROC]::[DEBUG]::DATA @ POS " << iChannel << std::hex << dataV[iChannel] << std::dec << "," <<  (dataV[iChannel]&CAEN_V265_ADCDATUM_BITMASK);
+      ostringstream s; s << "[CAEN_V265_ROC]::[DEBUG]::DATA @ POS " << iChannel << ": " << std::hex << dataV[iChannel] << std::dec << "," <<  ((dataV[iChannel]&CAEN_V265_CHANNEL_BITMASK) >> 13 ) << "," <<  (dataV[iChannel]&CAEN_V265_ADCDATUM_BITMASK);
       Log(s.str(),3);
 #endif
       v.push_back(dataV[iChannel]);
