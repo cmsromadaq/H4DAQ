@@ -9,7 +9,7 @@
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
     <ConnectTo>192.168.1.254:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>192.168.1.254:5566</ConnectTo>  <!-- GUI -->
-    <ConnectTo>192.168.1.254:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
+    <ConnectTo>localhost:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
   <Hardware>
 
