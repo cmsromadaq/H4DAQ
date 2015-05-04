@@ -7,7 +7,7 @@
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-5    <ConnectTo>localhost:6504</ConnectTo>  <!-- EB  -->
+    <ConnectTo>localhost:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>localhost:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>localhost:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
@@ -107,16 +107,6 @@
       <zsThreshold>0x0</zsThreshold> <!-- ZS THR value -->
     </board>
 
-    <board>
-      <type>MAROC_ROC</type> <!-- MAROC FEB -->
-      <ID>1</ID>
-      <baseAddress>0x00CC0000</baseAddress>
-      <configFile>/home/cmsdaq/DAQ/H4DAQ/data/maroc3_gain1_ss.dat</configFile> 
-      <triggerType>3</triggerType> <!-- 3 is for LEMO input, 0 for positive TTL -->
-      <debugMode>0</debugMode> <!-- 0 is standard RUN MODE -->
-      <holdValue>58</holdValue> <!-- Delay to be set ~150ns after physics signal (1 thick=3.3ns)-->
-      <holdDeltaValue>20</holdDeltaValue> <!-- Not used -->
-    </board>
 
     <board>
       <type>CAEN_V814</type> <!-- CAEN V814 PU -->
@@ -126,6 +116,31 @@
       <majorityThreshold>0x6</majorityThreshold>
       <outputWidth>0xFF</outputWidth>
       <commonThreshold>0x4</commonThreshold>
+    </board>
+
+
+    <board>
+      <type>CAEN_V265</type> <!-- CAEN 265 -->
+      <ID>1</ID>
+      <baseAddress>0x00666600</baseAddress>
+    </board>
+
+    <board>
+      <type>CAEN_V560</type> <!-- SCALER -->
+      <ID>1</ID>
+      <baseAddress>0x99999900</baseAddress>
+      <enabledChannels>0x00FF</enabledChannels>
+    </board>
+
+    <board>
+      <type>MAROC_ROC</type> <!-- MAROC FEB -->
+      <ID>1</ID>
+      <baseAddress>0x00CC0000</baseAddress>
+      <configFile>/home/cmsdaq/DAQ/H4DAQ/data/maroc3_gain1_ss.dat</configFile> 
+      <triggerType>3</triggerType> <!-- 3 is for LEMO input, 0 for positive TTL -->
+      <debugMode>0</debugMode> <!-- 0 is standard RUN MODE -->
+      <holdValue>58</holdValue> <!-- Delay to be set ~150ns after physics signal (1 thick=3.3ns)-->
+      <holdDeltaValue>20</holdDeltaValue> <!-- Not used -->
     </board>
 
     <board>
