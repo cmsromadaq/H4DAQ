@@ -1,18 +1,17 @@
 #!/bin/bash
 
 
-# RC/EB
-for machine in localhost pcethtb2; do 
+# DRO/RC/EB
+for machine in pcethtb1 pcethtb2; do 
 	echo "Terminating runcontrol on $machine"
 	ssh ${machine} "killall runcontrol"
 	echo "Terminating eventbuilder on $machine"
 	ssh ${machine} "killall eventbuilder"
 done
 
-for machine in localhost; do 
-	echo "Killing runcontrol on $machine"
-	ssh ${machine} "killall -9 runcontrol"
-	echo "Killing eventbuilder on $machine"
-	ssh ${machine} "killall -9 eventbuilder"
+#DRCV
+for machine in cms-h4-03 cms-h4-04 cms-h4-05; do 
+	echo "Killing datareceiver on $machine"
+	ssh ${machine} "killall -9 datareceiver"
 done
 
