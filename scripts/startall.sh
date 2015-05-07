@@ -163,10 +163,10 @@ done
 for machine in $drcv ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
 	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommandDQM" ; echo "$mydrcv" ; continue; }
+	[ "${dryrun}" == "0" ] || {  echo "$mycommandPlusDQM" ; echo "$mydrcv" ; continue; }
 #	[ "${start_drcv}" == "0" ] && continue;
 	## compile
-	[ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommandDQM}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommandDQM}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
+	[ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommandPlusDQM}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} "/bin/bash -c '${mycommandPlusDQM}' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log " ; fi
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATARECEIVER on $machine"
