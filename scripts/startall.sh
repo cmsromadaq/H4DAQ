@@ -80,6 +80,28 @@ mycommand="cd ${daqhome};  \
 		env python configure.py --noroot ; \
 		make -j 4;  \
 		./bin/resetCrate -t ${vmecontroller} -d 0 -l 0 ;  "
+
+mycommandPlusDQM="cd ${daqhome};  \
+                mkdir -p DAQ ;  \
+                cd DAQ ; \
+                [ -d H4DAQ ] || git clone -b ${mybranch} git@github.com:cmsromadaq/H4DAQ.git ; \
+                cd H4DAQ ;  \
+                rm -rf Makefile;                                                                                                                                                                                                                            git pull ; \
+                git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
+                git diff origin/${mybranch} | sed \"s/^.*$/@@@ & @@@/\" ;  \
+                env python configure.py --noroot ; \
+                make -j 4;  \
+                ./bin/resetCrate -t ${vmecontroller} -d 0 -l 0; \
+                cd ${daqhome};  \
+                cd DAQ ; \
+                [ -d H4DQM ] || git clone -b ${mybranch} git@github.com:cmsromadaq/H4DQM.git ; \
+                cd H4DQM ;  \
+                git pull ; \
+                git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
+                git diff origin/${mybranch} | sed \"s/^.*$/@@@ & @@@/\" ;  \  
+                make -j 4;  "
+
+
 IFS=','
 
 function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;41m\1\x1b[00m:g' ; done }
@@ -141,10 +163,10 @@ done
 for machine in $drcv ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
 	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydrcv" ; continue; }
+	[ "${dryrun}" == "0" ] || {  echo "$mycommandDQM" ; echo "$mydrcv" ; continue; }
 #	[ "${start_drcv}" == "0" ] && continue;
 	## compile
-	[ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
+	[ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommandDQM}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommandDQM}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
 	## launch the daemon
 	echo "-----------------------------"
 	echo "START DATARECEIVER on $machine"
