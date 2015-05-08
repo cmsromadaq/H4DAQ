@@ -52,7 +52,7 @@ int Daemon::Init(string configFileName){
 		istringstream ss(content);
 		string token;
 		while(std::getline(ss, token, ',')) 
-		  testEnableSequence_.push_back(Configurator::GetInt(token));
+		  testEnableSequence_.push_back(TRG_t(Configurator::GetInt(token)));
 		
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
