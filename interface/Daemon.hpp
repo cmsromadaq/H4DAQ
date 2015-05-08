@@ -44,9 +44,8 @@ int iLoop;
 int waitForDR_;
 int noEB_;
 int spillSignalsDisabled_;
-int pedestalTriggerDuringBeam_;
-int ledTriggerDuringBeam_;
-
+int testEnableDuringBeam_;
+vector<TRG_t> testEnableSequence_;
 bool error_;
 
 public:

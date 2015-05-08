@@ -7,8 +7,7 @@
 //#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
-//#define PEDINBEAM_DEBUG
-#define LEDINBEAM_DEBUG
+#define TESTENABLE_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -1126,21 +1125,13 @@ while (true) {
 		      gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      ResetMex();
-		      if (trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
+		      if (trgType_ == BEAM_TRIG && testEnableDuringBeam_>0 && testEnableSequence_.size()>0)
 			{
-#ifdef PEDINBEAM_DEBUG
-			  Log("[RunControlFSM]::[DEBUG]::Resetting PedTrigger Bool",3);
+#ifdef TESTENABLE_DEBUG
+			  Log("[RunControlFSM]::[DEBUG]::Resetting Test Enable Sequence",3);
 #endif
-			  lastPedTrigger_=false;
+			  testEnableSeqPos_=0;
 			}
-		      if (trgType_ == BEAM_TRIG && ledTriggerDuringBeam_>0)
-			{
-#ifdef LEDINBEAM_DEBUG
-			  Log("[RunControlFSM]::[DEBUG]::Resetting PedTrigger Bool",3);
-#endif
-			  lastLedTrigger_=false;
-			}
-
 
 
 		      MoveToStatus(WAITTRIG);
@@ -1150,58 +1141,39 @@ while (true) {
 	case CLEARBUSY: 
 	            {
 		      //handling of pedestals during beam
-		      if ( trgType_ == BEAM_TRIG && pedestalTriggerDuringBeam_>0)
+		      if ( trgType_ == BEAM_TRIG && testEnableDuringBeam_>0 && testEnableSequence_.size()>0)
 			{
-#ifdef PEDINBEAM_DEBUG
+#ifdef TESTENABLE_DEBUG
 			  ostringstream s;
-			  s << "[RunControlFSM]::[DEBUG]::Checking pedestalTriggerDuringBeam; lastPedTrigger " << lastPedTrigger_;
+			  s << "[RunControlFSM]::[DEBUG]::Checking Test Enable Sequence " << testEnableSeqPos_;
 			  Log(s.str(),3);
 #endif
-			  if (lastPedTrigger_==true)
+			  if (testEnableSeqPos_==testEnableSequence_.size())
 			    {
-#ifdef PEDINBEAM_DEBUG
+#ifdef TESTENABLE_DEBUG
 			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
 #endif
-			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_OFF );
-			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
-			      lastPedTrigger_=false;
+			      hwManager_->SetTriggerStatus( testEnableSequence_[testEnableSeqPos_-1], TRIG_OFF );
+			      hwManager_->SetTriggerStatus( BEAM_TRIG , TRIG_ON );
+			      testEnableSeqPos_=0;
 			    }
-			  else if (lastPedTrigger_==false && (trgRead_%pedestalTriggerDuringBeam_)==1)
+			  else if (testEnableSeqPos_==0 && (trgRead_%testEnableDuringBeam_)==1)
 			    {
-#ifdef PEDINBEAM_DEBUG
-			      Log("[RunControlFSM]::[DEBUG]::Enabling PED_TRIG",3);
+#ifdef TESTENABLE_DEBUG
+			      Log("[RunControlFSM]::[DEBUG]::Enabling Test Enable Sequence @ Pos 0",3);
 #endif
 			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
-			      hwManager_->SetTriggerStatus(PED_TRIG , TRIG_ON );
-			      lastPedTrigger_=true;
+			      hwManager_->SetTriggerStatus( testEnableSequence_[testEnableSeqPos_] , TRIG_ON );
+			      testEnableSeqPos_++;
 			    }
-			}
-
-		      //handling of led during beam
-		      if ( trgType_ == BEAM_TRIG && ledTriggerDuringBeam_>0 )
-			{
-#ifdef LEDINBEAM_DEBUG
-			  ostringstream s;
-			  s << "[RunControlFSM]::[DEBUG]::Checking ledTriggerDuringBeam; lastLedTrigger " << lastLedTrigger_;
-			  Log(s.str(),3);
-#endif
-			  if (lastLedTrigger_==true)
+			  else if (testEnableSeqPos_>0)
 			    {
-#ifdef LEDINBEAM_DEBUG
-			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
+#ifdef TESTENABLE_DEBUG
+			      Log("[RunControlFSM]::[DEBUG]::Moving on in Test Enable Sequence",3);
 #endif
-			      hwManager_->SetTriggerStatus(LED_TRIG , TRIG_OFF );
-			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
-			      lastLedTrigger_=false;
-			    }
-			  else if (lastLedTrigger_==false && (trgRead_%ledTriggerDuringBeam_)==1 && (trgRead_%pedestalTriggerDuringBeam_)!=1)//do we want to avoid both ped and led?
-			    {
-#ifdef LEDINBEAM_DEBUG
-			      Log("[RunControlFSM]::[DEBUG]::Enabling LED_TRIG",3);
-#endif
-			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
-			      hwManager_->SetTriggerStatus(LED_TRIG , TRIG_ON );
-			      lastLedTrigger_=true;
+			      hwManager_->SetTriggerStatus( testEnableSequence_[testEnableSeqPos_-1] , TRIG_OFF );
+			      hwManager_->SetTriggerStatus( testEnableSequence_[testEnableSeqPos_] , TRIG_ON );
+			      testEnableSeqPos_++;
 			    }
 			}
 

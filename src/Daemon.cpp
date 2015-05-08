@@ -20,8 +20,8 @@ Daemon::Daemon(){
 	waitForDR_=0;
 	noEB_=0;
 	spillSignalsDisabled_=0;
-	pedestalTriggerDuringBeam_=-1;
-	ledTriggerDuringBeam_=-1;
+	testEnableDuringBeam_=-1;
+	testEnableSequence_=vector<TRG_t>();
 	srand((unsigned)time(NULL));
 }
 
@@ -47,19 +47,22 @@ int Daemon::Init(string configFileName){
 		//these 2 are only used for RC
 		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
 		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
-		pedestalTriggerDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"pedestalTriggerDuringBeam",configurator_->root_element) ); // move to Config
-		ledTriggerDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"ledTriggerDuringBeam",configurator_->root_element) ); // move to Config
+		testEnableDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"testEnableDuringBeam",configurator_->root_element) ); // move to Config
+		testEnableSequence_.push_back(PED_TRIG);
+		testEnableSequence_.push_back(LED_TRIG);
+
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Spill Signals: "<< !spillSignalsDisabled_;
 		Log(s.str(),1);
-		s.str(""); s<<"[Daemon]::[Init] Pedestals During Beam: "<< pedestalTriggerDuringBeam_;
+		s.str(""); s<<"[Daemon]::[Init] Test Enable During Beam: "<< testEnableDuringBeam_;
 		Log(s.str(),1);
-		s.str(""); s<<"[Daemon]::[Init] Leds During Beam: "<< ledTriggerDuringBeam_;
+		s.str(""); s<<"[Daemon]::[Init] Test Enable sequence:";
+		for (unsigned int it=0; it<testEnableSequence_.size();++it)
+		  s<< " " << testEnableSequence_[it];
 		Log(s.str(),1);
-
 
 		//		printf("%s\n",s.str().c_str());
 		// Configure Everything else
