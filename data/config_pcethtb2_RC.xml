@@ -2,8 +2,7 @@
   <waitForDR>0</waitForDR> 
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
-  <pedestalTriggerDuringBeam>10</pedestalTriggerDuringBeam>
-  <ledTriggerDuringBeam>7</ledTriggerDuringBeam>
+  <testEnableDuringBeam>10</testEnableDuringBeam>
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
