@@ -45,6 +45,7 @@ int waitForDR_;
 int noEB_;
 int spillSignalsDisabled_;
 int pedestalTriggerDuringBeam_;
+int ledTriggerDuringBeam_;
 
 bool error_;
 

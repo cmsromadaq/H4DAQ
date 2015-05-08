@@ -60,6 +60,7 @@ protected:
 	TRG_t trgType_;
 	TRG_STATUS_t trgStatus_;
         bool lastPedTrigger_;
+        bool lastLedTrigger_;
 	long trgNevents_;
 	long trgRead_;
 	int readyDR_; // DR ready to take data
