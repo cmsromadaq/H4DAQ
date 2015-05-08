@@ -8,6 +8,7 @@
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
 //#define PEDINBEAM_DEBUG
+#define LEDINBEAM_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
@@ -1132,6 +1133,16 @@ while (true) {
 #endif
 			  lastPedTrigger_=false;
 			}
+		      if (trgType_ == BEAM_TRIG && ledTriggerDuringBeam_>0)
+			{
+#ifdef LEDINBEAM_DEBUG
+			  Log("[RunControlFSM]::[DEBUG]::Resetting PedTrigger Bool",3);
+#endif
+			  lastLedTrigger_=false;
+			}
+
+
+
 		      MoveToStatus(WAITTRIG);
 		    }
 		    break;
@@ -1165,6 +1176,35 @@ while (true) {
 			      lastPedTrigger_=true;
 			    }
 			}
+
+		      //handling of led during beam
+		      if ( trgType_ == BEAM_TRIG && ledTriggerDuringBeam_>0 )
+			{
+#ifdef LEDINBEAM_DEBUG
+			  ostringstream s;
+			  s << "[RunControlFSM]::[DEBUG]::Checking ledTriggerDuringBeam; lastLedTrigger " << lastLedTrigger_;
+			  Log(s.str(),3);
+#endif
+			  if (lastLedTrigger_==true)
+			    {
+#ifdef LEDINBEAM_DEBUG
+			      Log("[RunControlFSM]::[DEBUG]::Re-enabling BEAM_TRIG",3);
+#endif
+			      hwManager_->SetTriggerStatus(LED_TRIG , TRIG_OFF );
+			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_ON );
+			      lastLedTrigger_=false;
+			    }
+			  else if (lastLedTrigger_==false && (trgRead_%ledTriggerDuringBeam_)==1 && (trgRead_%pedestalTriggerDuringBeam_)!=1)//do we want to avoid both ped and led?
+			    {
+#ifdef LEDINBEAM_DEBUG
+			      Log("[RunControlFSM]::[DEBUG]::Enabling LED_TRIG",3);
+#endif
+			      hwManager_->SetTriggerStatus(BEAM_TRIG , TRIG_OFF );
+			      hwManager_->SetTriggerStatus(LED_TRIG , TRIG_ON );
+			      lastLedTrigger_=true;
+			    }
+			}
+
 		      //Clear Busy also sets the busy signal OFF
 		      hwManager_->ClearBusy();
 		      // hwManager_->SetBusyOff();

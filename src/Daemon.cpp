@@ -21,6 +21,7 @@ Daemon::Daemon(){
 	noEB_=0;
 	spillSignalsDisabled_=0;
 	pedestalTriggerDuringBeam_=-1;
+	ledTriggerDuringBeam_=-1;
 	srand((unsigned)time(NULL));
 }
 
@@ -47,6 +48,7 @@ int Daemon::Init(string configFileName){
 		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
 		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
 		pedestalTriggerDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"pedestalTriggerDuringBeam",configurator_->root_element) ); // move to Config
+		ledTriggerDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"ledTriggerDuringBeam",configurator_->root_element) ); // move to Config
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_;
@@ -55,6 +57,10 @@ int Daemon::Init(string configFileName){
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Pedestals During Beam: "<< pedestalTriggerDuringBeam_;
 		Log(s.str(),1);
+		s.str(""); s<<"[Daemon]::[Init] Leds During Beam: "<< ledTriggerDuringBeam_;
+		Log(s.str(),1);
+
+
 		//		printf("%s\n",s.str().c_str());
 		// Configure Everything else
 		eventBuilder_		->Config(*configurator_);
