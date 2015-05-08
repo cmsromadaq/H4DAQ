@@ -48,9 +48,12 @@ int Daemon::Init(string configFileName){
 		noEB_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"noEB",configurator_->root_element) ); // move to Config
 		spillSignalsDisabled_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"spillSignalsDisabled",configurator_->root_element) ); // move to Config
 		testEnableDuringBeam_=Configurator::GetInt(Configurable::getElementContent(*configurator_,"testEnableDuringBeam",configurator_->root_element) ); // move to Config
-		testEnableSequence_.push_back(PED_TRIG);
-		testEnableSequence_.push_back(LED_TRIG);
-
+		string content = Configurable::getElementContent (*configurator_, "testEnableSequence",configurator_->root_element) ;
+		istringstream ss(content);
+		string token;
+		while(std::getline(ss, token, ',')) 
+		  testEnableSequence_.push_back(Configurator::GetInt(token));
+		
 		ostringstream s; s<<"[Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_;
