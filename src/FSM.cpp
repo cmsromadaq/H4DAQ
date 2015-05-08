@@ -7,7 +7,7 @@
 //#define BUSY_DEBUG
 //#define PADE_READOUT
 //#define EMPTY_RC_TEST
-#define TESTENABLE_DEBUG
+//#define TESTENABLE_DEBUG
 
 // --- Constructor: C++11 inherits automatically. C++03 no
 DataReadoutFSM::DataReadoutFSM(): Daemon() {
