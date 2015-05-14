@@ -1285,8 +1285,8 @@ while (true) {
 			if (myCmd.cmd == SEND)
 			{
 			  ostringstream s;
-			  s << "[RCFSM]::[INFO]::send " << myCmd.N << " bytes";
-			    
+			  s << "[RunControlFSM]::[INFO]::send " << myCmd.N << " bytes";
+			  Log(s.str(),1);
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
 				connectionManager_->Send(myMex,DataSck);
