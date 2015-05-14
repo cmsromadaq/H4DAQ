@@ -513,7 +513,7 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
-		      usleep(500);
+		      //		      usleep(500);
 		     // check network  -- wait for EE
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
@@ -1242,7 +1242,7 @@ while (true) {
 			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->TriggerAck();
 			hwManager_->SetBusyOn();
-		        if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
+			if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  
 
@@ -1297,7 +1297,7 @@ while (true) {
 		    }
 	case RECVBUFFER:
 	  {
-	    usleep(500);
+	    //	    usleep(500);
 	    if ( noEB_ ) 
 	      {
 		eb_endspill=true;
