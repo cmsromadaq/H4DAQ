@@ -2,7 +2,7 @@
   <waitForDR>0</waitForDR> 
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
-  <testEnableDuringBeam>0</testEnableDuringBeam> 
+  <testEnableDuringBeam>10</testEnableDuringBeam> 
   <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
