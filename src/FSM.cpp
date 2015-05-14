@@ -1284,6 +1284,9 @@ while (true) {
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
+			  ostringstream s;
+			  s << "[RCFSM]::[INFO]::send " << myCmd.N << " bytes";
+			    
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
 				connectionManager_->Send(myMex,DataSck);
