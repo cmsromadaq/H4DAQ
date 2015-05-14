@@ -721,7 +721,7 @@ void DataReceiverFSM::Loop()
 	}
       case RECVBUFFER:
 	{ // wait for ALL the BUFFERS
-	  usleep(500);
+	  //	  usleep(500);
 	  dataType myMex;
 	  if (connectionManager_->Recv(myMex) ==0 )    
 	    {                                                                     
