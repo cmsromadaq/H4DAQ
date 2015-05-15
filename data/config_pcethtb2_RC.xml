@@ -131,7 +131,7 @@
        <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
        <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
        <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
-       <sigDelay>0x18</sigDelay> <!--DELAY 320ns (10 ns steps) -->
+       <sigDelay>0x1A</sigDelay> <!--DELAY 320ns (10 ns steps) -->
      </board>
      <board>
        <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
@@ -142,7 +142,7 @@
        <maskB>0xFFFFFFFF</maskB> <!--MASKB WORD -->
        <maskE>0xFFFFFFFF</maskE> <!--MASKE WORD -->
        <maskF>0xFFFFFFFF</maskF> <!--MASKF WORD -->
-       <sigDelay>0x18</sigDelay> <!--DELAY 320ns (10ns steps) -->
+       <sigDelay>0x1A</sigDelay> <!--DELAY 320ns (10ns steps) -->
      </board>
      
      <board>
