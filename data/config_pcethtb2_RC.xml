@@ -98,29 +98,6 @@
       <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
     </board>
 
-     <board>
-       <type>LECROY_1182</type> <!-- LECROY 1182-->
-       <ID>1</ID>
-       <baseAddress>0x00110000</baseAddress>
-     </board>
-
-     <board>
-       <type>LECROY_1182</type> <!-- LECROY 1182-->
-       <ID>2</ID>
-       <baseAddress>0x00120000</baseAddress>
-     </board>
-
-     <board>
-       <type>LECROY_1182</type> <!-- LECROY 1182-->
-       <ID>3</ID>
-       <baseAddress>0x00130000</baseAddress>
-     </board>
-
-     <board>
-       <type>LECROY_1182</type> <!-- LECROY 1182-->
-       <ID>4</ID>
-       <baseAddress>0x00140000</baseAddress>
-     </board>
 
      <board>
        <type>CAEN_V1495PU</type> <!-- CAEN V1495 PU -->
@@ -168,18 +145,6 @@
        <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns -->
      </board>
 
-      <board>
-	<type>CAEN_V785</type> <!-- ADC 785-->
-	<ID>1</ID>
-	<baseAddress>0x00EE0000</baseAddress>
-	<model>0</model> <!-- V785 model 32ch -->
-	<blkEnd>1</blkEnd> <!-- BLKEND -->
-	<zeroSuppression>0</zeroSuppression> <!-- ZS -->
-	<emptyEnable>1</emptyEnable> <!-- EMPTYEN -->
-	<overRange>1</overRange> <!-- OVERFLOW BIT -->
-	<iped>0x60</iped> <!-- IPED value -->
-	<zsThreshold>0x0</zsThreshold> <!-- ZS THR value -->
-      </board>
 
   </Hardware>
   <EventBuilder>
