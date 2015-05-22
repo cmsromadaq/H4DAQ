@@ -1114,7 +1114,7 @@ while (true) {
 		    dataType myMex;
 		    waitForReadyTimeOutCounter_++;
 		    //usleep(1000);
-		    if (waitForReadyTimeOutCounter_>1000)
+		    if (waitForReadyTimeOutCounter_>100000)
 		      {
 			Log("[RunControlFSM]::[ERROR]::Timeout in WAITFORREADY",1);
 			MoveToStatus(ERROR);
