@@ -62,6 +62,7 @@ protected:
         int testEnableSeqPos_;
 	long trgNevents_;
 	long trgRead_;
+        long waitForReadyTimeOutCounter_;
 	int readyDR_; // DR ready to take data
 		    bool gui_pauserun 	;
 		    bool gui_restartrun ;

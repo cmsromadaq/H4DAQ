@@ -808,6 +808,7 @@ void DataReceiverFSM::Loop()
 
 // ----------------------- RUN CONTROL FSM -----------
 RunControlFSM::RunControlFSM(): Daemon() {
+  waitForReadyTimeOutCounter_=0;
   gettimeofday(&spillduration_stopwatch_start_time,NULL);
   gettimeofday(&spillduration_stopwatch_stop_time,NULL);
 }
@@ -1111,7 +1112,14 @@ while (true) {
 	case WAITFORREADY:
 		    {
 		    dataType myMex;
+		    waitForReadyTimeOutCounter_++;
 		    //usleep(1000);
+		    if (waitForReadyTimeOutCounter_>1000)
+		      {
+			Log("[RunControlFSM]::[ERROR]::Timeout in WAITFORREADY",1);
+			MoveToStatus(ERROR);
+			waitForReadyTimeOutCounter_=0;
+		      }
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
