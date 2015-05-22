@@ -1037,7 +1037,7 @@ while (true) {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    eventBuilder_->OpenSpill();
 #ifdef PADE_READOUT
-			    sleep(5);
+			    sleep(10);
 #endif
 			    MoveToStatus(CLEARED);
 		    }
