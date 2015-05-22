@@ -1034,11 +1034,11 @@ while (true) {
 		    if (spillSignalsDisabled_ || trgType_==PED_TRIG || trgType_==LED_TRIG ) 
 		    {
 			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
-			    connectionManager_->Send(wweMex,CmdSck);
-			    eventBuilder_->OpenSpill();
 #ifdef PADE_READOUT
 			    sleep(10);
 #endif
+			    connectionManager_->Send(wweMex,CmdSck);
+			    eventBuilder_->OpenSpill();
 			    MoveToStatus(CLEARED);
 		    }
 		    else if (trgType_==BEAM_TRIG)
