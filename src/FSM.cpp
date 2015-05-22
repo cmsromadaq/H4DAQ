@@ -1036,7 +1036,7 @@ while (true) {
 		    {
 			    hwManager_->ClearSignalStatus(); //Acknowledge receive 
 #ifdef PADE_READOUT
-			    sleep(10);
+			    sleep(20);
 #endif
 			    connectionManager_->Send(wweMex,CmdSck);
 			    eventBuilder_->OpenSpill();
