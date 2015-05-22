@@ -5,7 +5,7 @@
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
 //#define BUSY_DEBUG
-//#define PADE_READOUT
+#define PADE_READOUT
 //#define EMPTY_RC_TEST
 //#define TESTENABLE_DEBUG
 
@@ -1037,7 +1037,7 @@ while (true) {
 			    connectionManager_->Send(wweMex,CmdSck);
 			    eventBuilder_->OpenSpill();
 #ifdef PADE_READOUT
-			    sleep(10);
+			    sleep(5);
 #endif
 			    MoveToStatus(CLEARED);
 		    }
