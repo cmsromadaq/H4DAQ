@@ -1,5 +1,5 @@
 <general>
-  <waitForDR>1</waitForDR>  <!-- Wait for PADE -->
+  <waitForDR>1</waitForDR>  
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
   <testEnableDuringBeam>0</testEnableDuringBeam> 
@@ -11,7 +11,7 @@
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
-    <ConnectTo>padepc.cern.ch:6000</ConnectTo> <!-- Pade PC DR_READY -->
+    <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo>  <!-- DR1 -->
   </Network>
   <Hardware>
 
