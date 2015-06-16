@@ -146,6 +146,29 @@
        <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns -->
      </board>
 
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>1</ID>
+       <baseAddress>0x00110000</baseAddress>
+     </board>
+     
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>2</ID>
+       <baseAddress>0x00120000</baseAddress>
+     </board>
+     
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>3</ID>
+       <baseAddress>0x00130000</baseAddress>
+     </board>
+     
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>4</ID>
+       <baseAddress>0x00140000</baseAddress>
+     </board>
 
   </Hardware>
   <EventBuilder>
