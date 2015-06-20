@@ -8,7 +8,7 @@
 #define EB_DEBUG
 #define EB_DEBUG_VERBOSE
 //#define TIME_DEBUG
-#define EB_SIMPLE_MERGE
+//#define EB_SIMPLE_MERGE
 
 
 // ---------- Event Builder
