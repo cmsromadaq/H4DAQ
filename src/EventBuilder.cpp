@@ -5,7 +5,7 @@
 #include "interface/FindMatch.hpp"
 #include <sstream>
 
-//#define EB_DEBUG
+#define EB_DEBUG
 #define EB_DEBUG_VERBOSE
 //#define TIME_DEBUG
 
