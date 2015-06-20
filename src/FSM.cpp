@@ -746,7 +746,7 @@ void DataReceiverFSM::Loop()
 		//   Log(buf,3);
 		transrate_size+=myData.size();
 		eventBuilder_->MergeSpills(myData);
-			    
+		myData.clear();	    
 	      }
 	      else if (myNewCmd.cmd == DIE){
 		MoveToStatus(BYE);

@@ -761,11 +761,6 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		spill1.append(myEvent);
 	       }	
 
-
-	//try this
-	oldSpill.clear();
-	spill2.clear();
-
 	spill1.append(T); 
 	// update Spill Size
 	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
