@@ -350,26 +350,23 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 		}
 	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
 #ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk READED TRAILER\n");
+	printf("[EventBuilder]::[IsEventOk] READ TRAILER\n");
 #endif
 	ptr += WORDSIZE;
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR\n");
 #endif
-	if ( myTrail[0] != Trailer[0] )  {
-#ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
-#endif
-		return 0;
-		}
+	if ( myTrail[0] != Trailer[0] )  
+	  {
+	    printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
+	    return 0;
+	  }
 	//mismatch in size
 	if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
-		{
-#ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
-#endif
-		return 0;
-		}
+	  {
+	    printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
+	    return 0;
+	  }
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
