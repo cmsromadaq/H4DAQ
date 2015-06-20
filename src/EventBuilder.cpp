@@ -302,8 +302,6 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	printf("[EventBuilder]::[IsEventOk] START\n");
 	printf("[EventBuilder]::[IsEventOk] Event Size %u\n",x.size());
 #endif
-#ifdef EB_SIMPLE_MERGE
-#endif
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*EventHeaderWords()); // read the first two WORDS
 	dataType H;EventHeader(H);
@@ -331,6 +329,10 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	WORD eventSize= myHead[EventSizePos()];
 	WORD eventNum = myHead[EventEnumPos()];
 
+#ifdef EB_SIMPLE_MERGE
+	printf("[EventBuilder]::[IsEventOk] Returning HEADER EventSize %u\n",eventSize);
+	return eventSize;
+#endif
 	
 	dataTypeSize_t leftsize=x.size() - WORDSIZE*EventHeaderWords();
 	ptr += WORDSIZE*EventHeaderWords() ;
@@ -375,7 +377,7 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
-	return ptr - (char*)x.data();
+	return eventSize;
 } 
 
 WORD 	EventBuilder::ReadRunNumFromSpill(dataType &x)
