@@ -8,7 +8,7 @@
 #define EB_DEBUG
 #define EB_DEBUG_VERBOSE
 //#define TIME_DEBUG
-
+#define EB_SIMPLE_MERGE
 
 
 // ---------- Event Builder
@@ -301,6 +301,9 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] START\n");
 #endif
+#ifdef EB_SIMPLE_MERGE
+	return x.size();
+#endif
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*EventHeaderWords()); // read the first two WORDS
 	dataType H;EventHeader(H);
@@ -328,6 +331,7 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	WORD eventSize= myHead[EventSizePos()];
 	WORD eventNum = myHead[EventEnumPos()];
 
+	
 	dataTypeSize_t leftsize=x.size() - WORDSIZE*EventHeaderWords();
 	ptr += WORDSIZE*EventHeaderWords() ;
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
@@ -362,12 +366,12 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	    printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
 	    return 0;
 	  }
-	// //mismatch in size
-	// if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
-	//   {
-	//     printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
-	//     return 0;
-	//   }
+	//mismatch in size
+	if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
+	  {
+	    printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
+	    return 0;
+	  }
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
