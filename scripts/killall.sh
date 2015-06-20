@@ -4,8 +4,8 @@
 for machine in pcethtb1 pcethtb2; do 
 	echo "Terminating runcontrol on $machine"
 	ssh ${machine} "killall runcontrol"
-	echo "Terminating runcontrol on $machine"
-	ssh ${machine} "killall datareceiver"
+	echo "Terminating readout on $machine"
+	ssh ${machine} "killall datareadout"
 	echo "Terminating eventbuilder on $machine"
 	ssh ${machine} "killall eventbuilder"
 done
