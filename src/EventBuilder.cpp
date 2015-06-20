@@ -197,7 +197,7 @@ vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 }
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[StreamToWord]::[DEBUG] Converting to Word %u bytes\n",x.size());
 	fflush(stdout);
 #endif
@@ -208,7 +208,7 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	dataTypeSize_t nWord=x.size() /WORDSIZE ;
 	for(unsigned long long int n=0; n<nWord ; n++)
 		{
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[StreamToWord]::[DEBUG]  Word %llu of %llu\n",n,nWord);
 	fflush(stdout);
 #endif
@@ -220,7 +220,7 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 
 dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] START\n");
 #endif
 	BoardId empty;
@@ -237,7 +237,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> myHead  = StreamToWord( x.data(), BoardHeaderWords()*WORDSIZE ); // read the first three
 	
 	if (myHead[0]  != Header[0] ) {
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Header is wrong\n");
 	printf("[EventBuilder]::[IsBoardOk] Header = %u==%u\n",myHead[0],Header[0]);
 	printf("[EventBuilder]::[IsBoardOk] Header = %c%c%c%c==%c%c%c%c\n",((char*) &myHead[0])[0],((char*) &myHead[0])[1],((char*) &myHead[0])[2],((char*) &myHead[0])[3],
@@ -251,7 +251,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	// the the N of bytes of the stream
 	if (myHead.size() < BoardHeaderWords()) 
 			{
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Header is size wrong,second check\n");
 #endif
 			return 0;
@@ -260,27 +260,27 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	WORD NWords  = NBytes / WORDSIZE;
 
 	if ( x.size() < NBytes) {
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Size is inconsistent\n");
 #endif
 			return 0;
 			}
 	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bytes\n", NBytes);
 	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
 	fflush(stdout);
 #endif
 	if (myWords[NWords-1] != Trailer[0] ) 
 		{
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Trailer is inconsistent: %u == %u\n",myWords[NWords-1] ,Trailer[0]);
 #endif
 		return 0;
 		}
 
-#ifdef EB_DEBUG_VERBOSE
+#ifdef EB_DEBUG_VERYVERBOSE
 	printf("[EventBuilder]::[IsBoardOk] BoardOK DONE\n");
 #endif
 	return (NBytes); // all size of the board
