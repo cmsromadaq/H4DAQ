@@ -362,12 +362,12 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	    printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
 	    return 0;
 	  }
-	//mismatch in size
-	if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
-	  {
-	    printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
-	    return 0;
-	  }
+	// //mismatch in size
+	// if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
+	//   {
+	//     printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
+	//     return 0;
+	//   }
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
