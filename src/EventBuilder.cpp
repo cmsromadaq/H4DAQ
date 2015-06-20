@@ -758,6 +758,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 		event2.release();
 
 		spill1.append(myEvent);
+		myEvent.release();
 	       }	
 	
 	spill1.append(T); 
