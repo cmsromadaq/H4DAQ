@@ -354,8 +354,9 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #endif
 	ptr += WORDSIZE;
 #ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR\n");
+	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR %u TRAILER %u\n",ptr -(char*)x.data(), myTrail[0]);
 #endif
+	
 	if ( myTrail[0] != Trailer[0] )  
 	  {
 	    printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
