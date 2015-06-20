@@ -370,10 +370,10 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #endif
 		return 0;
 		}
-	return ptr - (char*)x.data();
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
+	return ptr - (char*)x.data();
 } 
 
 WORD 	EventBuilder::ReadRunNumFromSpill(dataType &x)
