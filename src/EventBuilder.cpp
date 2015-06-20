@@ -616,7 +616,9 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 			return 1;
 			} // return 1; } // assume lasts are wrong
 	dataType oldSpill(spill1.size(),spill1.data());	
-	spill1.release();spill1.clear();
+	spill1.release();
+	//reinitialize
+	//spill1.clear();
 
 	dataType H;SpillHeader(H);
 	dataType T;SpillTrailer(T);
@@ -756,11 +758,14 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 
 		event1.release();
 		event2.release();
-
 		spill1.append(myEvent);
-		myEvent.release();
 	       }	
-	
+
+
+	//try this
+	oldSpill.clear();
+	spill2.clear();
+
 	spill1.append(T); 
 	// update Spill Size
 	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
