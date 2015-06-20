@@ -300,9 +300,9 @@ dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN)
 dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] START\n");
+	printf("[EventBuilder]::[IsEventOk] Event Size %u\n",x.size());
 #endif
 #ifdef EB_SIMPLE_MERGE
-	return x.size();
 #endif
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*EventHeaderWords()); // read the first two WORDS
