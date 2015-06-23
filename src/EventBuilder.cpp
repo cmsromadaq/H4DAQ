@@ -8,7 +8,7 @@
 #define EB_DEBUG
 //#define EB_DEBUG_VERBOSE
 //#define TIME_DEBUG
-
+//#define EB_ENFORCE_SAMEEVT
 
 
 // ---------- Event Builder
@@ -156,11 +156,13 @@ void EventBuilder::MergeEventStream(dataType &R,dataType &x,dataType &y){
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[MergeEvents]::[DEBUG] nBoard: %u;%u evenNum: %u==%u\n",nboards1,nboards2,eventNum1,eventNum2);
 #endif
-		
+
+#ifdef EB_ENFORCE_SAMEEVT		
 	if(eventNum1 != eventNum2) {
 		R.clear();
 		return;
 		}
+#endif
 
 	long size1=IsEventOk(x);
 	long size2=IsEventOk(y);
