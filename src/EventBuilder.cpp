@@ -6,9 +6,9 @@
 #include <sstream>
 
 #define EB_DEBUG
-#define EB_DEBUG_VERBOSE
+//#define EB_DEBUG_VERBOSE
 //#define TIME_DEBUG
-//#define EB_SIMPLE_MERGE
+
 
 
 // ---------- Event Builder
@@ -197,7 +197,7 @@ vector<WORD>	EventBuilder::StreamToWord(void*v,int N){
 }
 vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	vector<WORD> R;
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[StreamToWord]::[DEBUG] Converting to Word %u bytes\n",x.size());
 	fflush(stdout);
 #endif
@@ -208,7 +208,7 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 	dataTypeSize_t nWord=x.size() /WORDSIZE ;
 	for(unsigned long long int n=0; n<nWord ; n++)
 		{
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[StreamToWord]::[DEBUG]  Word %llu of %llu\n",n,nWord);
 	fflush(stdout);
 #endif
@@ -220,7 +220,7 @@ vector<WORD>	EventBuilder::StreamToWord(dataType &x){
 
 dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] START\n");
 #endif
 	BoardId empty;
@@ -237,7 +237,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	vector<WORD> myHead  = StreamToWord( x.data(), BoardHeaderWords()*WORDSIZE ); // read the first three
 	
 	if (myHead[0]  != Header[0] ) {
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Header is wrong\n");
 	printf("[EventBuilder]::[IsBoardOk] Header = %u==%u\n",myHead[0],Header[0]);
 	printf("[EventBuilder]::[IsBoardOk] Header = %c%c%c%c==%c%c%c%c\n",((char*) &myHead[0])[0],((char*) &myHead[0])[1],((char*) &myHead[0])[2],((char*) &myHead[0])[3],
@@ -251,7 +251,7 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	// the the N of bytes of the stream
 	if (myHead.size() < BoardHeaderWords()) 
 			{
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Header is size wrong,second check\n");
 #endif
 			return 0;
@@ -260,27 +260,27 @@ dataTypeSize_t EventBuilder::IsBoardOk(dataType &x){
 	WORD NWords  = NBytes / WORDSIZE;
 
 	if ( x.size() < NBytes) {
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Size is inconsistent\n");
 #endif
 			return 0;
 			}
 	vector<WORD> myWords = StreamToWord( x.data(), NBytes  ); //
 	//check trailer
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] STREAM TO WORD TAKE: %u bytes\n", NBytes);
 	printf("[EventBuilder]::[IsBoardOk] MyWords=%u NWords=%u\n",myWords.size(),NWords);
 	fflush(stdout);
 #endif
 	if (myWords[NWords-1] != Trailer[0] ) 
 		{
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] Trailer is inconsistent: %u == %u\n",myWords[NWords-1] ,Trailer[0]);
 #endif
 		return 0;
 		}
 
-#ifdef EB_DEBUG_VERYVERBOSE
+#ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsBoardOk] BoardOK DONE\n");
 #endif
 	return (NBytes); // all size of the board
@@ -300,7 +300,6 @@ dataTypeSize_t EventBuilder::IsBoardOk(void *v,int MaxN)
 dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] START\n");
-	printf("[EventBuilder]::[IsEventOk] Event Size %u\n",x.size());
 #endif
 	char *ptr=(char*)x.data();
 	vector<WORD> myHead=StreamToWord(x.data(),WORDSIZE*EventHeaderWords()); // read the first two WORDS
@@ -329,11 +328,6 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 	WORD eventSize= myHead[EventSizePos()];
 	WORD eventNum = myHead[EventEnumPos()];
 
-#ifdef EB_SIMPLE_MERGE
-	printf("[EventBuilder]::[IsEventOk] Returning HEADER EventSize %u\n",eventSize);
-	return eventSize;
-#endif
-	
 	dataTypeSize_t leftsize=x.size() - WORDSIZE*EventHeaderWords();
 	ptr += WORDSIZE*EventHeaderWords() ;
 	for(WORD iBoard = 0 ; iBoard < nBoard ;iBoard++)
@@ -356,28 +350,30 @@ dataTypeSize_t EventBuilder::IsEventOk(dataType &x){
 		}
 	vector<WORD> myTrail=StreamToWord( ptr , WORDSIZE ) ;
 #ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk] READ TRAILER\n");
+	printf("[EventBuilder]::[IsEventOk READED TRAILER\n");
 #endif
 	ptr += WORDSIZE;
 #ifdef EB_DEBUG_VERBOSE
-	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR %u TRAILER %u\n",ptr -(char*)x.data(), myTrail[0]);
+	printf("[EventBuilder]::[IsEventOk] UPDATED TRAILER PTR\n");
 #endif
-	
-	if ( myTrail[0] != Trailer[0] )  
-	  {
-	    printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
-	    return 0;
-	  }
+	if ( myTrail[0] != Trailer[0] )  {
+#ifdef EB_DEBUG_VERBOSE
+	printf("[EventBuilder]::[IsEventOk] Trail is Wrong\n");
+#endif
+		return 0;
+		}
 	//mismatch in size
 	if (eventSize != (WORD)(ptr -(char*)x.data()) ) 
-	  {
-	    printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
-	    return 0;
-	  }
+		{
+#ifdef EB_DEBUG_VERBOSE
+	printf("[EventBuilder]::[IsEventOk] Size Match is Wrong\n");
+#endif
+		return 0;
+		}
+	return ptr - (char*)x.data();
 #ifdef EB_DEBUG_VERBOSE
 	printf("[EventBuilder]::[IsEventOk] DONE");
 #endif
-	return eventSize;
 } 
 
 WORD 	EventBuilder::ReadRunNumFromSpill(dataType &x)
@@ -616,9 +612,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 			return 1;
 			} // return 1; } // assume lasts are wrong
 	dataType oldSpill(spill1.size(),spill1.data());	
-	spill1.release();
-	//reinitialize
-	//spill1.clear();
+	spill1.release();spill1.clear();
 
 	dataType H;SpillHeader(H);
 	dataType T;SpillTrailer(T);
@@ -758,9 +752,10 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 
 		event1.release();
 		event2.release();
+
 		spill1.append(myEvent);
 	       }	
-
+	
 	spill1.append(T); 
 	// update Spill Size
 	WORD *spillSizePtr= ((WORD*) spill1.data() )+ SpillSizePos();
