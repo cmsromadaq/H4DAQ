@@ -20,6 +20,7 @@
 	  <!--<postBuiltCmd>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCmd> -->
 	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/bin/unpack -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd> -->
           <!-- prescale factor -p = 2 -->
-	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -o /data/DQM/ -r %%RUN%% -s %%SPILL%% -p -1;</postBuiltCmd> <!-- -1 for automatic prescale -->
+	  <!-- <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/unpack_backup.sh -i %%RAWDIR%% -o /data/raw/DataTree/ -r %%RUN%% -s %%SPILL%% -p 1;</postBuiltCmd> -->
+	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/unpack -i %%RAWDIR%% -o /data/raw/DataTree/ -r %%RUN%% -s %%SPILL%% -p 1;</postBuiltCmd>
   </EventBuilder>
 </general>
