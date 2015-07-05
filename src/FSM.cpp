@@ -513,7 +513,7 @@ while (true) {
 			}
 	case WAITTRIG:
 		    {
-		      //		      usleep(500);
+		      usleep(500);
 		     // check network  -- wait for EE
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
@@ -545,6 +545,7 @@ while (true) {
 		    }
 	case RECVBUFFER:
 		    { // wait for ALL the BUFFERS
+		      usleep(50);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
@@ -721,7 +722,7 @@ void DataReceiverFSM::Loop()
 	}
       case RECVBUFFER:
 	{ // wait for ALL the BUFFERS
-	  //	  usleep(500);
+	  usleep(500);
 	  dataType myMex;
 	  if (connectionManager_->Recv(myMex) ==0 )    
 	    {                                                                     
@@ -800,7 +801,7 @@ void DataReceiverFSM::Loop()
       } // end switch
     } //end try
     catch(sigint_exception &sigint) { printf("\n%s\n",sigint.what()); exit(0);return ; } // grace exit . return doesn't work. 
-    catch(std::exception &e){ printf("--- EXCEPTION ---\n%s\n-------------\n",e.what()); MoveToStatus(ERROR); }
+    catch(std::exception &e){ ("--- ERROR ---\n%s\n--------\n",e.what()); MoveToStatus(ERROR); }
 
   } // end while
 } // end Loop
