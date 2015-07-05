@@ -468,6 +468,7 @@ while (true) {
 		    }
 	case BEGINSPILL:
 		    {
+		      usleep(500);
 		    // wait for wwe
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
@@ -491,6 +492,7 @@ while (true) {
 	case CLEARED:
 		    {
 		    // wait for we
+		      usleep(500);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
