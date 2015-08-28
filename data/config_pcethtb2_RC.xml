@@ -1,17 +1,16 @@
 <general>
-  <waitForDR>1</waitForDR>  
+  <waitForDR>0</waitForDR>  
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
-  <testEnableDuringBeam>0</testEnableDuringBeam> 
+  <testEnableDuringBeam>10</testEnableDuringBeam> 
   <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
-    <ConnectTo>pcethtb1.cern.ch:6504</ConnectTo>  <!-- EB  -->
+    <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
-    <ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- DR1 CMD -->
   </Network>
   <Hardware>
 
@@ -151,10 +150,38 @@
        <ID>1</ID>
        <baseAddress>0x00110000</baseAddress>
      </board>
-     
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>2</ID>
+       <baseAddress>0x00120000</baseAddress>
+     </board>
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>3</ID>
+       <baseAddress>0x00130000</baseAddress>
+     </board>
+     <board>
+       <type>LECROY_1182</type> <!-- LECROY 1182-->
+       <ID>4</ID>
+       <baseAddress>0x00140000</baseAddress>
+     </board>
+
+     <board>
+       <type>CAEN_V785</type> <!-- ADC 785-->
+       <ID>1</ID>
+       <baseAddress>0x00EE0000</baseAddress>
+       <model>0</model> <!-- V785 model 32ch -->
+       <blkEnd>1</blkEnd> <!-- BLKEND -->
+       <zeroSuppression>0</zeroSuppression> <!-- ZS -->
+       <emptyEnable>1</emptyEnable> <!-- EMPTYEN -->
+       <overRange>1</overRange> <!-- OVERFLOW BIT -->
+       <iped>0x60</iped> <!-- IPED value -->
+       <zsThreshold>0x0</zsThreshold> <!-- ZS THR value -->
+     </board>
+
   </Hardware>
   <EventBuilder>
-	  <dumpEvent>1</dumpEvent>
+	  <dumpEvent>0</dumpEvent>
 	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress>
 	  <sendEvent>1</sendEvent>
