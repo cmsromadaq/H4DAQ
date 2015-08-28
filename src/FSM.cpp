@@ -547,14 +547,17 @@ while (true) {
 		    }
 	case RECVBUFFER:
 		    { // wait for ALL the BUFFERS
-		      usleep(500);
+		    usleep(5000);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
-			    Command myNewCmd = ParseData( myMex); 
+			    Command myNewCmd = ParseData(myMex); 
+			    ostringstream s;
+			    s << "[EventBuilderFSM]::[INFO]::received " << myNewCmd.cmd; 
+			    Log(s.str(),1);
 			    if ( myNewCmd.cmd == DATA ) {
 			      ostringstream s;
-			      s << "[EventBuilderFSM]::[INFO]::received " << myNewCmd.N << " bytes";
+			      s << "[EventBuilderFSM]::[INFO]::received DATA:" << myNewCmd.N << " bytes";
 			      Log(s.str(),1);
 			      // pass the structure to a dataType
 			      dataType myData(myNewCmd.N,myNewCmd.data);
