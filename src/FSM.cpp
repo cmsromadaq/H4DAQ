@@ -547,7 +547,7 @@ while (true) {
 		    }
 	case RECVBUFFER:
 		    { // wait for ALL the BUFFERS
-		      usleep(50);
+		      usleep(500);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
