@@ -1318,8 +1318,21 @@ while (true) {
 	    else
 	      {
 		// this will pause the rc here, while the eb is receiving data, and will set the correct action (also gui) in the next step (SENTBUFFER)
+		usleep(1);
 		UpdateMex();
-		if ( eb_endspill ) MoveToStatus( SENTBUFFER );
+		waitForReadyTimeOutCounter_++;
+		if (waitForReadyTimeOutCounter_>100000)
+		  {
+		    Log("[RunControlFSM]::[ERROR]::Timeout in RECVBUFFER",1);
+		    waitForReadyTimeOutCounter_=0;
+		    MoveToStatus(ERROR);
+		  }
+
+		if ( eb_endspill ) 
+		  {
+		    waitForReadyTimeOutCounter_=0;
+		    MoveToStatus( SENTBUFFER );
+		  }
 	      }
 	    break;
 	  }
