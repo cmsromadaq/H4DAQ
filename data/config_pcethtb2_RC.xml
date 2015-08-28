@@ -5,7 +5,7 @@
   <testEnableDuringBeam>10</testEnableDuringBeam> 
   <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
   <Network>
-    <ListenPort>6000</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6010</ListenPort> <!-- DATA PORT Beware is different from standard 6000 -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
