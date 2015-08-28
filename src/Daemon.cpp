@@ -326,7 +326,7 @@ void Daemon::PublishStatusWithTimeInterval(){
   long timediff = Utility::timevaldiff(&lastSentStatusMessageTime_,&tv); // in usec
   if (timediff>200000) 
     {
-      Log("Publish status for timeout",1);
+      //      Log("Publish status for timeout",1);
       SendStatus(myStatus_,myStatus_);
     }
 }
