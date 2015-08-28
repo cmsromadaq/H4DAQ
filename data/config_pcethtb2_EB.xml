@@ -4,7 +4,7 @@
     <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6504</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-    <ConnectTo>pcethtb2.cern.ch:6006</ConnectTo>  <!-- RC Data beware this is different than standard 6000 -->
+    <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
     <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
   </Network>
