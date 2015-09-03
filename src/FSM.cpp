@@ -1303,9 +1303,10 @@ while (true) {
 			  ostringstream s;
 			  s << "[RunControlFSM]::[INFO]::send " << myCmd.N << " bytes";
 			  Log(s.str(),1);
-				dataType myMex;
-				myMex.append(myCmd.data,myCmd.N);
-				connectionManager_->Send(myMex,DataSck);
+			  usleep(5000);
+			  dataType myMex;
+			  myMex.append(myCmd.data,myCmd.N);
+			  connectionManager_->Send(myMex,DataSck);
 			}
 			//ResetMex(); //moved in Clear
 			MoveToStatus(RECVBUFFER);
