@@ -189,8 +189,7 @@ while (true) {
 		    }
 	case ENDSPILL:
 		    {
-		      usleep(5000);
-			    // received EE
+		      // received EE
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
@@ -548,7 +547,6 @@ while (true) {
 		    }
 	case RECVBUFFER:
 		    { // wait for ALL the BUFFERS
-		    usleep(5000);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
