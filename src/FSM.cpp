@@ -538,7 +538,7 @@ while (true) {
 		    }
 	case ENDSPILL:
 		    {
-		      usleep(1000000);
+		      usleep(500);
 			    // received EE NOT Open Close Spill
 			eventStarted=false;
 			gettimeofday(&transrate_stopwatch_start,NULL);
@@ -548,7 +548,7 @@ while (true) {
 		    }
 	case RECVBUFFER:
 		    { // wait for ALL the BUFFERS
-
+		      usleep(500);
 		    dataType myMex;
 		    if (connectionManager_->Recv(myMex) ==0 )    
 		    {                                                                     
