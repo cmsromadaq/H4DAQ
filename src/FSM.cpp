@@ -189,6 +189,7 @@ while (true) {
 		    }
 	case ENDSPILL:
 		    {
+		      usleep(5000);
 			    // received EE
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
