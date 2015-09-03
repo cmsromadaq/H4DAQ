@@ -193,8 +193,10 @@ while (true) {
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
 			{
+			  
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
+				usleep(1000);
 				connectionManager_->Send(myMex,DataSck);
 			}
 			MoveToStatus(SENTBUFFER);
