@@ -1,8 +1,8 @@
 <general>
-  <waitForDR>0</waitForDR>  
+  <waitForDR>1</waitForDR>  
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
-  <testEnableDuringBeam>10</testEnableDuringBeam> 
+  <testEnableDuringBeam>0</testEnableDuringBeam> 
   <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
@@ -181,7 +181,7 @@
 
   </Hardware>
   <EventBuilder>
-	  <dumpEvent>0</dumpEvent>
+	  <dumpEvent>1</dumpEvent>
 	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress>
 	  <sendEvent>1</sendEvent>
