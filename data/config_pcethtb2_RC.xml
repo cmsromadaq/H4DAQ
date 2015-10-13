@@ -3,14 +3,13 @@
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
   <testEnableDuringBeam>10</testEnableDuringBeam> 
-  <testEnableSequence>2</testEnableSequence> <!-- PED,LED -->
+  <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
   <Network>
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <ConnectTo>pcethtb3.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
-    <ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- PCETHTB1 CMD PORT -->
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
   <Hardware>
