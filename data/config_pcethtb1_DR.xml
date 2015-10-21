@@ -102,7 +102,7 @@
       <!--
          # DRS4_Frequency.  Values: 0 = 5 GHz, 1 = 2.5 GHz,  2 = 1 GHz
         -->
-      <DRS4_FREQUENCY>0</DRS4_FREQUENCY>
+      <DRS4_FREQUENCY>1</DRS4_FREQUENCY>
 
       <!--
          # ENABLE_DES_MODE: double edge sampling mode for the models 731 and 751. If enabled, the
@@ -145,7 +145,7 @@
          # options: 0 to 100
          # On models 742 there is a delay of about 35nsec on signal Fast Trigger TR; the post trigger is added to this delay  
         -->
-      <POST_TRIGGER>0</POST_TRIGGER>
+      <POST_TRIGGER>47</POST_TRIGGER>
       <!--
          # TRIGGER_EDGE: decides whether the trigger occurs on the rising or falling edge of the signal
          # options: RISING, FALLING
