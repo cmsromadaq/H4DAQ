@@ -331,49 +331,6 @@
 
     </board>
 
-    <board>
-      <type>CAEN_V513</type> <!-- I/O REGISTER -->
-      <ID>1</ID>
-      <baseAddress>0x00111100</baseAddress>
-      <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
-      <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
-      <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->
-      <channelsInputModeWord>0xFFF8</channelsInputModeWord><!-- normalInputMode (glitched for the first 3) --> 
-      <channelsTransferModeWord>0x0000</channelsTransferModeWord><!-- transparentTransferMode -->
-
-      <WWEReadBitMask>0x0001</WWEReadBitMask>
-      <WEReadBitMask>0x0002</WEReadBitMask>
-      <EEReadBitMask>0x0004</EEReadBitMask>
-
-      <beamTriggerVetoBitMask>0x0100</beamTriggerVetoBitMask>
-      <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
-      <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
-    </board>
-
-     <board>
-       <type>CAEN_V1290</type> <!-- TDC 1290-->
-       <ID>1</ID>
-       <baseAddress>0xAA000000</baseAddress>
-       <model>1</model> <!-- V1290N model 16ch -->
-       <triggerTimeSubtraction>1</triggerTimeSubtraction>
-       <triggerMatchMode>1</triggerMatchMode>
-       <emptyEventEnable>1</emptyEventEnable>
-       <edgeDetectionMode>2</edgeDetectionMode>
-       <timeResolution>3</timeResolution>
-       <maxHitsPerEvent>9</maxHitsPerEvent>
-       <enabledChannels>0x00FF</enabledChannels>
-       <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns -->
-       <windowOffset>-0x20</windowOffset> <!-- Window Offset unit=25 ns -->
-     </board>
-
-     <board>
-       <type>CAEN_V560</type> <!-- SCALER -->
-       <ID>1</ID>
-       <baseAddress>0x00999900</baseAddress>
-       <enabledChannels>0x00FF</enabledChannels>
-     </board>
-
-
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>0</dumpEvent>
