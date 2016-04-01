@@ -20,8 +20,9 @@ drcv=""
 rc=""
 eb=""
 nice=0
+tag=""
 
-TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,rc:,vmecontroller:,gitbranch:,norecompile,ebrecompile,drcvrecompile,dryrun -n 'startall.sh' -- "$@"`
+TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,rc:,vmecontroller:,gitbranch:,tag:,norecompile,ebrecompile,drcvrecompile,dryrun -n 'startall.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -37,6 +38,8 @@ while true; do
     --norecompile ) norecompile=1; shift;;
     --ebrecompile ) ebrecompile=1; shift;;
     --drcvrecompile ) drcvrecompile=1; shift;;
+    --tag )
+      tag="$2"; shift 2 ;;
     --daquser )
       daquser="$2"; shift 2 ;;
     --daqhome )
@@ -109,7 +112,7 @@ function col2 { while read line ; do echo "$line" | sed 's:%%%\(.*\)%%%:\x1b[01;
 
 for machine in $dr ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
+	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/${tag}/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
@@ -126,7 +129,7 @@ for machine in $dr ; do
 done
 
 for machine in $rc ; do 
-	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
+	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/${tag}/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myrc" ; continue; }
 #	[ "${start_rc}" == "0" ] && continue;
 	## compile
@@ -144,7 +147,7 @@ done
 
 for machine in $eb ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
+	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/${tag}/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myeb" ; continue; }
 #	[ "${start_eb}" == "0" ] && continue;
 	## compile
@@ -162,7 +165,7 @@ done
 
 for machine in $drcv ; do 
     if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
+	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/${tag}/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommandPlusDQM" ; echo "$mydrcv" ; continue; }
 #	[ "${start_drcv}" == "0" ] && continue;
 	## compile
