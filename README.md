@@ -14,6 +14,7 @@ Full installation of a new machine including all dependencies (devtoolset-3, ROO
 Create a new user ('cmsdaq') and an empty mysql RunDB
 
 As root user run:
+
 `curl -o 'install_h4daq.sh' https://raw.githubusercontent.com/cmsromadaq/H4DAQ/master/scripts/install_h4daq_slc6.sh`
 `chmod +x install_h4daq.sh`
 `./install_h4daq.sh`
@@ -31,5 +32,5 @@ DRCV data receiver machine, designed to receive data from the event builder e.g.
 
 To launch/test the daemons as cmsdaq user do:
 
-`cd /home/cmsdaq/DAQ/H4DAQ; scripts/startall.sh --tag \<tag_name\> --rc \<rc_machine\> --dr \<dr machine1\>,\<dr_machine2\> --eb \<eb_machine\> --drcv \<drcv machine1\>,\<drcv machine2\>`
+`cd /home/cmsdaq/DAQ/H4DAQ; scripts/startall.sh --tag <tag_name> --rc <rc_machine> --dr <dr machine1>,<dr_machine2> --eb <eb_machine> --drcv <drcv machine1>,<drcv machine2>`
 
