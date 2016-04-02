@@ -21,7 +21,7 @@ As root user run:
 ======
 Configuration
 
-Configuration file examples are available in the data directory. Create a new 'tag' (e.g. T9_2016_04) and put all the xml files for all the machines in the DAQ configuration (configuration files should be named as <tag>/config_<machine name>_<machine type>.xml 
+Configuration file examples are available in the data directory. Create a new 'tag' (e.g. T9_2016_04) and put all the xml files for all the machines in the DAQ configuration (configuration files should be named as \<tag\>/config_\<machine name\>_\<machine type\>.xml 
 
 Possible machine types are:
 RC run control machine, master VME crate
@@ -31,5 +31,5 @@ DRCV data receiver machine, designed to receive data from the event builder e.g.
 
 To launch/test the daemons as cmsdaq user do:
 
-`cd /home/cmsdaq/DAQ/H4DAQ; scripts/startall.sh --tag <tag_name> --rc <rc_machine> --dr <dr machine1>,<dr_machine2> --eb <eb_machine> --drcv <drcv machine1>,<drcv machine2>`
+`cd /home/cmsdaq/DAQ/H4DAQ; scripts/startall.sh --tag \<tag_name\> --rc \<rc_machine\> --dr \<dr machine1\>,\<dr_machine2\> --eb \<eb_machine\> --drcv \<drcv machine1\>,\<drcv machine2\>`
 
