@@ -8,7 +8,6 @@ Can also be used for direct communication with CAEN Digitizers without a host br
 It is supposed to be used together with H4DQM (<https://github.com/cmsromadaq/H4DQM>) and H4GUI (<https://github.com/cmsromadaq/H4GUI>) 
 
 #### Installation on SLC6 ####
-======
 
 Full installation of a new machine including all dependencies (devtoolset-3, ROOT, zeromq...). 
 Create a new user ('cmsdaq') and an empty mysql RunDB
@@ -21,7 +20,6 @@ chmod +x install_h4daq.sh
 ```
 
 #### Configuration ####
-======
 
 Configuration file examples are available in the data directory. Create a new 'tag' (e.g. T9_2016_04) and put all the xml files for all the machines in the DAQ configuration (configuration files should be named as \<tag\>/config_\<machine name\>_\<machine type\>.xml 
 
