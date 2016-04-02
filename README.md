@@ -33,5 +33,5 @@ To launch/test the daemons as cmsdaq user do:
 
 ```
 cd /home/cmsdaq/DAQ/H4DAQ
-scripts/startall.sh --tag <tag_name> --rc <rc_machine> --dr <dr machine1>,<dr_machine2> --eb <eb_machine> --drcv <drcv machine1>,<drcv machine2>`
+scripts/startall.sh --tag <tag_name> --rc <rc_machine> --dr <dr machine1>,<dr_machine2> --eb <eb_machine> --drcv <drcv machine1>,<drcv machine2>
 ```
