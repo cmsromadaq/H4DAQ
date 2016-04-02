@@ -259,8 +259,17 @@ printf "\r                                                                      
 printf "\r\rProgress : [${_fill// /#}${_empty// /-}] ${_progress}%% => $opt"
 }
 
+function usage()
+{
+    echo "Usage: $0 (-d for dryrun) (--opt) (-h for help)" 1>&2
+    echo "Possible options are: ${options[@]}." 1>&2
+    echo "Specify no option to run all the installation steps" 1>&2
+    echo "Installation log file: install_h4daq.log" 1>&2
+    exit 1
+}
+
 ### MAIN ###
-TEMP=`getopt -o d --long dryrun,useradd,arduino,caenlib,a2818_driver,zeromq,root,post_install,h4sw,mysql_db,web_server,data_disk -n 'install_h4daq.sh' -- "$@"`
+TEMP=`getopt -o dh --long dryrun,help,useradd,arduino,caenlib,a2818_driver,zeromq,root,post_install,h4sw,mysql_db,web_server,data_disk -n 'install_h4daq.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -269,10 +278,12 @@ eval set -- "$TEMP"
 
 all=1
 dryrun=0
+help=0
 
 while true; do
     case "$1" in
 	-d | --dryrun ) dryrun=1; shift;;
+	-h | --help ) help=1; shift;;
 	--post_install ) post_install=1; all=0; shift;;
 	--root ) root=1; all=0; shift;;
 	--zeromq ) zeromq=1; all=0; shift;;
@@ -289,11 +300,15 @@ while true; do
     esac
 done
 
-echo "H4DAQ installer V1.0"
-touch install_h4daq.log
-i=1
 options=("post_install" "root" "zeromq" "caenlib" "a2818_driver" "arduino" "useradd" "h4sw" "mysql_db" "web_server" "data_disk")
 len=${#options[@]}
+echo "H4DAQ installer V1.0"
+if [ "$help" == 1 ]; then
+    usage
+fi
+touch install_h4daq.log
+i=1
+
 if  [ "$all" != 1 ]; then
     len=1
 fi
@@ -301,7 +316,11 @@ for opt in "${options[@]}";
 do    
     eval var=\$$opt
     if [ "$all" == 1 ] || [ "$var" == 1 ]; then
-    	$opt $dryrun 2>&1 >> install_h4daq.log 
+    	$opt $dryrun 2>&1 >> install_h4daq.log
+	if [ $? != 0 ]; then
+	    tail -n 10 install_h4daq.log
+	    exit $?
+	fi
 	progress_bar $((i++)) $len 
         sleep 0.5
     fi
