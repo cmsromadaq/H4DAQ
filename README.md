@@ -10,7 +10,7 @@ It is supposed to be used together with H4DQM (<https://github.com/cmsromadaq/H4
 #### Installation on SLC6 ####
 
 Full installation of a new machine including all dependencies (devtoolset-3, ROOT, zeromq...). 
-Create a new user ('cmsdaq') and an empty mysql RunDB
+The script also create a new user ('cmsdaq') and an empty mysql RunDB
 
 As root user run:
 ```
