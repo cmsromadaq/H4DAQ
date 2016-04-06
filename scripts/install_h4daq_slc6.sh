@@ -67,7 +67,7 @@ function zeromq ()
     wget https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp
     cp zmq.hpp /usr/include/
     ldconfig
-    easy_install pyzmq
+    easy_install-2.6 pyzmq
 }
 
 function caenlib ()
