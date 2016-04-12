@@ -11,7 +11,7 @@ for machine in pcethtb1 pcethtb2 pcminn03; do
 done
 
 #DRCV
-for machine in cms-h4-03 cms-h4-04 cms-h4-05 pcethtb3 pccmsrmtb01 ; do 
+for machine in cms-h4-03 cms-h4-04 cms-h4-05 pcethtb3 ; do 
 	echo "Killing datareceiver on $machine"
 	ssh ${machine} "killall -9 datareceiver"
 done
