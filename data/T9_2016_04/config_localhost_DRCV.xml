@@ -4,23 +4,22 @@
     <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6504</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <ConnectTo>pcminn03.cern.ch:6500</ConnectTo>  <!-- EB Data  -->
     <ConnectTo>pcminn03.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
     <ConnectTo>pcminn03.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
-    <ConnectTo>pcminn03.cern.ch:6000</ConnectTo>  <!-- DR1 Data  -->
   </Network>
   <Hardware>
-    <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
+    <crateId>12</crateId> <!-- In case it configure it. But it is empty-->
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
 	  <dumpDirName>/data/raw/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
-	  <sendEvent>1</sendEvent>
+	  <sendEvent>0</sendEvent>
 	  <recvEvent>1</recvEvent> <!-- Number of machine to wait for -->
 	  <!--<postBuiltCmd>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCmd> -->
 	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/bin/unpack -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd> -->
-	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -o /data/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd>-->
-          <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -o /data/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd>-->
-          <postBuiltCmd>sleep 0.1</postBuiltCmd>
+          <!-- prescale factor -p = 2 -->
+	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/unpack_backup.sh -i %%RAWDIR%% -o /data/raw/DataTree/ -r %%RUN%% -s %%SPILL%% -p 1;</postBuiltCmd>
   </EventBuilder>
 </general>
