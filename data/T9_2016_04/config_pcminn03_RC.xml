@@ -125,7 +125,7 @@
          # This can be used to exclude parts of the file.
         -->
 
-      <OPEN>PCI 0 0 0x44440000</OPEN>
+      <OPEN>PCI 0 0 0x55550000</OPEN>
       <CORRECTION_LEVEL>AUTO</CORRECTION_LEVEL>
 
       <!--
@@ -220,33 +220,8 @@
          # ENABLE_INPUT: enable/disable one channel (or one group in the case of the Mod 740 and Mod 742)
          # options: YES, NO
         -->
-      <ENABLE_INPUT>YES</ENABLE_INPUT>
 
-      <!--
-         # DC_OFFSET: DC offset adjust (DAC channel setting) in percent of the Full Scale. 
-         # For model 740 and 742* the DC offset adjust is the same for all channel in the group
-         # -50: analog input dynamic range = -Vpp to 0 (negative signals)*
-         # +50: analog input dynamic range = 0 to +Vpp (positive signals)*
-         # 0:   analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)*
-         # options: -50.0 to 50.0  (floating point)
-         #*NOTE: Ranges are different for 742 Model.....see GRP_CH_DC_OFFSET description
-        -->
-      <DC_OFFSET>0</DC_OFFSET>
-
-      <!--
-         # TRIGGER_THRESHOLD: threshold for the channel auto trigger (ADC counts)
-         # options 0 to 2^N-1 (N=Number of bit of the ADC)
-         #TRIGGER_THRESHOLD      2659
-        -->
-
-      <!--
-         # CHANNEL_TRIGGER: channel auto trigger settings. When enabled, the ch. auto trg. can be either 
-         # propagated (ACQUISITION_AND_TRGOUT) or not (ACQUISITION_ONLY) through the TRGOUT
-         # options: DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT
-        -->
-      <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
-
-      <TRIGGER_THRESHOLD>     100                              </TRIGGER_THRESHOLD>
+      <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
 
       <TRIGGER>
         <ID>0</ID>
