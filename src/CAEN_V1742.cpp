@@ -492,10 +492,13 @@ int CAEN_V1742::programDigitizer ()
   if (boardInfo_.FamilyCode == CAEN_DGTZ_XX742_FAMILY_CODE) {
     for (i=0 ; i< (digitizerConfiguration_.Nch/9) ; i++) {
       s.str(""); s << "[CAEN_V1742]::[INFO]::Setting DRS4_FREQUENCY_CONFIG for Chip#" << i << " to " << digitizerConfiguration_.DRS4Frequency;
-      Log(s.str(),1);
       ret |= CAEN_DGTZ_SetDRS4SamplingFrequency(digitizerHandle_, digitizerConfiguration_.DRS4Frequency);
+      s << " " << ret;
       ret |= CAEN_DGTZ_SetGroupFastTriggerDCOffset (digitizerHandle_,i,digitizerConfiguration_.FTDCoffset[i]) ;
+      s << " " << ret;
       ret |= CAEN_DGTZ_SetGroupFastTriggerThreshold (digitizerHandle_,i,digitizerConfiguration_.FTThreshold[i]) ;
+      s << " " << ret;
+      Log(s.str(),1);
     }
   }
     
