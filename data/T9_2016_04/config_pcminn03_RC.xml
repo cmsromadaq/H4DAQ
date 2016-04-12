@@ -132,7 +132,7 @@
          # RECORD_LENGTH = number of samples in the acquisition window
          # For the models 742 the options available are only 1024, 520, 256 and 136
         -->
-      <RECORD_LENGTH>1024</RECORD_LENGTH>
+      <RECORD_LENGTH>256</RECORD_LENGTH>
 
       <!--
          # TEST_PATTERN: if enabled, data from ADC are replaced by test pattern (triangular wave)
