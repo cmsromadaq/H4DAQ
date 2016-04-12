@@ -99,7 +99,7 @@
     <board>
        <type>CAEN_V1290</type> <!-- TDC 1290-->
        <ID>1</ID>
-       <baseAddress>0xAA000000</baseAddress>
+       <baseAddress>0x00AA0000</baseAddress>
        <model>1</model> <!-- V1290N model 16ch -->
        <triggerTimeSubtraction>1</triggerTimeSubtraction>
        <triggerMatchMode>1</triggerMatchMode>
