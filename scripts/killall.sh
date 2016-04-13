@@ -8,6 +8,8 @@ for machine in pcethtb1 pcethtb2 pcminn03; do
 	ssh ${machine} "killall datareadout"
 	echo "Terminating eventbuilder on $machine"
 	ssh ${machine} "killall eventbuilder"
+	echo "Killing datareceiver on $machine"
+	ssh ${machine} "killall -9 datareceiver"
 done
 
 #DRCV
