@@ -117,6 +117,12 @@ function a2818_driver()
     cd A2818Drv-1.19
     make
     sh a2818_load
+    cat <<EOF >> /etc/rc.local
+. /etc/rc.d/init.d/functions
+echo -n "Loading A2818 kernel driver"
+cd /opt/A2818Drv-1.19
+/opt/A2818Drv-1.19/a2818_load && success || failure
+EOF
 }
 
 function arduino ()
@@ -166,6 +172,24 @@ function h4sw ()
     if [ ${1} == 1 ]; then
 	return 
     fi
+    cat <<EOF > /etc/sysconfig/iptables
+# Firewall configuration written by system-config-firewall                                                                                                                      
+# Manual customization of this file is not recommended.                                                                                                                          
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
+-A INPUT -m state --state NEW -m udp -p udp --dport 7001 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 5000:6999 -j ACCEPT
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+EOF
     # install H4DAQ H4DQM H4GUI H4Analysis as cmsdaq
     yum -y install mysql-connector-python.noarch
     source /opt/root/bin/thisroot.sh
