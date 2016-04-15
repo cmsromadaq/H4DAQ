@@ -80,7 +80,8 @@ function caenlib ()
     # get CAEN lib
     cd /tmp
     curl -o CAENComm-1.2-build20140211.tgz https://cernbox.cern.ch/index.php/s/wHT5e5aJOPencyy/download
-    curl -o CAENDigitizer_2.6.8.tgz https://cernbox.cern.ch/index.php/s/Z5uzpOJehmQphZA/download
+#    curl -o CAENDigitizer_2.6.8.tgz https://cernbox.cern.ch/index.php/s/Z5uzpOJehmQphZA/download
+    curl -o CAENDigitizer_2.4.6.tgz https://cernbox.cern.ch/index.php/s/rQc8dYOyBjujZwH/download
     curl -o CAENUpgrader-1.5.2-build20120724.tgz https://cernbox.cern.ch/index.php/s/sONBXV0iLl8pf3r/download
     curl -o CAENVMELib-2.50.tgz https://cernbox.cern.ch/index.php/s/pTKdUwIZsMayRKr/download
     cd /opt
