@@ -174,24 +174,24 @@
          # options: DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT
          #EXTERNAL_TRIGGER   ACQUISITION_ONLY
         -->
-      <EXTERNAL_TRIGGER>ACQUISITION_ONLY</EXTERNAL_TRIGGER>
-      <!--<EXTERNAL_TRIGGER>DISABLED</EXTERNAL_TRIGGER>-->
+      <!--<EXTERNAL_TRIGGER>ACQUISITION_ONLY</EXTERNAL_TRIGGER>-->
+      <EXTERNAL_TRIGGER>DISABLED</EXTERNAL_TRIGGER>
       
       <!--
          # FAST_TRIGGER: fast trigger input settings. ONLY FOR 742 MODELS. When enabled, the fast trigger is used for the data acquisition 
          # options: DISABLED, ACQUISITION_ONLY
          #FAST_TRIGGER   DISABLED    
         -->
-      <FAST_TRIGGER>DISABLED</FAST_TRIGGER>
-      <!--<FAST_TRIGGER>ACQUISITION_ONLY</FAST_TRIGGER>-->
+      <!--<FAST_TRIGGER>DISABLED</FAST_TRIGGER>-->
+      <FAST_TRIGGER>ACQUISITION_ONLY</FAST_TRIGGER>
 
       <!--
          # FAST_TRIGGER_DIGITIZING: ONLY FOR 742 MODELS. If enabled the fast trigger signal is digitized and it is present in data readout as channel n.8 for each group.
          # options: YES, NO
          #ENABLED_FAST_TRIGGER_DIGITIZING        NO    
         -->
-      <ENABLED_FAST_TRIGGER_DIGITIZING>NO</ENABLED_FAST_TRIGGER_DIGITIZING>
-      <!--<ENABLED_FAST_TRIGGER_DIGITIZING>YES</ENABLED_FAST_TRIGGER_DIGITIZING>-->
+      <!--<ENABLED_FAST_TRIGGER_DIGITIZING>NO</ENABLED_FAST_TRIGGER_DIGITIZING>-->
+      <ENABLED_FAST_TRIGGER_DIGITIZING>YES</ENABLED_FAST_TRIGGER_DIGITIZING>
 
       <!--
          # MAX_NUM_EVENTS_BLT: maximum number of events to read out in one Block Transfer. High values corresponds to 
