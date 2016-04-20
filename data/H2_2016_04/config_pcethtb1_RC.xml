@@ -199,7 +199,7 @@
          # options: 0 to 100
          # On models 742 there is a delay of about 35nsec on signal Fast Trigger TR; the post trigger is added to this delay  
         -->
-      <POST_TRIGGER>17</POST_TRIGGER>
+      <POST_TRIGGER>27</POST_TRIGGER>
       <!--
          # TRIGGER_EDGE: decides whether the trigger occurs on the rising or falling edge of the signal
          # options: RISING, FALLING
