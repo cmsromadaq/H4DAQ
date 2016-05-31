@@ -86,7 +86,8 @@ function caenlib ()
     curl -o CAENVMELib-2.50.tgz https://cernbox.cern.ch/index.php/s/pTKdUwIZsMayRKr/download
     cd /opt
     tar -xzf /tmp/CAENComm-1.2-build20140211.tgz 
-    tar -xzf /tmp/CAENDigitizer_2.6.8.tgz 
+#    tar -xzf /tmp/CAENDigitizer_2.6.8.tgz 
+    tar -xzf /tmp/CAENDigitizer_2.4.6.tgz 
     tar -xzf /tmp/CAENUpgrader-1.5.2-build20120724.tgz 
     tar -xzf /tmp/CAENVMELib-2.50.tgz
 
@@ -94,7 +95,8 @@ function caenlib ()
     ./install_x64
     cd ../../CAENComm-1.2/lib/
     ./install_x64
-    cd ../../CAENDigitizer_2.6.8/
+#    cd ../../CAENDigitizer_2.6.8/
+    cd ../../CAENDigitizer_2.4.6/
     ./install_64
     cd ../CAENUpgrader-1.5.2
     ./configure
@@ -262,6 +264,7 @@ function data_disk()
     if [ ${1} == 1 ]; then
 	return 
     fi
+    mkdir /data
     chown -R cmsdaq.cmsdaq /data/
     su cmsdaq <<EOF
     mkdir -p /data
