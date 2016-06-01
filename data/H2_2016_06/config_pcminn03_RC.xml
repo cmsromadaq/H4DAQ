@@ -290,7 +290,7 @@
       </CHANNEL>
 
       <CHANNEL>
-        <ID>3</ID>
+        <ID>1</ID>
         <ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
@@ -314,16 +314,15 @@
       </CHANNEL>
 
       <CHANNEL>
-        <ID>1</ID>
+        <ID>2</ID>
         <ENABLE_INPUT>NO</ENABLE_INPUT>
       </CHANNEL>
 
 
       <CHANNEL>
-        <ID>2</ID>
+        <ID>3</ID>
         <ENABLE_INPUT>NO</ENABLE_INPUT>
       </CHANNEL>
-
 
     </board>
 
