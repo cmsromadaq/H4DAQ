@@ -24,7 +24,7 @@ function kill_machine(){
      return 0
 }
 # DRO/RC/EB
-for machine in pcethtb1 pcethtb2 pcminn03 cms-h4-03 cms-h4-04 cms-h4-05 pcethtb3; do 
+for machine in pcethtb1 pcethtb2 pcminn03 cms-h4-04 cms-h4-05 pcethtb3; do 
     kill_machine $machine
 done
 
