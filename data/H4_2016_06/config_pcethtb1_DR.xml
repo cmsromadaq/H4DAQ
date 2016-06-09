@@ -84,7 +84,7 @@
          # This can be used to exclude parts of the file.
         -->
 
-      <OPEN>PCI 0 0 0x33330000</OPEN>
+      <OPEN>PCI 0 0 0x55550000</OPEN>
       <CORRECTION_LEVEL>AUTO</CORRECTION_LEVEL>
 
       <!--
