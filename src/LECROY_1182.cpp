@@ -107,7 +107,7 @@ int LECROY_1182::Read(vector<WORD> &v)
       status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+LECROY_1182_DATA_START_REG+(LECROY_1182_DATA_REG_SIZE*i),&data,LECROY_1182_ADDRESSMODE,LECROY_1182_DATAWIDTH);
       if (!status)
 	{
-	  v.push_back(data); //Filling event buffer
+	  v.push_back(data&0xFFFF); //Filling event buffer (mask with 0xFFFF???)
 #ifdef LECROY1182_DEBUG
 	  ostringstream s; s << "[LECROY_1182]::[INFO]::Read Channel " << "\tchannel " << i << "\tvalue " << data;  
 	  Log(s.str(),3);
