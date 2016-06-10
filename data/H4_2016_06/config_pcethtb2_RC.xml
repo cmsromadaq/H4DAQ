@@ -10,7 +10,7 @@
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <ConnectTo>cms-h4-06.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
-    <ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- PCETHTB1 CMD PORT -->
+    <!--<ConnectTo>pcethtb1.cern.ch:6004</ConnectTo>  <!-- PCETHTB1 CMD PORT --> -->
     <ConnectTo>pcethtb2.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
   </Network>
   <Hardware>
