@@ -193,6 +193,7 @@ function h4sw ()
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 COMMIT
 EOF
+    /etc/init.d/iptables restart #this switches off firewall
     # install H4DAQ H4DQM H4GUI H4Analysis as cmsdaq
     yum -y install mysql-connector-python.noarch
     source /opt/root/bin/thisroot.sh
