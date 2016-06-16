@@ -266,12 +266,12 @@
       </TRIGGER>
 
       <CHANNEL>
-        <ID>1</ID>
+        <ID>0</ID>
         <ENABLE_INPUT>NO</ENABLE_INPUT>
       </CHANNEL>
 
       <CHANNEL>
-        <ID>0</ID>
+        <ID>1</ID>
         <ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
