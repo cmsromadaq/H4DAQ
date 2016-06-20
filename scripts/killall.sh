@@ -23,8 +23,34 @@ function kill_machine(){
      ssh ${machine} "killall -9 datareceiver"
      return 0
 }
+
+TEMP=`getopt -o t: --long tag: -n 'killall.sh' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
+
+# Note the quotes around `$TEMP': they are essential!
+eval set -- "$TEMP"
+
+tag=""
+
+while true; do
+  case "$1" in
+    -t | --tag )
+      tag="$2"; shift 2 ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+if [ "${tag}" == "H4_2016" ]; then  
+    machines="pcethtb1 pcethtb2 cms-h4-04 cms-h4-05" ;
+elif [ "${tag}" == "T9_2016" ]; then
+    machines="pcminn03 pccmsrmtb01" ;
+fi
+
 # DRO/RC/EB
-for machine in pcethtb1 pcethtb2 pcminn03 cms-h4-04 cms-h4-05 pcethtb3; do 
+#for machine in pcethtb1 pcethtb2 pcminn03 cms-h4-04 cms-h4-05 pcethtb3; do 
+for machine in $machines; do 
     kill_machine $machine
 done
 
