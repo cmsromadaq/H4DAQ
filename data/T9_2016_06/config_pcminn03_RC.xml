@@ -191,7 +191,7 @@
          # options: 0 to 100
          # On models 742 there is a delay of about 35nsec on signal Fast Trigger TR; the post trigger is added to this delay  
         -->
-      <POST_TRIGGER>17</POST_TRIGGER>
+      <POST_TRIGGER>0</POST_TRIGGER>
       <!--
          # TRIGGER_EDGE: decides whether the trigger occurs on the rising or falling edge of the signal
          # options: RISING, FALLING
@@ -266,12 +266,12 @@
       </TRIGGER>
 
       <CHANNEL>
-        <ID>1</ID>
+        <ID>0</ID>
         <ENABLE_INPUT>NO</ENABLE_INPUT>
       </CHANNEL>
 
       <CHANNEL>
-        <ID>0</ID>
+        <ID>1</ID>
         <ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
@@ -282,7 +282,7 @@
            # 0: analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)
            # options: -50.0 to 50.0  (floating point)
           -->
-        <GRP_CH_DC_OFFSET>-12 -12 -12 -12 -12 -12 -12 -12</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
+        <GRP_CH_DC_OFFSET>-12 22 -12 -12 -12 -12 -12 -12</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
         <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
         <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
         <!--
