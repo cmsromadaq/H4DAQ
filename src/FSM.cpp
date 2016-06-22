@@ -5,7 +5,7 @@
 //#define FSM_DEBUG
 //#define SYNC_DEBUG
 //#define BUSY_DEBUG
-//#define PADE_READOUT
+#define PADE_READOUT
 //#define EMPTY_RC_TEST
 //#define TESTENABLE_DEBUG
 
