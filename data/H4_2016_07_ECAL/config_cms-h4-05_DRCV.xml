@@ -9,7 +9,7 @@
     <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
   </Network>
   <Hardware>
-    <crateId>11</crateId> <!-- In case it configure it. But it is empty-->
+    <crateId>12</crateId> <!-- In case it configure it. But it is empty-->
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>1</dumpEvent>
@@ -20,6 +20,8 @@
 	  <!--<postBuiltCmd>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCmd> -->
 	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/bin/unpack -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd> -->
           <!-- prescale factor -p = 2 -->
-	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -k -c -u /data/raw/DataTree -o /data/DQM/ -r %%RUN%% -s %%SPILL%% -p 10  -a 6 -w cms-h4-06.cern.ch;</postBuiltCmd> <!-- -1 for automatic prescale -->
+	  <!--postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/unpack_backup.sh -i %%RAWDIR%% -o /data/raw/DataTree/ -r %%RUN%% -s %%SPILL%% -p 1;</postBuiltCmd> -->
+	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/unpackBackup.sh -i %%RAWDIR%%  -o /data/raw/DataTree/ -r %%RUN%% -s %%SPILL%%  -p 1 -l /tmp/unpack;</postBuiltCmd>
+	  
   </EventBuilder>
 </general>
