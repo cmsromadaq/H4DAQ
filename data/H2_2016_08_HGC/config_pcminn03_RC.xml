@@ -110,7 +110,7 @@
        <enabledChannels>0x00FF</enabledChannels>
        <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns -->
        <windowOffset>-0x24</windowOffset> <!-- Window Offset unit=25 ns -->
-     </board>
+    </board>
 
   </Hardware>
   <EventBuilder>
