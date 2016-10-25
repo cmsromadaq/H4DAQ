@@ -1,0 +1,334 @@
+<general>
+  <waitForDR>0</waitForDR>  
+  <noEB>0</noEB> 
+  <spillSignalsDisabled>0</spillSignalsDisabled> 
+  <testEnableDuringBeam>0</testEnableDuringBeam> 
+  <testEnableSequence>2,3</testEnableSequence> <!-- PED,LED -->
+  <Network>
+    <ListenPort>6000</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
+    <ListenPort>6004</ListenPort> <!-- CMD PORT -->
+    <ConnectTo>pccmsrmtb01.cern.ch:5566</ConnectTo>  <!-- GUI -->
+    <ConnectTo>pcminn03.cern.ch:6504</ConnectTo>  <!-- EB  -->
+    <ConnectTo>pcminn03.cern.ch:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
+  </Network>
+  <Hardware>
+
+    <crateId>1</crateId>
+
+    <board> <!-- TIME board always as first -->
+      <ID>1</ID>
+      <type>TIME</type>
+    </board>
+
+    <board>
+      <ID>1</ID> 
+      <type>CAEN_VX718</type> <!-- CRATE Controller -->  
+      <boardType>1</boardType> <!-- USB=0, PCI Optical=1 -->
+      <LinkType>0</LinkType> <!--int32_t-->
+      <LinkNum>0</LinkNum> <!--int32_t-->
+
+      <clearBusyOutputBit>0x40</clearBusyOutputBit> <!--CVOutputSelect out0-->
+      <trigAckOutputBit>0x80</trigAckOutputBit> <!--CVOutputSelect out1-->
+      <daqBusyOutputBit>0x100</daqBusyOutputBit> <!--CVOutputMaskBit out2-->
+      <triggerInputBit>0</triggerInputBit> <!--CVInputSelect in0-->
+
+      <outputMaskWord>0x700</outputMaskWord> <!--uint32_t Orwell-->
+      <outputMuxWord>0x3FA</outputMuxWord> <!--uint32_t--> 
+
+      <scalerConfWord>0xFFF</scalerConfWord> <!--uint32_t--> 
+      <controlRegWord>0x200</controlRegWord> <!--uint32_t-->
+      
+      <Output0Polarity>0</Output0Polarity> <!--CVIOPolarity-->
+      <Output0LedPolarity>0</Output0LedPolarity> <!--CVLEDPolarity-->
+      <Output0Source>0</Output0Source> <!--CVIOSources-->
+
+      <Output1Polarity>0</Output1Polarity> <!--CVIOPolarity-->
+      <Output1LedPolarity>0</Output1LedPolarity> <!--CVLEDPolarity-->
+      <Output1Source>0</Output1Source> <!--CVIOSources-->
+
+      <Output2Polarity>0</Output2Polarity> <!--CVIOPolarity-->
+      <Output2LedPolarity>0</Output2LedPolarity> <!--CVLEDPolarity-->
+      <Output2Source>0</Output2Source> <!--CVIOSources-->
+
+      <Output3Polarity>0</Output3Polarity> <!--CVIOPolarity-->
+      <Output3LedPolarity>0</Output3LedPolarity> <!--CVLEDPolarity-->
+      <Output3Source>0</Output3Source> <!--CVIOSources-->
+
+      <Output4Polarity>0</Output4Polarity> <!--CVIOPolarity-->
+      <Output4LedPolarity>0</Output4LedPolarity> <!--CVLEDPolarity-->
+      <Output4Source>0</Output4Source> <!--CVIOSources-->
+
+      <Input0Polarity>0</Input0Polarity> <!--CVIOPolarity-->
+      <Input0LedPolarity>0</Input0LedPolarity> <!--CVLEDPolarity-->
+
+      <Input1Polarity>0</Input1Polarity> <!--CVIOPolarity-->
+      <Input1LedPolarity>0</Input1LedPolarity> <!--CVLEDPolarity-->
+      
+      <ScalerLimit>1023</ScalerLimit> <!--uint32_t-->
+      <ScalerAutoReset>1</ScalerAutoReset> <!--uint32_t-->
+      <ScalerSignalInput>1</ScalerSignalInput> <!--CVIOSources-->
+      <ScalerGateInput>0</ScalerGateInput> <!--CVIOSources-->
+      <ScalerResetInput>0</ScalerResetInput> <!--CVIOSources-->
+
+      <PulserATimeUnit>0</PulserATimeUnit> <!--CVTimeUnits-->
+      <PulserATimeWidth>1</PulserATimeWidth> <!--uint32_t-->
+      <PulserATimePeriod>1</PulserATimePeriod> <!--uint32_t-->
+      <PulserATimePulses>1</PulserATimePulses> <!--uint32_t-->
+      <PulserAStartInput>0</PulserAStartInput> <!--CVIOSources-->
+      <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
+    </board>
+    <board>
+      <type>CAEN_V513</type> <!-- I/O REGISTER -->
+      <ID>1</ID>
+      <baseAddress>0xBBBBBB00</baseAddress>
+      <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
+      <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
+      <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->
+      <channelsInputModeWord>0xFFF8</channelsInputModeWord><!-- normalInputMode (glitched for the first 3) -->
+      <channelsTransferModeWord>0x0000</channelsTransferModeWord><!-- transparentTransferMode -->
+
+      <WWEReadBitMask>0x0001</WWEReadBitMask>
+      <WEReadBitMask>0x0002</WEReadBitMask>
+      <EEReadBitMask>0x0004</EEReadBitMask>
+
+      <beamTriggerVetoBitMask>0x0100</beamTriggerVetoBitMask>
+      <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
+      <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
+    </board>
+    <board>
+       <type>CAEN_V1290</type> <!-- TDC 1290-->
+       <ID>1</ID>
+       <baseAddress>0x00AA0000</baseAddress>
+       <model>1</model> <!-- V1290N model 16ch -->
+       <triggerTimeSubtraction>1</triggerTimeSubtraction>
+       <triggerMatchMode>1</triggerMatchMode>
+       <emptyEventEnable>1</emptyEventEnable>
+       <edgeDetectionMode>2</edgeDetectionMode>
+       <timeResolution>3</timeResolution>
+       <maxHitsPerEvent>9</maxHitsPerEvent>
+       <enabledChannels>0x00FF</enabledChannels>
+       <windowWidth>0x40</windowWidth> <!-- Window Width unit=25 ns -->
+       <windowOffset>-0x24</windowOffset> <!-- Window Offset unit=25 ns -->
+    </board>
+
+ <board>
+      <ID>1</ID>
+      <type>CAEN_V1742</type>
+
+      <!--                                                                                                                                
+         # ****************************************************************                                                               
+         # WaveDump Configuration File                                                                                                    
+         # ****************************************************************                                                               
+                                                                                                                                          
+         # NOTE:                                                                                                                          
+         # The lines between the commands @OFF and @ON will be skipped.                                                                   
+         # This can be used to exclude parts of the file.                                                                                 
+        -->
+
+      <OPEN>PCI 0 0 0x55550000</OPEN>
+      <CORRECTION_LEVEL>AUTO</CORRECTION_LEVEL>
+
+      <!--                                                                                                                                
+         # RECORD_LENGTH = number of samples in the acquisition window                                                                    
+         # For the models 742 the options available are only 1024, 520, 256 and 136                                                       
+        -->
+      <RECORD_LENGTH>1024</RECORD_LENGTH>
+
+      <!--                                                                                                                                
+         # TEST_PATTERN: if enabled, data from ADC are replaced by test pattern (triangular wave)                                         
+         # options: YES, NO                                                                                                               
+        -->
+      <TEST_PATTERN>NO</TEST_PATTERN>
+
+      <!--                                                                                                                                
+         # DRS4_Frequency.  Values: 0 = 5 GHz, 1 = 2.5 GHz,  2 = 1 GHz                                                                    
+        -->
+      <DRS4_FREQUENCY>0</DRS4_FREQUENCY>
+    <!--                                                                                                                                
+         # ENABLE_DES_MODE: double edge sampling mode for the models 731 and 751. If enabled, the                                         
+         # board interleaves two channels to make one channel running at double sampling frequency.                                       
+         # This setting is ignored for the boards that don't support DES mode.                                                            
+         # options: YES, NO                                                                                                               
+        -->
+      <ENABLE_DES_MODE>NO</ENABLE_DES_MODE>
+
+      <!--                                                                                                                                
+         # EXTERNAL_TRIGGER: external trigger input settings. When enabled, the ext. trg. can be either                                   
+         # propagated (ACQUISITION_AND_TRGOUT) or not (ACQUISITION_ONLY) through the TRGOUT                                               
+         # options: DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT                                                                    
+         #EXTERNAL_TRIGGER   ACQUISITION_ONLY                                                                                             
+        -->
+      <!--<EXTERNAL_TRIGGER>ACQUISITION_ONLY</EXTERNAL_TRIGGER>-->
+      <EXTERNAL_TRIGGER>DISABLED</EXTERNAL_TRIGGER>
+
+      <!--                                                                                                                                
+         # FAST_TRIGGER: fast trigger input settings. ONLY FOR 742 MODELS. When enabled, the fast trigger is used for the data acquisition
+         # options: DISABLED, ACQUISITION_ONLY                                                                                            
+         #FAST_TRIGGER   DISABLED                                                                                                         
+        -->
+      <!--<FAST_TRIGGER>DISABLED</FAST_TRIGGER>-->
+      <FAST_TRIGGER>ACQUISITION_ONLY</FAST_TRIGGER>
+
+      <!--                                                                                                                                
+         # FAST_TRIGGER_DIGITIZING: ONLY FOR 742 MODELS. If enabled the fast trigger signal is digitized and it is present in data readout as channel n.8 for each group.
+         # options: YES, NO                                                                                                               
+         #ENABLED_FAST_TRIGGER_DIGITIZING        NO                                                                                       
+        -->
+      <!--<ENABLED_FAST_TRIGGER_DIGITIZING>NO</ENABLED_FAST_TRIGGER_DIGITIZING>-->
+      <ENABLED_FAST_TRIGGER_DIGITIZING>YES</ENABLED_FAST_TRIGGER_DIGITIZING>
+
+      <!--                                                                                                                                
+         # MAX_NUM_EVENTS_BLT: maximum number of events to read out in one Block Transfer. High values corresponds to                     
+         # options: 1 to 1023                                                                                                             
+        -->
+      <MAX_NUM_EVENTS_BLT>1</MAX_NUM_EVENTS_BLT>
+
+      <!--                                                                                                                                       
+         # POST_TRIGGER: post trigger size in percent of the whole acquisition window                                                            
+         # options: 0 to 100                                                                                                                     
+         # On models 742 there is a delay of about 35nsec on signal Fast Trigger TR; the post trigger is added to this delay                     
+        -->
+      <POST_TRIGGER>0</POST_TRIGGER>
+      <!--                                                                                                                                       
+         # TRIGGER_EDGE: decides whether the trigger occurs on the rising or falling edge of the signal                                          
+         # options: RISING, FALLING                                                                                                              
+        -->
+      <TRIGGER_EDGE>FALLING</TRIGGER_EDGE>
+
+      <!--                                                                                                                                       
+         # USE_INTERRUPT: number of events that must be ready for the readout when the IRQ is asserted.                                          
+         # Zero means that the interrupts are not used (readout runs continuously)                                                               
+        -->
+      <USE_INTERRUPT>0</USE_INTERRUPT>
+
+      <!--                                                                                                                                       
+         # FPIO_LEVEL: type of the front panel I/O LEMO connectors                                                                               
+         # options: NIM, TTL                                                                                                                     
+        -->
+      <FPIO_LEVEL>NIM</FPIO_LEVEL>
+      <!--                                                                                                                                               
+         # WRITE_REGISTER: generic write register access. This command allows the user to have a direct write access to the                              
+         # registers of the board. NOTE: all the direct write accesses are executed before the other setting, thus it might                              
+         # happen that one specific setting overwrites the register content.                                                                             
+         # Syntax: WRITE_REGISTER ADDRESS DATA, where ADDRESS is the address offset of the register (16 bit hex)                                         
+         # and DATA is the value being written (31 bit hex)                                                                                              
+         # Example: WRITE_REGISTER  1080  00000010  # Set the threshold of channel 0 to 16 ADC counts (hex 10)                                           
+         #  WRITE_REGISTER  8168  8                                                                                                                      
+        -->
+
+
+      <!--                                                                                                                                               
+         # ENABLE_INPUT: enable/disable one channel (or one group in the case of the Mod 740 and Mod 742)                                                
+         # options: YES, NO                                                                                                                              
+        -->
+      <ENABLE_INPUT>YES</ENABLE_INPUT>
+
+      <!--                                                                                                                                               
+         # DC_OFFSET: DC offset adjust (DAC channel setting) in percent of the Full Scale.                                                               
+         # For model 740 and 742* the DC offset adjust is the same for all channel in the group                                                          
+         # -50: analog input dynamic range = -Vpp to 0 (negative signals)*                                                                               
+         # +50: analog input dynamic range = 0 to +Vpp (positive signals)*                                                                               
+         # 0:   analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)*                                                                         
+         # options: -50.0 to 50.0  (floating point)                                                                                                      
+         #*NOTE: Ranges are different for 742 Model.....see GRP_CH_DC_OFFSET description                                                                 
+        -->
+      <DC_OFFSET>0</DC_OFFSET>
+
+      <!--                                                                                                                                               
+         # TRIGGER_THRESHOLD: threshold for the channel auto trigger (ADC counts)                                                                        
+         # options 0 to 2^N-1 (N=Number of bit of the ADC)                                                                                               
+         #TRIGGER_THRESHOLD      2659                                                                                                                    
+        -->
+
+      <!--                                                                                                                                               
+         # CHANNEL_TRIGGER: channel auto trigger settings. When enabled, the ch. auto trg. can be either                                                 
+         # propagated (ACQUISITION_AND_TRGOUT) or not (ACQUISITION_ONLY) through the TRGOUT                                                              
+         # options: DISABLED, ACQUISITION_ONLY, ACQUISITION_AND_TRGOUT                                                                                   
+        -->
+      <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
+
+      <TRIGGER_THRESHOLD>     100                              </TRIGGER_THRESHOLD>
+
+      <TRIGGER>
+        <ID>0</ID>
+        <DC_OFFSET>32768</DC_OFFSET>
+        <TRIGGER_THRESHOLD>20934</TRIGGER_THRESHOLD>
+      </TRIGGER>
+
+      <TRIGGER>
+        <ID>1</ID>
+        <DC_OFFSET>32768</DC_OFFSET>
+        <TRIGGER_THRESHOLD>20934</TRIGGER_THRESHOLD>
+      </TRIGGER>
+
+      <CHANNEL>
+        <ID>0</ID>
+        <ENABLE_INPUT>NO</ENABLE_INPUT>
+      </CHANNEL>
+
+
+      <CHANNEL>
+        <ID>1</ID>
+        <ENABLE_INPUT>NO</ENABLE_INPUT>
+      </CHANNEL>
+      <CHANNEL>
+        <ID>2</ID>
+        <ENABLE_INPUT>YES</ENABLE_INPUT>
+        <DC_OFFSET>0</DC_OFFSET>
+        <!--                                                                                                                                             
+           # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7                                                                             
+           # Available only for model 742, allows to set different DC offset adjust for each channel (DAC channel setting) in percent of the Full Scale.
+           # -50: analog input dynamic range = -3Vpp/2 to -Vpp/2 (max negative dynamic)                                                                  
+           # +50: analog input dynamic range = +Vpp/2 to +3Vpp/2 (max positive dynamic)                                                                  
+           # 0: analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)                                                                          
+           # options: -50.0 to 50.0  (floating point)                                                                                                    
+          -->
+        <GRP_CH_DC_OFFSET>-12 22 -12 -12 -12 -12 -12 -12</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
+        <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
+        <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
+        <!--                                                                                                                                             
+           # GROUP_TRG_ENABLE_MASK: this option is used only for the Models x740. These models have the                                                  
+           # channels grouped 8 by 8; one group of 8 channels has a common trigger that is generated as                                                  
+           # the OR of the self trigger of the channels in the group that are enabled by this mask.                                                      
+           # options: 0 to FF                                                                                                                            
+          -->
+        <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
+      </CHANNEL>
+
+     <CHANNEL>
+       <ID>3</ID>
+       <ENABLE_INPUT>YES</ENABLE_INPUT>
+       <DC_OFFSET>0</DC_OFFSET>
+       <!--                                                                                                                                             
+          # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7                                                                             
+          # Available only for model 742, allows to set different DC offset adjust for each channel (DAC channel setting) in percent of the Full Scale.
+          # -50: analog input dynamic range = -3Vpp/2 to -Vpp/2 (max negative dynamic)                                                                  
+          # +50: analog input dynamic range = +Vpp/2 to +3Vpp/2 (max positive dynamic)                                                                  
+          # 0: analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)                                                                          
+          # options: -50.0 to 50.0  (floating point)                                                                                                    
+         -->
+       <GRP_CH_DC_OFFSET>+26 +26 +26 +26 +26 +26 +26 +26</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
+       <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
+       <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
+       <!--                                                                                                                                             
+          # GROUP_TRG_ENABLE_MASK: this option is used only for the Models x740. These models have the                                                  
+          # channels grouped 8 by 8; one group of 8 channels has a common trigger that is generated as                                                  
+          # the OR of the self trigger of the channels in the group that are enabled by this mask.                                                      
+          # options: 0 to FF                                                                                                                            
+         -->
+        <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
+      </CHANNEL>
+
+    </board>
+
+  </Hardware>
+  <EventBuilder>
+	  <dumpEvent>0</dumpEvent>
+	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>0</dumpCompress>
+	  <sendEvent>1</sendEvent>
+	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
+	  <compress>0</compress>
+  </EventBuilder>
+</general>
