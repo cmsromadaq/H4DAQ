@@ -46,10 +46,11 @@ if [ "${tag}" == "H4_2016" ]; then
     machines="pcethtb1 pcethtb2 cms-h4-04 cms-h4-05" ;
 elif [ "${tag}" == "T9_2016" ]; then
     machines="pcminn03 pccmsrmtb01" ;
+elif [ "${tag}" == "T9_2017" ]; then
+    machines="cmsmi5 pccmsrmtb01" ;
 fi
 
 # DRO/RC/EB
-#for machine in pcethtb1 pcethtb2 pcminn03 cms-h4-04 cms-h4-05 pcethtb3; do 
 for machine in $machines; do 
     kill_machine $machine
 done
