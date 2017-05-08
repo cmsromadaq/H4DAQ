@@ -4,9 +4,9 @@
     <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6504</ListenPort> <!-- CMD PORT -->
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
-    <ConnectTo>cmsmi5.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
-    <ConnectTo>cmsmi5.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
     <ConnectTo>cmsmi5.cern.ch:6000</ConnectTo>  <!-- DR1 Data  -->
+    <ConnectTo>cmsmi5.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
+    <ConnectTo>localhost:5568</ConnectTo>  <!-- CML INTERFACE -->
   </Network>
   <Hardware>
     <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
