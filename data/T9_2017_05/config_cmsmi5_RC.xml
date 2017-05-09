@@ -311,6 +311,10 @@
            # options: 0 to FF
           -->
         <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
+      <!--
+         # DRS4_Frequency.  Values: 0 = 5 GHz, 1 = 2.5 GHz,  2 = 1 GHz
+        -->
+      <DRS4_FREQUENCY>1</DRS4_FREQUENCY>
       </CHANNEL>
 
 
