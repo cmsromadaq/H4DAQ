@@ -56,7 +56,7 @@ function zeromq ()
     # get ZEROMQ
     yum install -y libsodium libsodium-devel
     cd /tmp/
-    curl -o zeromq-4.1.4.tar.gz https://cernbox.cern.ch/index.php/s/SBUmAYCdRv2I2rK/download 
+    curl -o zeromq-4.1.4.tar.gz https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=zeromq-4.1.4.tar.gz
     cd /opt
     tar -xzf /tmp/zeromq-4.1.4.tar.gz 
     cd zeromq-4.1.4
@@ -79,11 +79,11 @@ function caenlib ()
     fi
     # get CAEN lib
     cd /tmp
-    curl -o CAENComm-1.2-build20140211.tgz https://cernbox.cern.ch/index.php/s/wHT5e5aJOPencyy/download
+    curl -o CAENComm-1.2-build20140211.tgz https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=CAENComm-1.2-build20140211.tgz
 #    curl -o CAENDigitizer_2.6.8.tgz https://cernbox.cern.ch/index.php/s/Z5uzpOJehmQphZA/download
-    curl -o CAENDigitizer_2.4.6.tgz https://cernbox.cern.ch/index.php/s/rQc8dYOyBjujZwH/download
-    curl -o CAENUpgrader-1.5.2-build20120724.tgz https://cernbox.cern.ch/index.php/s/sONBXV0iLl8pf3r/download
-    curl -o CAENVMELib-2.50.tgz https://cernbox.cern.ch/index.php/s/pTKdUwIZsMayRKr/download
+    curl -o CAENDigitizer_2.4.6.tgz https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=CAENDigitizer_2.4.6.tgz
+    curl -o CAENUpgrader-1.5.2-build20120724.tgz  https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=CAENUpgrader-1.5.2-build20120724.tgz
+    curl -o CAENVMELib-2.50.tgz  https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=CAENVMELib-2.50.tgz
     cd /opt
     tar -xzf /tmp/CAENComm-1.2-build20140211.tgz 
 #    tar -xzf /tmp/CAENDigitizer_2.6.8.tgz 
@@ -114,7 +114,7 @@ function a2818_driver()
     fi
     # get CAEN lib
     cd /tmp
-    curl -o A2818Drv-1.19.tgz https://cernbox.cern.ch/index.php/s/sB4GVBXEWm36xwi/download
+    curl -o A2818Drv-1.19.tgz https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=A2818Drv-1.19-build20150826.tgz
     cd /opt
     tar -xzf /tmp/A2818Drv-1.19.tgz
     cd A2818Drv-1.19
@@ -137,7 +137,7 @@ function arduino ()
     fi
     # get arduino lib
     cd /tmp
-    curl -o arduino-1.6.8-linux64.tar.xz https://cernbox.cern.ch/index.php/s/6ZF6oZxvRyfKkur/download
+    curl -o arduino-1.6.8-linux64.tar.xz https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=arduino-1.6.8-linux64.tar.xz
     cd /opt
     tar -xf /tmp/arduino-1.6.8-linux64.tar.xz
     
@@ -155,7 +155,7 @@ function useradd ()
     su cmsdaq <<EOF
     mkdir -p /home/cmsdaq/.ssh
     echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAkrNSeBxzuZlyTp0ni28eyU2EogwedJCZuZ/e+6stkM1iwXAdPzcbm6BK1VAdzCOlqGzu8RueDit6KNvWzCzqLeJcIU5K46OgWcNZDuf25Qxe0rNbxrYP6JCpLojaPdXDSGTrCxza+7VJTUN680ew39GFzOBMy1gV5G9VPdeX37dwutCeQ0JN3hb3MLbHXILC0ZqjeU6HuuaT+Ev3/B86lTCICUy/bEL6UyhQrco75Oo7zeQkPt3dKNcFESiNJHgzuwvoGtkjud04uEYdldcZWcQ3XQTRC3bFblei/TFiyxmoAtphO7b5+QCoaAHuoTkxFqqcmZPbslkWazcviajAjw== cmsdaq@myhost' > /home/cmsdaq/.ssh/id_rsa.pub
-    curl -o /home/cmsdaq/.ssh/id_rsa https://cernbox.cern.ch/index.php/s/PkRK1Dkb2ibZUHo/download
+    curl -o /home/cmsdaq/.ssh/id_rsa https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=id_rsa
     chmod 0600 /home/cmsdaq/.ssh/id_rsa
     cat << EOL > /home/cmsdaq/.k5login
 meridian@CERN.CH
@@ -231,7 +231,7 @@ function mysql_db()
     /etc/init.d/mysqld start
     mysqladmin -u root password db...h4daq
     /sbin/chkconfig mysqld --levels 35 on
-    curl -o '/tmp/rundb_v2.mysql' https://cernbox.cern.ch/index.php/s/qMkuIN7WEDMuEOD/download
+    curl -o '/tmp/rundb_v2.mysql' https://cernbox.cern.ch/index.php/s/G7fSf1hgEXAoB9t/download?path=%2F\&files=rundb_v2.mysql
     /usr/bin/mysql -u root -p'db...h4daq' < /tmp/rundb_v2.mysql
 }
 
