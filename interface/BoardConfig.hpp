@@ -34,6 +34,7 @@ public:
 	xmlNode* GetBoardNodePtr(){return board_node;}
 	// --- overload member to read the xml 
 	string inline getElementContent(const char*key){return Configurable::getElementContent(*this,key,board_node) ;};
+        std::vector<string> inline getElementVector(const char*key){return Configurable::getElementVector(*this,key,board_node) ;};
     // --- get the list of elements from a single node
     std::vector<std::pair<std::string, std::string> > getNodeContentList (const char * key) ;
 
