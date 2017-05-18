@@ -1,0 +1,21 @@
+<general>
+        <Hardware>
+                <crateID>1</crateID>
+                <board>
+                        <ID>VFE_adapter_1</ID>
+                        <type>VFE_adapter</type>
+                        <ManagerCfg>file://./data/VFE_adapter_connection_file.xml</ManagerCfg>
+                        <Device>vice.udp.0</Device>
+                        <Device>vice.udp.1</Device>
+                        <Nsamples>40</Nsamples>
+                        <TriggerSelf>0</TriggerSelf>
+                        <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+                        <TriggerLoop>0</TriggerLoop>
+                        <TriggerType>1</TriggerType>
+                        <HwDAQDelay>115</HwDAQDelay>
+                        <SwDAQDelay>0x0</SwDAQDelay>
+                        <DebugLevel>2</DebugLevel>
+                        <LoggerType>stderr</LoggerType>
+                </board>
+        </Hardware>
+</general>
