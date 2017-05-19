@@ -1,5 +1,7 @@
 #include "interface/VFE_adapter.hpp"
 
+#include <chrono>
+
 int main(int argc, char ** argv)
 {
         Board * b = new VFE_adapter(); 
@@ -34,8 +36,20 @@ int main(int argc, char ** argv)
         b->Config(&bc);
         b->Init();
 
+        b->Clear();
+
         std::vector<WORD> v;
-        b->Read(v);
+        int cnt = 0;
+        auto begin = std::chrono::high_resolution_clock::now();
+        while (cnt++ < 10000) {
+
+                (static_cast<VFE_adapter *>(b))->Trigger();
+                b->Read(v);
+                //getchar();
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto dt = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
+        printf("Elapsed time for %d events: %lld ns (%.2f Hz)\n", cnt - 1, dt, (cnt - 1) / (dt * 1e-9));
 
         return 0;
 }
