@@ -88,6 +88,8 @@ class VFE_adapter : public Board {
                 virtual int Read(std::vector<WORD> &v);
                 virtual int SetHandle(int) { return 0; }
 
+                void Trigger(); // for standalone acquisition (e.g. pedestals)
+
                 int Print();
 
         private:
@@ -124,7 +126,9 @@ class VFE_adapter : public Board {
                 int _trigger_loop;            // use internal software trigger (1) or Laser with external trigger (0)
                 int _trigger_type;            // continuous DAQ (0) or triggered DAQ (1)
                 int _hw_daq_delay;            // laser with external trigger
-                int _sw_daq_delay;            // delay for laser with external trigger
+                                              // waiting time on external trigger arrival (# clocks @ 160 MHz)
+                                              // greater values moves the signal *left*
+                int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
                 int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
                 std::string _logger_type;             // debug level: 0: none, 1: functions, 2: detailed
                 FILE * _fl;

@@ -68,8 +68,9 @@ int VFE_adapter::StartDAQ()
                 hw.getNode("CAP_CTRL").write(command);
                 hw.dispatch();
         }
+        Print();
         if (_debug) fprintf(_fl, "[VFE_adapter::StartDAQ] ...returning.\n");
-        return 0;
+        return 1;
 }
 
 
@@ -82,7 +83,7 @@ int VFE_adapter::StopDAQ()
                 hw.dispatch();
         }
         if (_debug) fprintf(_fl, "[VFE_adapter::StopDAQ] ...returning.\n");
-        return 0;
+        return 1;
 }
 
 
@@ -130,8 +131,10 @@ int VFE_adapter::Read(std::vector<WORD> &v)
 
         // for debugging purposes, can dump the whole decoded event content
         if (_debug > 1) _mem.clear();
-
         for (auto & hw : _dv) {
+                //uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
+                //hw.dispatch();
+                //fprintf(_fl, "     Free memory           : 0x%8.8x\n", free_mem.value());
                 for(int itrans = 0; itrans < _n_transfer; ++itrans)
                 {
                         _block = hw.getNode ("CAP_DATA").readBlock(VFE_adapter_MAX_PAYLOAD / 4);
@@ -211,6 +214,15 @@ void VFE_adapter::Decode()
 }
 
 
+void VFE_adapter::Trigger()
+{
+        for (auto & hw : _dv) {
+                hw.getNode("FW_VER").write(1);
+                hw.dispatch();
+        }
+}
+
+
 int VFE_adapter::Print()
 {
         if (_debug) fprintf(_fl, "[VFE_adapter::Print] entering...\n");
@@ -239,6 +251,7 @@ int VFE_adapter::Print()
                 _address = hw.getNode("CAP_ADDRESS").read();
                 uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
                 uhal::ValWord<uint32_t> trig_reg = hw.getNode("VICE_CTRL").read();
+                hw.dispatch();
 
                 // Print init values
                 fprintf(_fl, "     Firmware version      : %8.8x\n",   reg.value());
