@@ -50,33 +50,10 @@ class VFE_adapter : public Board {
 
         public:
 
-                typedef enum  {
-                        //ERR_NONE= 0,
-                        //ERR_CONF_NOT_FOUND,
-                        //ERR_CONF_INVALID,
-                        //ERR_DGZ_OPEN,
-                        //ERR_BOARD_INFO_READ,
-                        //ERR_INVALID_BOARD_TYPE,
-                        //ERR_DGZ_PROGRAM,
-                        //ERR_MALLOC,
-                        //ERR_RESTART,
-                        //ERR_INTERRUPT,
-                        //ERR_READOUT,
-                        //ERR_READOUT_TIMEOUT,
-                        //ERR_EVENT_BUILD,
-                        //ERR_CLEARBUFFER,
-                        //ERR_UNHANDLED_BOARD,
-                        //ERR_MISMATCH_EVENTS,
-                        //ERR_FREE_BUFFER,
-                        //ERR_DUMMY_LAST,
-                } ERROR_CODES;
-
                 VFE_adapter() : Board()
                 {
                         if (_logger_type == "stderr") _fl = stderr;
                         else                          _fl = stdout;
-                        //buffer_   = NULL;
-                        //event_    = NULL;
                         type_     = "VFE_adapter";
                 }
 
@@ -125,8 +102,7 @@ class VFE_adapter : public Board {
                 int _trigger_self_threshold;  // signal threshold [ADC count] to generate self trigger
                 int _trigger_loop;            // use internal software trigger (1) or Laser with external trigger (0)
                 int _trigger_type;            // continuous DAQ (0) or triggered DAQ (1)
-                int _hw_daq_delay;            // laser with external trigger
-                                              // waiting time on external trigger arrival (# clocks @ 160 MHz)
+                int _hw_daq_delay;            // readout waiting time on external trigger arrival [# clocks @ 160 MHz]
                                               // greater values moves the signal *left*
                 int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
                 int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
