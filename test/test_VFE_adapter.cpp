@@ -8,6 +8,7 @@ int main(int argc, char ** argv)
 
 	Configurator * cfg = new Configurator();
 	cfg->xmlFileName = "data/VFE_adapter.xml";
+	//cfg->xmlFileName = argv[1];
 	cfg->Init();
 
 	// find the board in the cfg
@@ -41,15 +42,19 @@ int main(int argc, char ** argv)
         std::vector<WORD> v;
         int cnt = 0;
         auto begin = std::chrono::high_resolution_clock::now();
-        while (cnt++ < 10000) {
-
-                (static_cast<VFE_adapter *>(b))->Trigger();
+        // can be commented if a fake trigger is generated
+        //while (cnt++ < 10000) {
+        while (1) {
+                // can be commented if a fake trigger is generated
+                usleep(5000);
+                // uncomment to generate fake trigger
+                //(static_cast<VFE_adapter *>(b))->Trigger();
                 b->Read(v);
                 //getchar();
         }
         auto end = std::chrono::high_resolution_clock::now();
         auto dt = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
-        printf("Elapsed time for %d events: %lld ns (%.2f Hz)\n", cnt - 1, dt, (cnt - 1) / (dt * 1e-9));
+        printf("Elapsed time for %d events: %ld ns (%.2f Hz)\n", cnt - 1, dt, (cnt - 1) / (dt * 1e-9));
 
         return 0;
 }
