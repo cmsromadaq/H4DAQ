@@ -130,8 +130,8 @@ int VFE_adapter::Read(std::vector<WORD> &v)
         // loading into v
 
         // for debugging purposes, can dump the whole decoded event content
-        if (_debug > 1) _mem.clear();
         for (auto & hw : _dv) {
+                if (_debug > 1) _mem.clear();
                 //uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
                 //hw.dispatch();
                 //fprintf(_fl, "     Free memory           : 0x%8.8x\n", free_mem.value());
