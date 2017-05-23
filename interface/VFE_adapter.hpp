@@ -13,7 +13,7 @@
 // for reference (and debugging messages)
 #define VFE_adapter_DV              1750./16384.; // 14 bits on 1.75V
 
-//#define VFE_adapter_NSAMPLE_MAX 65536
+//#define VFE_adapter_NSAMPLE_MAX 28670
 // Max ethernet packet = 1536 bytes, max user payload = 1500 bytes
 #define VFE_adapter_MAX_PAYLOAD 1380
 
@@ -68,6 +68,18 @@ class VFE_adapter : public Board {
                 void Trigger(); // for standalone acquisition (e.g. pedestals)
 
                 int Print();
+
+                void ConfigOptions(std::string & s);
+
+                // accessors for config parameters
+                size_t NDevices()             { return _devices.size();         }
+                int    NSamples()             { return _nsamples;               }
+                int    SelfTrigger()          { return _trigger_self;           }
+                int    SelfTriggerThreshold() { return _trigger_self_threshold; }
+                int    TriggerLoop()          { return _trigger_loop;           }
+                int    TriggerType()          { return _trigger_type;           }
+                int    HwDAQDelay()           { return _hw_daq_delay;           }
+                int    SwDAQDelay()           { return _sw_daq_delay;           }
 
         private:
 
