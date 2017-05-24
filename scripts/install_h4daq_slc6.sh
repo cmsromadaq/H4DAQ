@@ -128,6 +128,23 @@ cd /opt/A2818Drv-1.19
 EOF
 }
 
+function cactus ()
+{
+   # DRYRUN
+    echo ">> ARDUINO"
+    if [ ${1} == 1 ]; then
+	return 
+    fi
+    wget https://svnweb.cern.ch/trac/cactus/export/47920/trunk/scripts/release/ipbus-sw.slc6.x86_64.repo
+    sudo cp ipbus-sw.slc6.x86_64.repo /etc/yum.repos.d/ipbus-sw.repo
+    yum clean all
+    yum groupinstall uhal
+    cat <<EOF > /etc/profile.d/cactus.sh
+export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
+export PATH=/opt/cactus/bin:$PATH
+EOF
+}
+
 function arduino ()
 {
     # DRYRUN
@@ -298,7 +315,7 @@ function usage()
 }
 
 ### MAIN ###
-TEMP=`getopt -o dh --long dryrun,help,useradd,arduino,caenlib,a2818_driver,zeromq,root,post_install,h4sw,mysql_db,web_server,data_disk -n 'install_h4daq.sh' -- "$@"`
+TEMP=`getopt -o dh --long dryrun,help,useradd,arduino,caenlib,a2818_driver,zeromq,cactus,root,post_install,h4sw,mysql_db,web_server,data_disk -n 'install_h4daq.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -317,6 +334,7 @@ while true; do
 	--root ) root=1; all=0; shift;;
 	--zeromq ) zeromq=1; all=0; shift;;
 	--caenlib ) caenlib=1; all=0; shift;;
+	--cactus ) cactus=1; all=0; shift;;
 	--a2818_driver ) a2818_driver=1; all=0; shift;;
 	--arduino ) arduino=1; all=0; shift;;
 	--useradd ) useradd=1; all=0; shift;;
@@ -329,7 +347,7 @@ while true; do
     esac
 done
 
-options=("post_install" "root" "zeromq" "caenlib" "a2818_driver" "arduino" "useradd" "h4sw" "mysql_db" "web_server" "data_disk")
+options=("post_install" "root" "zeromq" "caenlib" "a2818_driver" "arduino" "cactus" "useradd" "h4sw" "mysql_db" "web_server" "data_disk")
 len=${#options[@]}
 echo "H4DAQ installer V1.0"
 if [ "$help" == 1 ]; then
