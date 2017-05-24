@@ -104,6 +104,7 @@ protected:
 
   // working variables
   uhal::ValWord<uint32_t> _address;
+  uhal::ValWord<uint32_t> _buffer_size;
 
   // how many ethernet packets are needed to transfer the VFE data
   // (depends on the number of samples)

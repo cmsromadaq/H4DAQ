@@ -26,7 +26,7 @@ int VFE_adapter::Init()
         // Add laser latency before catching data ~ 40 us
         hw.getNode("TRIG_DELAY").write((_sw_daq_delay<<16) + _hw_daq_delay);
         hw.dispatch();
-
+        Log("[VFE_adapter::Init] entering 1...", 1);
         // Reset the reading base address :
         hw.getNode("CAP_ADDRESS").write(0);
 
@@ -107,10 +107,10 @@ int VFE_adapter::ClearBusy()
 
 int VFE_adapter::Config(BoardConfig * bc)
 {
-    if (_debug) Log("[VFE_adapter::Config] entering...", 3);
-    TriggerBoard::Config(bc);
+    Log("[VFE_adapter::Config] entering...", 1);
+    Board::Config(bc);
     ParseConfiguration(bc);
-    if (_debug) Log("[VFE_adapter::Config] ...returning.", 3);
+    Log("[VFE_adapter::Config] ...returning.", 1);
     return 0;
 }
 
@@ -172,14 +172,14 @@ int VFE_adapter::ParseConfiguration(BoardConfig * bc)
     Log("[VFE_adapter::ParseConfiguration] entering...", 1);
     _manager_cfg             = bc->getElementContent("ManagerCfg");
     _devices                 = bc->getElementVector("Device");
-    _nsamples                = atoi(bc->getElementContent("Nsamples").c_str());
-    _trigger_self            = atoi(bc->getElementContent("TriggerSelf").c_str());
-    _trigger_self_threshold  = atoi(bc->getElementContent("TriggerSelfThreshold").c_str());
-    _trigger_loop            = atoi(bc->getElementContent("TriggerLoop").c_str());
-    _trigger_type            = atoi(bc->getElementContent("TriggerType").c_str());
-    _hw_daq_delay            = atoi(bc->getElementContent("HwDAQDelay").c_str());
-    _sw_daq_delay            = atoi(bc->getElementContent("SwDAQDelay").c_str());
-    _debug                   = atoi(bc->getElementContent("DebugLevel").c_str());
+    _nsamples                = Configurator::GetInt(bc->getElementContent("Nsamples").c_str());
+    _trigger_self            = Configurator::GetInt(bc->getElementContent("TriggerSelf").c_str());
+    _trigger_self_threshold  = Configurator::GetInt(bc->getElementContent("TriggerSelfThreshold").c_str());
+    _trigger_loop            = Configurator::GetInt(bc->getElementContent("TriggerLoop").c_str());
+    _trigger_type            = Configurator::GetInt(bc->getElementContent("TriggerType").c_str());
+    _hw_daq_delay            = Configurator::GetInt(bc->getElementContent("HwDAQDelay").c_str());
+    _sw_daq_delay            = Configurator::GetInt(bc->getElementContent("SwDAQDelay").c_str());
+    _debug                   = Configurator::GetInt(bc->getElementContent("DebugLevel").c_str());
 
     return 0;
 }
@@ -220,6 +220,9 @@ void VFE_adapter::Trigger()
     for (auto & hw : _dv) {
         hw.getNode("FW_VER").write(1);
         hw.dispatch();
+        // free_mem = hw.getNode("CAP_FREE").read();
+        // hw.dispatch();
+        // Log(Form("     Free memory after trigger : 0x%8.8x", free_mem.value()),1);
     }
 }
 
@@ -250,7 +253,7 @@ int VFE_adapter::Print()
         uhal::ValWord<uint32_t> delays = hw.getNode("TRIG_DELAY").read();
         // Read back the read/write base address
         _address = hw.getNode("CAP_ADDRESS").read();
-        uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
+        _buffer_size = hw.getNode("CAP_FREE").read();
         uhal::ValWord<uint32_t> trig_reg = hw.getNode("VICE_CTRL").read();
         hw.dispatch();
 
@@ -258,10 +261,10 @@ int VFE_adapter::Print()
         Log(Form("     Firmware version      : %8.8x",   reg.value()), 1);
         Log(Form("     Delays                : %8.8x",   delays.value()), 1);
         Log(Form("     Initial R/W addresses : 0x%8.8x", _address.value()), 1);
-        Log(Form("     Free memory           : 0x%8.8x", free_mem.value()), 1);
+        Log(Form("     Buffer Size           : 0x%8.8x", _buffer_size.value()), 1);
         Log(Form("     Trigger mode          : 0x%8.8x", trig_reg.value()), 1);
     }
-    if (_debug) Log(Form("[VFE_adapter::Print] ...returning."), 1);
+    if (_debug) Log(Form("[VFE_adapter::Print] ...returning."), 3);
     return 0;
 }
 
@@ -270,7 +273,17 @@ bool VFE_adapter::TriggerReceived()
     //--external trigger
     if(_trigger_loop == 0)
     {
-        return 0;
+        while (1)
+        {
+            //check free memory
+            for (auto & hw : _dv) {
+                uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
+                hw.dispatch();
+                if (free_mem.value() != _buffer_size.value()) //for the moment just signaling a trigger using an event present in memory
+                    return 1;
+            }
+            usleep(10);
+        }
     }
     //--self trigger
     else if(_trigger_loop == 1)
