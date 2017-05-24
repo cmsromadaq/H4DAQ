@@ -1,19 +1,7 @@
 #include "interface/HwManager.hpp"
 
 //Boards
-#include "interface/CAEN_VX718.hpp"
-#include "interface/CAEN_V1742.hpp"
-#include "interface/CAEN_V1495PU.hpp"
-#include "interface/CAEN_V1290.hpp"
-#include "interface/CAEN_V814.hpp"
-#include "interface/CAEN_V792.hpp"
-#include "interface/CAEN_V785.hpp"
-#include "interface/CAEN_V560.hpp"
-#include "interface/CAEN_V513.hpp"
-#include "interface/LECROY_1182.hpp"
-#include "interface/MAROC_ROC.hpp"
-#include "interface/CAEN_V265.hpp"
-#include "interface/TimeBoard.hpp"
+#include "interface/BoardList.hpp"
 
 #include "interface/EventBuilder.hpp" // boardId
 //#include "interface/BoardConfig.hpp"
@@ -137,6 +125,11 @@ void HwManager::Config(Configurator &c){
 			  //constructing a CAEN V785
 			  hw_.push_back( new CAEN_V785() );
 			}
+		else if( getElementContent(c,"type",board_node) == "VFE_ADAPTER")
+			{
+			  //constructing a VFE_ADAPTER
+			  hw_.push_back( new VFE_adapter() );
+			}
 		else
 		  {
 		    //UNKNOWN board get to the next node
@@ -210,7 +203,7 @@ void HwManager::Init(){
 // --- Close
 void HwManager::Close(){
   //Crate init
-  if (hw_.size()>0 )
+  if (hw_.size()>0 && hw_[ioControlBoard_.boardIndex_]->GetType() != "VFE_ADAPTER")
   	CrateClose();
 }
 
@@ -243,6 +236,17 @@ int HwManager::CrateClose(){
 int HwManager::CrateInit()
 {
   int status =0;
+
+  //---VFE adapter
+  for(unsigned int i=0;i<hw_.size();i++)
+    {
+      if ( hw_[i]->GetType() == "VFE_ADAPTER" )
+	{
+	  controllerBoard_.boardIndex_=i;
+	  ioControlBoard_.boardIndex_=i;
+	  return 0; 
+	}
+    }
 
   for(unsigned int i=0;i<hw_.size();i++)
     {
@@ -283,7 +287,7 @@ int HwManager::CrateInit()
   
   if (digiBoard_.boardIndex_<0)
     {
-      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
+      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=dynamic_cast<CAEN_VX718*>(hw_[controllerBoard_.boardIndex_])->GetConfiguration();
 
       status |= CAENVME_Init(controllerConfig->boardType, controllerConfig->LinkType, controllerConfig->LinkNum, &controllerBoard_.boardHandle_);
 
@@ -300,8 +304,8 @@ int HwManager::CrateInit()
     }
   else
     {
-      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=((CAEN_VX718*)hw_[controllerBoard_.boardIndex_])->GetConfiguration();
-      CAEN_V1742::CAEN_V1742_Config_t* digiConfig=((CAEN_V1742*)hw_[digiBoard_.boardIndex_])->GetConfiguration();
+      CAEN_VX718::CAEN_VX718_Config_t* controllerConfig=dynamic_cast<CAEN_VX718*>(hw_[controllerBoard_.boardIndex_])->GetConfiguration();
+      CAEN_V1742::CAEN_V1742_Config_t* digiConfig=dynamic_cast<CAEN_V1742*>(hw_[digiBoard_.boardIndex_])->GetConfiguration();
 
       CAEN_DGTZ_ConnectionType linkType=(CAEN_DGTZ_ConnectionType) 0;
       if (controllerConfig->boardType != cvV1718 )

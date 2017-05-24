@@ -70,7 +70,7 @@ int VFE_adapter::StartDAQ()
         }
         Print();
         if (_debug) fprintf(_fl, "[VFE_adapter::StartDAQ] ...returning.\n");
-        return 1;
+        return 0;
 }
 
 
@@ -83,14 +83,14 @@ int VFE_adapter::StopDAQ()
                 hw.dispatch();
         }
         if (_debug) fprintf(_fl, "[VFE_adapter::StopDAQ] ...returning.\n");
-        return 1;
+        return 0;
 }
 
 
 int VFE_adapter::BufferClear()
 {
         if (_debug) fprintf(_fl, "[VFE_adapter::BufferClear] entering...\n");
-        int ret = StopDAQ() && StartDAQ();
+        int ret = !(!StopDAQ() && !StartDAQ());
         if (_debug) fprintf(_fl, "[VFE_adapter::BufferClear] ...returning.\n");
         return ret;
 }
@@ -108,7 +108,7 @@ int VFE_adapter::ClearBusy()
 int VFE_adapter::Config(BoardConfig * bc)
 {
         if (_debug) fprintf(_fl, "[VFE_adapter::Config] entering...\n");
-        Board::Config(bc);
+        TriggerBoard::Config(bc);
         ParseConfiguration(bc);
         if (_debug) fprintf(_fl, "[VFE_adapter::Config] ...returning.\n");
         return 0;
@@ -262,4 +262,49 @@ int VFE_adapter::Print()
         }
         if (_debug) fprintf(_fl, "[VFE_adapter::Print] ...returning.\n");
         return 0;
+}
+
+bool VFE_adapter::TriggerReceived()
+{
+  //--external trigger
+  if(_trigger_loop == 0)
+    {
+      return 0;
+    }
+    //--self trigger
+  else if(_trigger_loop == 1)
+    {
+      Trigger();
+      return 1;
+    }
+  return 0;
+}
+
+int VFE_adapter::SetBusyOn()
+{
+  return 0;
+}
+
+int VFE_adapter::SetBusyOff()
+{
+  return 0;
+}
+
+int VFE_adapter::TriggerAck()
+{
+  return 0;
+}
+
+int VFE_adapter::SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus)
+{
+  int status=0;
+  if (triggerStatus == TRIG_ON)
+    {
+      status |= StopDAQ();
+      status |= StartDAQ();
+    }
+  else if (triggerStatus == TRIG_OFF)
+    status |= StopDAQ();
+
+  return status;
 }
