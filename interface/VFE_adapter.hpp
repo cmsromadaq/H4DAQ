@@ -52,8 +52,6 @@ public:
 
   VFE_adapter() : TriggerBoard(), IOControlBoard() 
   {
-    if (_logger_type == "stderr") _fl = stderr;
-    else                          _fl = stdout;
     type_     = "VFE_ADAPTER";
   }
 
@@ -124,8 +122,6 @@ protected:
   // greater values moves the signal *left*
   int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
   int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
-  std::string _logger_type;             // debug level: 0: none, 1: functions, 2: detailed
-  FILE * _fl;
 };
 
 #endif
