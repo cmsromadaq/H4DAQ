@@ -46,80 +46,86 @@
  *    ...       ...    ...    ...
  */
 
-class VFE_adapter : public Board {
+class VFE_adapter : public TriggerBoard, IOControlBoard
+{
+public:
 
-        public:
+  VFE_adapter() : TriggerBoard(), IOControlBoard() 
+  {
+    if (_logger_type == "stderr") _fl = stderr;
+    else                          _fl = stdout;
+    type_     = "VFE_ADAPTER";
+  }
 
-                VFE_adapter() : Board()
-                {
-                        if (_logger_type == "stderr") _fl = stderr;
-                        else                          _fl = stdout;
-                        type_     = "VFE_adapter";
-                }
+  virtual int Init();
+  virtual int Clear(); // stop + start
+  virtual int BufferClear(); // stop + start
+  virtual int ClearBusy();
+  virtual int Config(BoardConfig *bc);
+  virtual int Read(std::vector<WORD> &v);
+  virtual int SetHandle(int) { return 0; }
 
-                virtual int Init();
-                virtual int Clear(); // stop + start
-                virtual int BufferClear(); // stop + start
-                virtual int ClearBusy();
-                virtual int Config(BoardConfig *bc);
-                virtual int Read(std::vector<WORD> &v);
-                virtual int SetHandle(int) { return 0; }
+  void Trigger(); // for standalone acquisition (e.g. pedestals)
 
-                void Trigger(); // for standalone acquisition (e.g. pedestals)
+  int Print();
 
-                int Print();
+  void ConfigOptions(std::string & s);
 
-                void ConfigOptions(std::string & s);
+  // accessors for config parameters
+  size_t NDevices()             { return _devices.size();         }
+  int    NSamples()             { return _nsamples;               }
+  int    SelfTrigger()          { return _trigger_self;           }
+  int    SelfTriggerThreshold() { return _trigger_self_threshold; }
+  int    TriggerLoop()          { return _trigger_loop;           }
+  int    TriggerType()          { return _trigger_type;           }
+  int    HwDAQDelay()           { return _hw_daq_delay;           }
+  int    SwDAQDelay()           { return _sw_daq_delay;           }
 
-                // accessors for config parameters
-                size_t NDevices()             { return _devices.size();         }
-                int    NSamples()             { return _nsamples;               }
-                int    SelfTrigger()          { return _trigger_self;           }
-                int    SelfTriggerThreshold() { return _trigger_self_threshold; }
-                int    TriggerLoop()          { return _trigger_loop;           }
-                int    TriggerType()          { return _trigger_type;           }
-                int    HwDAQDelay()           { return _hw_daq_delay;           }
-                int    SwDAQDelay()           { return _sw_daq_delay;           }
+  //Main functions to handle the event trigger
+  virtual int SetBusyOn();
+  virtual int SetBusyOff();
+  virtual bool TriggerReceived();
+  virtual int TriggerAck();
+  virtual inline bool  SignalReceived(CMD_t signal) { return true; };
+  virtual int SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus);
 
-        private:
+protected:
 
-                void Decode();
-                int StartDAQ();
-                int StopDAQ();
-                /* reads params from cfg file */  
-                int ParseConfiguration(BoardConfig * bc);
+  void Decode();
+  int StartDAQ();
+  int StopDAQ();
+  /* reads params from cfg file */  
+  int ParseConfiguration(BoardConfig * bc);
 
-        private:
+  // main hardware interface, can read multiple VFE adapter (devices)
+  std::vector<uhal::HwInterface> _dv;
 
-                // main hardware interface, can read multiple VFE adapter (devices)
-                std::vector<uhal::HwInterface> _dv;
+  // to host data
+  uhal::ValVector<uint32_t> _block;
+  uhal::ValVector<uint32_t> _mem; // just for debugging
 
-                // to host data
-                uhal::ValVector<uint32_t> _block;
-                uhal::ValVector<uint32_t> _mem; // just for debugging
+  // working variables
+  uhal::ValWord<uint32_t> _address;
 
-                // working variables
-                uhal::ValWord<uint32_t> _address;
+  // how many ethernet packets are needed to transfer the VFE data
+  // (depends on the number of samples)
+  int _n_transfer;
+  int _n_last;
 
-                // how many ethernet packets are needed to transfer the VFE data
-                // (depends on the number of samples)
-                int _n_transfer;
-                int _n_last;
-
-                // configuration parameters
-                std::string _manager_cfg;
-                std::vector<std::string> _devices;
-                int _nsamples;                // number of samples to acquire
-                int _trigger_self;            // generate self trigger from data (1) or not (0)
-                int _trigger_self_threshold;  // signal threshold [ADC count] to generate self trigger
-                int _trigger_loop;            // use internal software trigger (1) or Laser with external trigger (0)
-                int _trigger_type;            // continuous DAQ (0) or triggered DAQ (1)
-                int _hw_daq_delay;            // readout waiting time on external trigger arrival [# clocks @ 160 MHz]
-                                              // greater values moves the signal *left*
-                int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
-                int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
-                std::string _logger_type;             // debug level: 0: none, 1: functions, 2: detailed
-                FILE * _fl;
+  // configuration parameters
+  std::string _manager_cfg;
+  std::vector<std::string> _devices;
+  int _nsamples;                // number of samples to acquire
+  int _trigger_self;            // generate self trigger from data (1) or not (0)
+  int _trigger_self_threshold;  // signal threshold [ADC count] to generate self trigger
+  int _trigger_loop;            // use internal software trigger (1) or Laser with external trigger (0)
+  int _trigger_type;            // continuous DAQ (0) or triggered DAQ (1)
+  int _hw_daq_delay;            // readout waiting time on external trigger arrival [# clocks @ 160 MHz]
+  // greater values moves the signal *left*
+  int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
+  int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
+  std::string _logger_type;             // debug level: 0: none, 1: functions, 2: detailed
+  FILE * _fl;
 };
 
 #endif

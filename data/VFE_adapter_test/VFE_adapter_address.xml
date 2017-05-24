@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<node id="TOP">
+  <node id="FW_VER"      address="0x0"     permission="rw" description="R_fw W_trigger" />
+  <node id="VICE_CTRL"   address="0x1"     permission="rw" description="VICE control registers" />
+  <node id="TRIG_DELAY"  address="0x2"     permission="rw" description="HW and SW delays" />
+  <node id="VFE_CTRL"    address="0x3"     permission="rw" description="ADC registers access"/>
+
+  <node id="CAP_CTRL"    address="0x10000" permission="rw" description="Capture control"/>
+  <node id="CAP_ADDRESS" address="0x10001" permission="rw" description="Read/Write address" />
+  <node id="CAP_FREE"    address="0x10002" permission="rw" description="Free memory" />
+  <node id="CAP_DATA"    address="0x18000" permission="r"  mode="incremental" size="28672" description="Captured data port" />
+
+  <node id="OUTPUT_CTRL" address="0x20000" permission="rw" description="Output control" />
+  <node id="CH1_SET_VAL" address="0x22000" permission="rw" description="CH1 output value for mode 0x3" />
+  <node id="CH2_SET_VAL" address="0x24000" permission="rw" description="CH2 output value for mode 0x3" />
+  <node id="CH3_SET_VAL" address="0x26000" permission="rw" description="CH3 output value for mode 0x3" />
+  <node id="CH4_SET_VAL" address="0x28000" permission="rw" description="CH4 output value for mode 0x3" />
+  <node id="CH5_SET_VAL" address="0x2A000" permission="rw" description="CH5 output value for mode 0x3" />
+</node>

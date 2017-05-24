@@ -1,0 +1,58 @@
+<general>
+  <waitForDR>0</waitForDR> 
+  <noEB>0</noEB> 
+  <spillSignalsDisabled>1</spillSignalsDisabled> <!-- standalone mode: just pass through spill signals -->
+  <Network>
+    <ListenPort>6000</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
+    <ListenPort>6004</ListenPort> <!-- CMD PORT -->
+    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <ConnectTo>localhost:6504</ConnectTo>  <!-- EB  -->
+    <ConnectTo>localhost:5566</ConnectTo>  <!-- GUI -->
+    <ConnectTo>localhost:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
+  </Network>
+
+  <Hardware>
+    <crateId>1</crateId>
+
+    <board><!-- Time Board --> 
+      <ID>1</ID>
+      <type>TIME</type> <!-- Remember to put always TIMEBOARD at the first location among boards -->
+    </board>
+
+    <board>
+      <ID>1</ID>
+      <type>VFE_ADAPTER</type>
+      <ManagerCfg>file://./data/VFE_adapter_test/VFE_adapter_connection_file.xml</ManagerCfg>
+      <Device>vice.udp.0</Device>                        
+      <!-- N.B. it has to be consistent with the connection map
+           <Device>vice.udp.1</Device>
+      -->
+      <!-- number of samples to acquire -->
+      <Nsamples>50</Nsamples>
+      <!-- generate self trigger from data (1) or not (0) -->
+      <TriggerSelf>1</TriggerSelf>
+      <!-- self trigger threshold [ADC count] -->
+      <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+      <!-- use internal software trigger (1) or external trigger (0) -->
+      <TriggerLoop>1</TriggerLoop>
+      <!-- continous DAQ (0) or triggered DAQ (1) -->
+      <TriggerType>1</TriggerType>
+      <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
+      <HwDAQDelay>115</HwDAQDelay>
+      <!-- as HwDAQDelay but for internally generated trigger -->
+      <SwDAQDelay>0x0</SwDAQDelay>
+      <DebugLevel>0</DebugLevel>
+      <LoggerType>stderr</LoggerType>
+    </board>
+  </Hardware>
+
+  <EventBuilder>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>0</dumpCompress>
+	  <sendEvent>1</sendEvent>
+	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
+	  <compress>0</compress>
+  </EventBuilder>
+</general>

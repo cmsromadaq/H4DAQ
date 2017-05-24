@@ -53,7 +53,7 @@ public:
 	virtual int SetHandle(int)=0;
 };
 
-class TriggerBoard : public Board {
+class TriggerBoard : virtual public Board {
 protected:
 
 public:
@@ -68,7 +68,7 @@ public:
 
 };
 
-class IOControlBoard : public Board {
+class IOControlBoard : virtual public Board {
 protected:
 
 public:

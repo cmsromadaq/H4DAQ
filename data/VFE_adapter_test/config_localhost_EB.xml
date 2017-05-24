@@ -1,0 +1,24 @@
+<general>
+  <Network>
+    <ListenPort>6500</ListenPort> <!-- DATA PORT -->
+    <ListenPort>6502</ListenPort> <!-- STATUS PORT -->
+    <ListenPort>6504</ListenPort> <!-- CMD PORT -->
+    <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
+    <ConnectTo>localhost:6000</ConnectTo>  <!-- RC Data  -->
+    <ConnectTo>localhost:6004</ConnectTo>  <!-- RC Cmd -->
+    <ConnectTo>localhost:5568</ConnectTo>  <!-- CML INTERFACE -->
+  </Network>
+  <Hardware>
+    <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
+  </Hardware>
+  <EventBuilder>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpDirName>/tmp/raw/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
+	  <sendEvent>0</sendEvent>
+	  <recvEvent>1</recvEvent> <!-- Number of machine to wait for -->
+	  <!--<postBuiltCmd>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCmd>-->
+	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/bin/unpack -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd> -->
+	  <postBuiltCmd>/home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%%</postBuiltCmd>-->
+  </EventBuilder>
+</general>
