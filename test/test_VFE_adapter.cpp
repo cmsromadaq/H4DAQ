@@ -39,14 +39,15 @@ void init_branches(TTree * t, int nsamples)
 
 void dump_event(TTree * t, std::vector<WORD> & w, int ndevices, int nsamples)
 {
+        WORD head = w[0];
         for (int id = 0; id < ndevices; ++id) {
                 e_._id = id;
                 if((w[0]>>31) != 1) printf("Sample 0 not a header : %8.8x\n",w[0]);
-                unsigned long int t1= w[0]     &0xFFFF;
-                unsigned long int t2= w[1]     &0xFFFF;
-                unsigned long int t3=(w[1]>>16)&0xFFFF;
-                unsigned long int t4= w[2]     &0xFFFF;
-                unsigned long int t5=(w[2]>>16)&0x00FF;
+                unsigned long int t1= w[1]     &0xFFFF;
+                unsigned long int t2= w[2]     &0xFFFF;
+                unsigned long int t3=(w[2]>>16)&0xFFFF;
+                unsigned long int t4= w[3]     &0xFFFF;
+                unsigned long int t5=(w[3]>>16)&0x00FF;
                 e_._ts = (t5<<56) + (t4<<42) + (t3<<28) + (t2<<14) + t1;
 
                 int debug = 0;
@@ -58,7 +59,7 @@ void dump_event(TTree * t, std::vector<WORD> & w, int ndevices, int nsamples)
                 }
                 for(int is = 0; is < nsamples; ++is)
                 {
-                        int j=(is+1)*3;
+                        int j = (is + 2) * 3;
                         e_._samples[0][is]= w[j]       &0xFFFF;
                         e_._samples[1][is]= w[j+1]     &0xFFFF;
                         e_._samples[2][is]=(w[j+1]>>16)&0xFFFF;
