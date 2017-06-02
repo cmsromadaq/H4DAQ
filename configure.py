@@ -12,6 +12,7 @@ parser.add_option("","--noroot",action="store_true",help="NO ROOT",default=False
 parser.add_option("","--nocaen",action="store_true",help="NO CAEN",default=False)
 parser.add_option("","--noxml" ,action="store_true",help="NO XML",default=False)
 parser.add_option("","--nozmq" ,action="store_true",help="NO ZMQ",default=False)
+parser.add_option("","--nocactus" ,action="store_true",help="NO CACTUS",default=False)
 
 (opts,argv)=parser.parse_args();
 
@@ -33,6 +34,10 @@ if opts.nocaen:
 if opts.nozmq:
 	print "-> NO ZMQ"
 	cmd=["sed","-i","s:Makefile\.ZMQ:Makefile.NOZMQ:","Makefile"]
+	call(cmd)
+if opts.nocactus:
+	print "-> NO CACTUS"
+	cmd=["sed","-i","s:Makefile\.CACTUS:Makefile.NOCACTUS:","Makefile"]
 	call(cmd)
 
 print "DONE"

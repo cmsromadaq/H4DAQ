@@ -210,7 +210,7 @@ void Logger::Dump(dataType &d)
 	else { Write(d) ; return;}
 }
 
-void Logger::Log(string line,short level){
+void Logger::Log(string& line,short level){
 // implement the high level logging for async operation
     line = string("")+ Utility::now() + ": " + line + "\n";
     if (level>logLevel_) return; // don't log unrequired ones

@@ -1,0 +1,13 @@
+# libs for XML files
+CXXFLAGS	+= -I/opt/cactus/include 
+LDFLAGS 	+= -L/opt/cactus/lib/ -lpthread \
+                \
+                -lboost_filesystem \
+                -lboost_regex \
+                -lboost_system \
+                -lboost_thread \
+                \
+                -lcactus_extern_pugixml \
+                -lcactus_uhal_log \
+                -lcactus_uhal_grammars \
+                -lcactus_uhal_uhal

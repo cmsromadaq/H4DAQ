@@ -164,8 +164,8 @@ int main(int argc, char ** argv)
                         fprintf(stderr, "Error: cannot open file `%s'\n", root_file);
                         return 2;
                 }
-                nsamples = (static_cast<VFE_adapter *>(b))->NSamples();
-                ndevices = (static_cast<VFE_adapter *>(b))->NDevices();
+                nsamples = (dynamic_cast<VFE_adapter *>(b))->NSamples();
+                ndevices = (dynamic_cast<VFE_adapter *>(b))->NDevices();
                 // 5 channels per VFE
                 //e_._samples = (sample_t **)calloc(5, sizeof(sample_t *));
                 for (size_t i = 0; i < 5; ++i) {
@@ -184,8 +184,8 @@ int main(int argc, char ** argv)
                 // can be commented if a fake trigger is generated
                 //usleep(5000);
                 // uncomment to generate fake trigger
-                (static_cast<VFE_adapter *>(b))->Trigger();
                 v.clear();
+                (dynamic_cast<VFE_adapter *>(b))->Trigger();
                 b->Read(v);
                 if (root_output) dump_event(t, v, ndevices, nsamples);
                 //getchar();

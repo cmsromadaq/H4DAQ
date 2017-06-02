@@ -80,7 +80,7 @@ mycommand="cd ${daqhome};  \
 		git pull ; \
 		git log --oneline -n1 | sed \"s/^.*$/%%% & %%%/\" ;  \
 		git diff origin/${mybranch} | sed \"s/^.*$/@@@ & @@@/\" ;  \
-		env python configure.py --noroot ; \
+		env python configure.py; \
 		make -j 4;  \
 		./bin/resetCrate -t ${vmecontroller} -d 0 -l 0 ;  "
 

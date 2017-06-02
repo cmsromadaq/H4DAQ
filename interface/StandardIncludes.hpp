@@ -51,8 +51,9 @@ using namespace std;
 
 #ifndef NO_ROOT
 //ROOT
-	#include "TTree.h"
-	#include "TFile.h"
+#include "TTree.h"
+#include "TFile.h"
+#include "TString.h"
 #endif
 
 #ifndef NO_ZLIB

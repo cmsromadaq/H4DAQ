@@ -42,6 +42,7 @@ include make/Makefile.ROOT
 include make/Makefile.ZMQ
 include make/Makefile.CAEN
 include make/Makefile.XML
+include make/Makefile.CACTUS
 
 #wait to update Packages in NO_xxx
 .PHONY: all2

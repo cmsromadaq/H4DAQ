@@ -72,7 +72,7 @@ public:
 	// --- Write a DataType on file
 	void Write(dataType &d, bool dryrun=false); // this requires Binary moed
 	// --- Log 
-	void Log(string line,short level);
+	void Log(string& line,short level);
 	// --- High level function for dumping
 	void Dump(dataType &d);
 	// --- Close files
