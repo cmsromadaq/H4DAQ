@@ -86,20 +86,20 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         //  3 bits [17-19] -> number of devices (adapters) read by the VFE_adapter instance
         //  5 bits [20-24] -> firmware version
         //  8 bits [25-32] -> unreserved
-        void     setHeadNSamples(uint16_t nsamples)    { _header |= (nsamples & 0x3FFF); }
-        void     setHeadFrequency(uint16_t ifreq)      { _header |= ((ifreq & 0x3)<<14); }
-        void     setHeadNDevices(uint16_t ndev)        { _header |= ((ndev & 0x7)<<16);  }
-        void     setHeadFwVersion(uint16_t ver)        { _header |= ((ver & 0x1F)<<19);  }
+        void     setHeadNSamples(int nsamples)    { _header |= (nsamples & 0x3FFF); }
+        void     setHeadFrequency(int ifreq)      { _header |= ((ifreq & 0x3)<<14); }
+        void     setHeadNDevices(int ndev)        { _header |= ((ndev & 0x7)<<16);  }
+        void     setHeadFwVersion(int ver)        { _header |= ((ver & 0x1F)<<19);  }
         // to be used e.g. by DQM or any RAW data decoder
-        static uint16_t headNSamples(uint32_t header)  { return  header & 0x3FFF;    }
-        static uint16_t headFrequency(uint32_t header) { return (header>>14) & 0x3;  }
-        static uint16_t headNDevices(uint32_t header)  { return (header>>16) & 0x7;  }
-        static uint16_t headFwVersion(uint32_t header) { return (header>>19) & 0x1F; }
+        static int headNSamples(uint32_t header)  { return  header & 0x3FFF;    }
+        static int headFrequency(uint32_t header) { return (header>>14) & 0x3;  }
+        static int headNDevices(uint32_t header)  { return (header>>16) & 0x7;  }
+        static int headFwVersion(uint32_t header) { return (header>>19) & 0x1F; }
 
-        uint16_t headNSamples()  { return headNSamples(_header);  }
-        uint16_t headFrequency() { return headFrequency(_header); }
-        uint16_t headNDevices()  { return headNDevices(_header);  }
-        uint16_t headFwVersion() { return headFwVersion(_header); }
+        int headNSamples()  { return headNSamples(_header);  }
+        int headFrequency() { return headFrequency(_header); }
+        int headNDevices()  { return headNDevices(_header);  }
+        int headFwVersion() { return headFwVersion(_header); }
 
         //Main functions to handle the event trigger
         virtual int SetBusyOn();

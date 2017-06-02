@@ -593,5 +593,6 @@ BoardTypes_t HwManager::GetBoardTypeId(string type){
 	else if( type=="MAROC_ROC") return _MAROCROC_;
 	else if( type=="CAEN_V265") return _CAENV265_;
 	else if( type=="CAEN_V785") return _CAENV785_;
+	else if( type=="VFE_ADAPTER") return _VFEADAPTER_;
 	else return _UNKWN_;
 }
