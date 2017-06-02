@@ -15,9 +15,11 @@ int VFE_adapter::Init()
         _dv.push_back(manager.getDevice(d));
     }
 
+    uhal::ValWord<uint32_t> tmp;
+    bool first = true;
     for (auto & hw : _dv) {
         // Read FW version to check :
-        uhal::ValWord<uint32_t> reg = hw.getNode("FW_VER").read();
+        _fw_version = hw.getNode("FW_VER").read();
         // Switch to triggered mode + external trigger :
         hw.getNode("VICE_CTRL").write((_trigger_self_threshold<<16) + 8 * _trigger_self + 4 * _trigger_loop + 2 * _trigger_type);
         // Stop DAQ and ask for 16 _nsamples per frame (+timestamp) :
@@ -29,8 +31,15 @@ int VFE_adapter::Init()
         Log("[VFE_adapter::Init] entering 1...", 1);
         // Reset the reading base address :
         hw.getNode("CAP_ADDRESS").write(0);
-
         hw.dispatch();
+        // check FW version
+        if (first) {
+            tmp = _fw_version;
+            first = false;
+        }
+        if (_fw_version != tmp) {
+            Log("[VFE_adapter::FwVersion] WARNING: not all the devices have the same firmware!!", 1);
+        }
     }
 
     // init number of words needed for transfer
@@ -45,6 +54,14 @@ int VFE_adapter::Init()
         Log("[VFE_adapter::Init] Max frame size : 28672", 1);
     }
     Print();
+
+    // init event header
+    //
+    // if different FW versions across devices, the version of the last device is written
+    setHeadFwVersion(_fw_version); 
+    setHeadNSamples(_nsamples);
+    setHeadNDevices(_dv.size());
+    setHeadFrequency(3); // FIXME: if FW changed to handle different frequency, implement a function to read it from the FW directly
 
     Log("[VFE_adapter::Init] ...returning.", 1);
     return 0;
@@ -125,6 +142,9 @@ int VFE_adapter::Read(std::vector<WORD> &v)
     ///address = hw.getNode("CAP_ADDRESS").read();
     ///hw.dispatch();
     ///if(debug>0)printf("address : 0x%8.8x, Free memory : %d",address.value(),free_mem.value());
+
+    // write event header
+    v.push_back(_header);
 
     // Read event samples from FPGA
     // loading into v
@@ -268,13 +288,12 @@ int VFE_adapter::Print()
     return 0;
 }
 
+
 bool VFE_adapter::TriggerReceived()
 {
     //--external trigger
-    if(_trigger_loop == 0)
-    {
-        while (1)
-        {
+    if (_trigger_loop == 0) {
+        while (1) {
             //check free memory
             for (auto & hw : _dv) {
                 uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
@@ -284,41 +303,40 @@ bool VFE_adapter::TriggerReceived()
             }
             usleep(10);
         }
-    }
-    //--self trigger
-    else if(_trigger_loop == 1)
-    {
+    } else if(_trigger_loop == 1) { //--self trigger
         Trigger();
         return 1;
     }
     return 0;
 }
 
+
 int VFE_adapter::SetBusyOn()
 {
     return 0;
 }
+
 
 int VFE_adapter::SetBusyOff()
 {
     return 0;
 }
 
+
 int VFE_adapter::TriggerAck()
 {
     return 0;
 }
 
+
 int VFE_adapter::SetTriggerStatus(TRG_t triggerType, TRG_STATUS_t triggerStatus)
 {
     int status=0;
-    if (triggerStatus == TRIG_ON)
-    {
+    if (triggerStatus == TRIG_ON) {
         status |= StopDAQ();
         status |= StartDAQ();
-    }
-    else if (triggerStatus == TRIG_OFF)
+    } else if (triggerStatus == TRIG_OFF) {
         status |= StopDAQ();
-
+    }
     return status;
 }
