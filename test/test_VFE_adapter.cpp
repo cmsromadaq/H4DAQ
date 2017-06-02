@@ -185,12 +185,12 @@ int main(int argc, char ** argv)
                 //usleep(5000);
                 // uncomment to generate fake trigger
                 (static_cast<VFE_adapter *>(b))->Trigger();
+                v.clear();
                 b->Read(v);
                 if (root_output) dump_event(t, v, ndevices, nsamples);
                 //getchar();
         }
         if (root_output) {
-                fprintf(stderr, "fineeeeeeeeeee!!!!!!!!\n");
                 froot->Write();
                 froot->Close();
         }
