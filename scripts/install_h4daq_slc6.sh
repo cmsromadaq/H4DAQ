@@ -138,10 +138,10 @@ function cactus ()
     wget https://svnweb.cern.ch/trac/cactus/export/47920/trunk/scripts/release/ipbus-sw.slc6.x86_64.repo
     sudo cp ipbus-sw.slc6.x86_64.repo /etc/yum.repos.d/ipbus-sw.repo
     yum clean all
-    yum groupinstall uhal
+    yum groupinstall uhal -y
     cat <<EOF > /etc/profile.d/cactus.sh
-export LD_LIBRARY_PATH=/opt/cactus/lib:$LD_LIBRARY_PATH
-export PATH=/opt/cactus/bin:$PATH
+export LD_LIBRARY_PATH=/opt/cactus/lib:\$LD_LIBRARY_PATH
+export PATH=/opt/cactus/bin:\$PATH
 EOF
 }
 
