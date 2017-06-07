@@ -80,6 +80,24 @@
       <PulserAResetInput>0</PulserAResetInput> <!--CVIOSources-->
     </board>
 
+    <board>
+      <type>CAEN_V513</type> <!-- I/O REGISTER -->
+      <ID>1</ID>
+      <baseAddress>0x00111100</baseAddress>
+      <strobePolarity>0</strobePolarity> <!-- positive strobe polarity -->
+      <channelsDirectionWord>0x00FF</channelsDirectionWord> <!-- ch 0-7 IN, ch 8-15 OUT -->
+      <channelsPolarityWord>0xFFFF</channelsPolarityWord> <!-- positive polarity -->
+      <channelsInputModeWord>0xFFF8</channelsInputModeWord><!-- normalInputMode (glitched for the first 3) --> 
+      <channelsTransferModeWord>0x0000</channelsTransferModeWord><!-- transparentTransferMode -->
+
+      <WWEReadBitMask>0x0001</WWEReadBitMask>
+      <WEReadBitMask>0x0002</WEReadBitMask>
+      <EEReadBitMask>0x0004</EEReadBitMask>
+
+      <beamTriggerVetoBitMask>0x0100</beamTriggerVetoBitMask>
+      <pedTriggerVetoBitMask>0x0200</pedTriggerVetoBitMask>
+      <ledTriggerVetoBitMask>0x0400</ledTriggerVetoBitMask>
+    </board>
 
 
      <board>
