@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <connections>
-  <connection id="vice.udp.0" uri="ipbusudp-2.0://10.0.0.19:50001" address_table="file://VFE_adapter_address.xml" />
-  <connection id="vice.udp.1" uri="ipbusudp-2.0://10.0.0.20:50001" address_table="file://VFE_adapter_address.xml" />
-  <connection id="vice.udp.2" uri="ipbusudp-2.0://10.0.0.24:50001" address_table="file://VFE_adapter_address.xml" />
+  <connection id="vice.udp.3" uri="ipbusudp-2.0://10.0.0.19:50001" address_table="file://VFE_adapter_address.xml" />
+  <connection id="vice.udp.5" uri="ipbusudp-2.0://10.0.0.21:50001" address_table="file://VFE_adapter_address.xml" />
+  <connection id="vice.udp.4" uri="ipbusudp-2.0://10.0.0.20:50001" address_table="file://VFE_adapter_address.xml" />
+  <connection id="vice.udp.7" uri="ipbusudp-2.0://10.0.0.23:50001" address_table="file://VFE_adapter_address.xml" />
+  <connection id="vice.udp.8" uri="ipbusudp-2.0://10.0.0.24:50001" address_table="file://VFE_adapter_address.xml" />
 </connections>
