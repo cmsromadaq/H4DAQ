@@ -21,7 +21,7 @@ int CAEN_V513::Init()
   status |= CAENVME_ReadCycle(handle_,configuration_.baseAddress+CAEN_V513_VERSION_REGISTER,&data,CAEN_V513_ADDRESSMODE,CAEN_V513_DATAWIDTH);
   if (status)
     {
-      s.str(""); s << status << "[CAEN_V513]::[ERROR]::Cannot open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
+      s.str(""); s << "[CAEN_V513]::[ERROR]::Cannot open V513 board @0x" << std::hex << configuration_.baseAddress << std::dec; 
       Log(s.str(),1);
       return ERR_OPEN;
     }    
