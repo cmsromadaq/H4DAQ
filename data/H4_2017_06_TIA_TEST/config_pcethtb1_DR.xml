@@ -40,7 +40,7 @@
       <DebugLevel>0</DebugLevel>
       <LoggerType>stderr</LoggerType>
     </board>
-  <Hardware>
+  </Hardware>
 
   <EventBuilder>
 	  <dumpEvent>0</dumpEvent>
