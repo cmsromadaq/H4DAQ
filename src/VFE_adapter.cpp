@@ -303,11 +303,11 @@ bool VFE_adapter::TriggerReceived()
             for (auto & hw : _dv) {
                 uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
                 hw.dispatch();
-		Log(Form("     Free mem           : 0x%8.8x", free_mem.value()), 1);
+		// Log(Form("     Free mem           : 0x%8.8x", free_mem.value()), 1);
                 if (free_mem.value() != _buffer_size.value()) //for the moment just signaling a trigger using an event present in memory
                     return 1;
             }
-            usleep(100);
+            usleep(10);
         }
     } else if(_trigger_loop == 1) { //--self trigger
         Trigger();
