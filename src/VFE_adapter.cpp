@@ -154,9 +154,9 @@ int VFE_adapter::Read(std::vector<WORD> &v)
     for (auto & hw : _dv) {
         if (_debug > 1) _mem.clear();
 
-        uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
-        hw.dispatch();
-	Log(Form("     Free mem before      : 0x%8.8x", free_mem.value()), 1);
+        // uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
+        // hw.dispatch();
+	// Log(Form("     Free mem before      : 0x%8.8x", free_mem.value()), 1);
 
         //fprintf(_fl, "     Free memory           : 0x%8.8x", free_mem.value());
         for(int itrans = 0; itrans < _n_transfer; ++itrans)
@@ -171,9 +171,9 @@ int VFE_adapter::Read(std::vector<WORD> &v)
         _block = hw.getNode ("CAP_DATA").readBlock(_n_last);
         // for debugging
         //_address = hw.getNode("CAP_ADDRESS").read();
-        free_mem = hw.getNode("CAP_FREE").read();
-        hw.dispatch();
-	Log(Form("     Free mem after       : 0x%8.8x", free_mem.value()), 1);
+        // free_mem = hw.getNode("CAP_FREE").read();
+        // hw.dispatch();
+	// Log(Form("     Free mem after       : 0x%8.8x", free_mem.value()), 1);
         //if(debug>0)printf("After reading address : 0x%8.8x, Free memory : %d",address.value(),free_mem.value());
         for(int is = 0; is < _n_last; ++is) {
             if (_debug > 1) _mem.push_back(_block[is]);
@@ -307,7 +307,7 @@ bool VFE_adapter::TriggerReceived()
                 if (free_mem.value() != _buffer_size.value()) //for the moment just signaling a trigger using an event present in memory
                     return 1;
             }
-            usleep(10);
+            usleep(1000);
         }
     } else if(_trigger_loop == 1) { //--self trigger
         Trigger();
