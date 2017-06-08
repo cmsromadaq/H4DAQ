@@ -53,7 +53,7 @@ int VFE_adapter::Init()
         Log("[VFE_adapter::Init] Event size too big! Please reduce number of samples per frame.", 1);
         Log("[VFE_adapter::Init] Max frame size : 28672", 1);
     }
-    int reset=StartDAQ() && StopDAQ();
+    int reset = StartDAQ() && StopDAQ();
     Print();
 
     // init event header
@@ -172,7 +172,7 @@ int VFE_adapter::Read(std::vector<WORD> &v)
         // for debugging
         //_address = hw.getNode("CAP_ADDRESS").read();
         // free_mem = hw.getNode("CAP_FREE").read();
-        // hw.dispatch();
+        hw.dispatch();
 	// Log(Form("     Free mem after       : 0x%8.8x", free_mem.value()), 1);
         //if(debug>0)printf("After reading address : 0x%8.8x, Free memory : %d",address.value(),free_mem.value());
         for(int is = 0; is < _n_last; ++is) {
