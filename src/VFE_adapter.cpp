@@ -23,7 +23,7 @@ int VFE_adapter::Init()
         // Switch to triggered mode + external trigger :
         hw.getNode("VICE_CTRL").write((_trigger_self_threshold<<16) + 8 * _trigger_self + 4 * _trigger_loop + 2 * _trigger_type);
         // Stop DAQ and ask for 16 _nsamples per frame (+timestamp) :
-        int command = ((_nsamples + 1)<<16) + VFE_adapter_CAPTURE_STOP;
+	int command = ((_nsamples + 1)<<16) + VFE_adapter_CAPTURE_STOP;
         hw.getNode("CAP_CTRL").write(command);
         // Add laser latency before catching data ~ 40 us
         hw.getNode("TRIG_DELAY").write((_sw_daq_delay<<16) + _hw_daq_delay);
@@ -53,6 +53,7 @@ int VFE_adapter::Init()
         Log("[VFE_adapter::Init] Event size too big! Please reduce number of samples per frame.", 1);
         Log("[VFE_adapter::Init] Max frame size : 28672", 1);
     }
+    int reset=StartDAQ() && StopDAQ();
     Print();
 
     // init event header
