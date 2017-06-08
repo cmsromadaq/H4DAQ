@@ -30,7 +30,7 @@
       <!-- self trigger threshold [ADC count] -->
       <TriggerSelfThreshold>3000</TriggerSelfThreshold>
       <!-- use internal software trigger (1) or external trigger (0) -->
-      <TriggerLoop>0</TriggerLoop>
+      <TriggerLoop>1</TriggerLoop>
       <!-- continous DAQ (0) or triggered DAQ (1) -->
       <TriggerType>1</TriggerType>
       <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
