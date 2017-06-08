@@ -26,7 +26,7 @@
       <!-- number of samples to acquire -->
       <Nsamples>50</Nsamples>
       <!-- generate self trigger from data (1) or not (0) -->
-      <TriggerSelf>0</TriggerSelf>
+      <TriggerSelf>1</TriggerSelf>
       <!-- self trigger threshold [ADC count] -->
       <TriggerSelfThreshold>3000</TriggerSelfThreshold>
       <!-- use internal software trigger (1) or external trigger (0) -->
