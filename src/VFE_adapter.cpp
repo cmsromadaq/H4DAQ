@@ -301,7 +301,7 @@ bool VFE_adapter::TriggerReceived()
     //--external trigger
     if (_trigger_loop == 0) {
       int timeout=0;
-        while (1 && timeout<200) {
+        while (1 && timeout<2000) {
             //check free memory
             for (auto & hw : _dv) {
                 uhal::ValWord<uint32_t> free_mem = hw.getNode("CAP_FREE").read();
