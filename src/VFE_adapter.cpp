@@ -66,6 +66,7 @@ int VFE_adapter::Init()
     setHeadNDevices(_dv.size());
     setHeadFrequency(3); // FIXME: if FW changed to handle different frequency, implement a function to read it from the FW directly
 
+    Log(Form("[VFE_adapter::Init] Header: %x", _header), 1);
     Log("[VFE_adapter::Init] ...returning.", 1);
     return 0;
 }
