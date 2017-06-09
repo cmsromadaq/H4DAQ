@@ -7,6 +7,8 @@
 
 #include "TString.h"
 
+#define DEEPDEBUG 1
+
 int VFE_adapter::Init()
 {
     Log("[VFE_adapter::Init] entering...", 1);
@@ -305,7 +307,7 @@ bool VFE_adapter::TriggerReceived()
                 hw.dispatch();
 		// Log(Form("     Free mem           : 0x%8.8x", free_mem.value()), 1);
                 if (free_mem.value() != _buffer_size.value()) //for the moment just signaling a trigger using an event present in memory
-                    return 1;
+		return 1;
             }
             usleep(10);
         }
