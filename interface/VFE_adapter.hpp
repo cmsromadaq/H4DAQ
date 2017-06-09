@@ -53,6 +53,7 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         VFE_adapter() : TriggerBoard(), IOControlBoard() 
         {
             type_     = "VFE_ADAPTER";
+	    _header = 0;
         }
 
         virtual int Init();
