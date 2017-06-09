@@ -40,6 +40,60 @@
       <DebugLevel>0</DebugLevel>
       <LoggerType>stderr</LoggerType>
     </board>
+
+    <board>
+      <ID>7</ID>
+      <type>VFE_ADAPTER</type>
+      <ManagerCfg>file://./data/VFE_adapter_test/VFE_adapter_connection_file.xml</ManagerCfg>
+      <Device>vice.udp.7</Device>                        
+      <!-- N.B. it has to be consistent with the connection map
+           <Device>vice.udp.1</Device>
+      -->
+      <!-- number of samples to acquire -->
+      <Nsamples>50</Nsamples>
+      <!-- generate self trigger from data (1) or not (0) -->
+      <TriggerSelf>0</TriggerSelf>
+      <!-- self trigger threshold [ADC count] -->
+      <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+      <!-- use internal software trigger (1) or external trigger (0) -->
+      <TriggerLoop>0</TriggerLoop>
+      <!-- continous DAQ (1) or triggered DAQ (1) -->
+      <TriggerType>1</TriggerType>
+      <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
+      <HwDAQDelay>115</HwDAQDelay>
+      <!-- as HwDAQDelay but for internally generated trigger -->
+      <SwDAQDelay>0x0</SwDAQDelay>
+      <DebugLevel>0</DebugLevel>
+      <LoggerType>stderr</LoggerType>
+    </board>
+
+    <board>
+      <ID>5</ID>
+      <type>VFE_ADAPTER</type>
+      <ManagerCfg>file://./data/VFE_adapter_test/VFE_adapter_connection_file.xml</ManagerCfg>
+      <Device>vice.udp.5</Device>                        
+      <!-- N.B. it has to be consistent with the connection map
+           <Device>vice.udp.1</Device>
+      -->
+      <!-- number of samples to acquire -->
+      <Nsamples>50</Nsamples>
+      <!-- generate self trigger from data (1) or not (0) -->
+      <TriggerSelf>0</TriggerSelf>
+      <!-- self trigger threshold [ADC count] -->
+      <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+      <!-- use internal software trigger (1) or external trigger (0) -->
+      <TriggerLoop>0</TriggerLoop>
+      <!-- continous DAQ (1) or triggered DAQ (1) -->
+      <TriggerType>1</TriggerType>
+      <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
+      <HwDAQDelay>115</HwDAQDelay>
+      <!-- as HwDAQDelay but for internally generated trigger -->
+      <SwDAQDelay>0x0</SwDAQDelay>
+      <DebugLevel>0</DebugLevel>
+      <LoggerType>stderr</LoggerType>
+    </board>
+
+
   </Hardware>
 
   <EventBuilder>
