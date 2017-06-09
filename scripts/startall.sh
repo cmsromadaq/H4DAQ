@@ -110,9 +110,15 @@ IFS=','
 function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;41m\1\x1b[00m:g' ; done }
 function col2 { while read line ; do echo "$line" | sed 's:%%%\(.*\)%%%:\x1b[01;31m\1\x1b[00m:g' ; done }
 
-for machine in $dr ; do 
-    if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/${tag}/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
+for machine in $dr ; do
+    # if more then one DR runs on the same machine they are separeted by commas. e.g. dr:0:stic:10
+    IFS=':' read -r -a num_deamon <<< "$machine"
+    machine="${num_deamon[0]}"
+    unset num_deamon[0]
+    for dea in "${num_deamon[@]}"
+    do
+	if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
+	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/${tag}/config_${machine}_DR_${dea}.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_${dea}_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_${dea}_\$(date +%s)_${daquser}.log" 
 	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
 #	[ "${start_dr}" == "0" ] && continue;
 	## compile
@@ -122,10 +128,11 @@ for machine in $dr ; do
 	echo "START DATAREADOUT on $machine"
 	echo "-----------------------------"
 	if  [ "${machine}" == "localhost" ]; then
-	    /bin/bash -i -c "${mydatato}" 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
+	    /bin/bash -i -c "${mydatato}" 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_${dea}_$(date +%s)_${USER}.log;
 	else
-	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
+	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_${dea}_$(date +%s)_${USER}.log;
 	fi
+    done
 done
 
 for machine in $rc ; do 
