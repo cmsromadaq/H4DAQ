@@ -37,7 +37,7 @@
       <HwDAQDelay>115</HwDAQDelay>
       <!-- as HwDAQDelay but for internally generated trigger -->
       <SwDAQDelay>0x0</SwDAQDelay>
-      <DebugLevel>3</DebugLevel>
+      <DebugLevel>0</DebugLevel>
       <LoggerType>stderr</LoggerType>
     </board>
   </Hardware>
