@@ -1,5 +1,5 @@
 <general>
-  <waitForDR>1</waitForDR>  
+  <waitForDR>3</waitForDR>  
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
   <testEnableDuringBeam>0</testEnableDuringBeam> 
@@ -17,7 +17,7 @@
   </Network>
   <Hardware>
 
-    <crateId>2</crateId>
+    <crateId>0</crateId>
 
     <board> <!-- TIME board always as first -->
       <ID>1</ID>
