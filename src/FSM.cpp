@@ -192,11 +192,13 @@ while (true) {
 		      // received EE
 			Command myCmd=eventBuilder_->CloseSpill(); // eventBuilder know if the mex is to be sent on the network
 			if (myCmd.cmd == SEND)
-			{
-			  
+			  {
+			        ostringstream s;
+				s << "[DataReadoutFSM]::[INFO]::send " << myCmd.N << " bytes";
+				Log(s.str(),1);
 				dataType myMex;
 				myMex.append(myCmd.data,myCmd.N);
-				usleep(1000);
+				usleep(500);
 				connectionManager_->Send(myMex,DataSck);
 			}
 			MoveToStatus(SENTBUFFER);
