@@ -1,0 +1,54 @@
+<general>
+  <Network>
+    <ListenPort>6070</ListenPort> <!--send data: Port0-->
+    <ListenPort>6072</ListenPort> <!--send status: Port1 -->
+    <ListenPort>6074</ListenPort> <!--send Cmds -->
+    <!-- <ConnectTo>localhost:5557</ConnectTo> -->
+    <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo> <!-- RUN CONTROL -->
+    <ConnectTo>pcethtb2.cern.ch:5569</ConnectTo> <!-- EMERGENCY CLI -->
+  </Network>
+  <Hardware>
+    <crateId>2</crateId>
+
+    <board><!-- Time Board --> 
+      <ID>1</ID>
+      <type>TIME</type> <!-- Remember to put always TIMEBOARD at the first location among boards -->
+    </board>
+
+    <board>
+      <ID>7</ID>
+      <type>VFE_ADAPTER</type>
+      <ManagerCfg>file://./data/VFE_adapter_test/VFE_adapter_connection_file.xml</ManagerCfg>
+      <Device>vice.udp.7</Device>                        
+      <!-- N.B. it has to be consistent with the connection map
+           <Device>vice.udp.1</Device>
+      -->
+      <!-- number of samples to acquire -->
+      <Nsamples>50</Nsamples>
+      <!-- generate self trigger from data (1) or not (0) -->
+      <TriggerSelf>0</TriggerSelf>
+      <!-- self trigger threshold [ADC count] -->
+      <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+      <!-- use internal software trigger (1) or external trigger (0) -->
+      <TriggerLoop>0</TriggerLoop>
+      <!-- continous DAQ (1) or triggered DAQ (1) -->
+      <TriggerType>1</TriggerType>
+      <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
+      <HwDAQDelay>115</HwDAQDelay>
+      <!-- as HwDAQDelay but for internally generated trigger -->
+      <SwDAQDelay>0x0</SwDAQDelay>
+      <DebugLevel>0</DebugLevel>
+      <LoggerType>stderr</LoggerType>
+    </board>
+
+  </Hardware>
+
+  <EventBuilder>
+	  <dumpEvent>1</dumpEvent>
+	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpCompress>0</dumpCompress>
+	  <sendEvent>1</sendEvent>
+	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
+	  <compress>0</compress>
+  </EventBuilder>
+</general>
