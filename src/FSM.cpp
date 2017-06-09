@@ -1307,7 +1307,7 @@ while (true) {
 			  ostringstream s;
 			  s << "[RunControlFSM]::[INFO]::send " << myCmd.N << " bytes";
 			  Log(s.str(),1);
-			  usleep(1000);
+			  usleep(20000);
 			  dataType myMex;
 			  myMex.append(myCmd.data,myCmd.N);
 			  connectionManager_->Send(myMex,DataSck);
@@ -1330,7 +1330,7 @@ while (true) {
 		usleep(1);
 		UpdateMex();
 		waitForReadyTimeOutCounter_++;
-		if (waitForReadyTimeOutCounter_>100000)
+		if (waitForReadyTimeOutCounter_>1000000)
 		  {
 		    Log("[RunControlFSM]::[ERROR]::Timeout in RECVBUFFER",1);
 		    waitForReadyTimeOutCounter_=0;
