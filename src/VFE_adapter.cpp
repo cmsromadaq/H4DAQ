@@ -61,7 +61,7 @@ int VFE_adapter::Init()
     // init event header
     //
     // if different FW versions across devices, the version of the last device is written
-    Log(Form("[VFE_adapter::Init] Header: %x", _header), 1);
+    _header=0;
     setHeadFwVersion(_fw_version); 
     setHeadNSamples(_nsamples);
     setHeadNDevices(_dv.size());
