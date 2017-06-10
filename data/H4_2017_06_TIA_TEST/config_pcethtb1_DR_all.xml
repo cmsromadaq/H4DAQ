@@ -24,7 +24,7 @@
            <Device>vice.udp.1</Device>
       -->
       <!-- number of samples to acquire -->
-      <Nsamples>2000</Nsamples>
+      <Nsamples>150</Nsamples>
       <!-- generate self trigger from data (1) or not (0) -->
       <TriggerSelf>0</TriggerSelf>
       <!-- self trigger threshold [ADC count] -->
@@ -34,7 +34,7 @@
       <!-- continous DAQ (1) or triggered DAQ (1) -->
       <TriggerType>1</TriggerType>
       <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
-      <HwDAQDelay>10</HwDAQDelay>
+      <HwDAQDelay>60</HwDAQDelay>
       <!-- as HwDAQDelay but for internally generated trigger -->
       <SwDAQDelay>0x0</SwDAQDelay>
       <DebugLevel>0</DebugLevel>
@@ -50,7 +50,7 @@
            <Device>vice.udp.1</Device>
       -->
       <!-- number of samples to acquire -->
-      <Nsamples>2000</Nsamples>
+      <Nsamples>150</Nsamples>
       <!-- generate self trigger from data (1) or not (0) -->
       <TriggerSelf>0</TriggerSelf>
       <!-- self trigger threshold [ADC count] -->
@@ -60,7 +60,7 @@
       <!-- continous DAQ (1) or triggered DAQ (1) -->
       <TriggerType>1</TriggerType>
       <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
-      <HwDAQDelay>10</HwDAQDelay>
+      <HwDAQDelay>60</HwDAQDelay>
       <!-- as HwDAQDelay but for internally generated trigger -->
       <SwDAQDelay>0x0</SwDAQDelay>
       <DebugLevel>0</DebugLevel>
@@ -76,7 +76,7 @@
            <Device>vice.udp.1</Device>
       -->
       <!-- number of samples to acquire -->
-      <Nsamples>2000</Nsamples>
+      <Nsamples>150</Nsamples>
       <!-- generate self trigger from data (1) or not (0) -->
       <TriggerSelf>0</TriggerSelf>
       <!-- self trigger threshold [ADC count] -->
@@ -86,7 +86,7 @@
       <!-- continous DAQ (1) or triggered DAQ (1) -->
       <TriggerType>1</TriggerType>
       <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
-      <HwDAQDelay>10</HwDAQDelay>
+      <HwDAQDelay>60</HwDAQDelay>
       <!-- as HwDAQDelay but for internally generated trigger -->
       <SwDAQDelay>0x0</SwDAQDelay>
       <DebugLevel>0</DebugLevel>
