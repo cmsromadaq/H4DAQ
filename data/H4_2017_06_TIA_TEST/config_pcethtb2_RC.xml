@@ -15,7 +15,7 @@
   </Network>
   <Hardware>
 
-    <crateId>0</crateId>
+    <crateId>2</crateId>
 
     <board> <!-- TIME board always as first -->
       <ID>1</ID>
