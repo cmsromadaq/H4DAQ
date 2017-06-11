@@ -244,6 +244,9 @@ int FindMatch::Iterative()
 	// 
 	uint_t pos1=0,pos2=0;
 	double myMaxChi2=0;
+
+	ofstream myfile;
+	myfile.open("/tmp/debug/findme.txt",ios::out | ios::app);
 	for(;pos1 <time1.size() && pos2<time2.size() ; )
 		{
 		double chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
@@ -277,16 +280,15 @@ int FindMatch::Iterative()
 			continue;
 			}
 
-		ofstream myfile;
-		myfile.open("/tmp/debug/findme.txt",ios::out | ios::app);
 		myfile << "Unmerged pos1="<<pos1<< "pos2="<<pos2<<"time1"<<time1[pos1]<<"time2"<<time2[pos2]<<" Delta "<<delta<<"chi2" <<chi2<<endl;
-		myfile.close();
 		//fprintf(file,"unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2); // editing it to print to a file... Originally it was plain printf
 		// increment both and continue
 		//fclose(file);
 		++pos1; ++ pos2;
 		
 		}
+	
+	myfile.close();
 	d2_=100;
 	d_=1;
 	maxChi2_=myMaxChi2;
