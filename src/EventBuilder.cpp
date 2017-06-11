@@ -702,8 +702,8 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	timeval tv_start; 
 	gettimeofday(&tv_start,NULL);
 #endif
-	int status=A.Run();
-	//int status=A.Iterative();
+	//int status=A.Run();
+	int status=A.Iterative();
 	if (status >0 ) 
 		{
 		ostringstream s; s<<"[EventBuilder]::[MergeSpills]::[Error] Matching algorithm exited with error status "<<status;
