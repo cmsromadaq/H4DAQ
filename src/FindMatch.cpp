@@ -1,4 +1,5 @@
 #include "interface/FindMatch.hpp"
+#include "stdio.h"
 //#define FM_DEBUG
 //#define FM_TIME_DEBUG
 
@@ -274,7 +275,7 @@ int FindMatch::Iterative()
 			++pos1;
 			continue;
 			}
-		printf("unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2);
+		fprintf("/tmp/debug/FindMatchIterative.txt","unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2); // editing it to print to a file... Originally it was plain printf
 		// increment both and continue
 		++pos1; ++ pos2;
 		
