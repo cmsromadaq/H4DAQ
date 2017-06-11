@@ -821,6 +821,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
+		Log("### [EventBuilder]::[MergeSpill] spill size:" + mySpill_.size(),1) ;
 		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
