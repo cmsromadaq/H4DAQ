@@ -32,7 +32,7 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	double myMaxChi2=0;
 	for(uint_t i=0;i<x.size();++i)
 	{
-		double chi2=sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
+		double chi2=std::sqrt( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
 		R+= chi2;// ???
 		if (chi2 >myMaxChi2) myMaxChi2=chi2;
 		if ( R> d2_ ) {
@@ -242,7 +242,7 @@ int FindMatch::Iterative()
 	double myMaxChi2=0;
 	for(;pos1 <time1.size() && pos2<time2.size() ; )
 		{
-		double chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
+		double chi2=std::sqrt( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
 		//if ( time1[pos1] -time1[0] > 438000 &&  time1[pos1] -time1[0] < 440000 )printf("INFO : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1]-time1[0],time2[pos2]-time2[0],delta,chi2);
 		if(chi2 < 40000)
 			{
@@ -253,7 +253,7 @@ int FindMatch::Iterative()
 			continue;
 			}
 		// try pos1++
-		chi2=sqr( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
+		chi2=std::sqrt( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
 		if(chi2 < 40000)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
@@ -263,7 +263,7 @@ int FindMatch::Iterative()
 			continue;
 			}
 		// try pos2++
-		chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
+		chi2=std::sqrt( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
 		if(chi2 < 40000)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
@@ -272,7 +272,7 @@ int FindMatch::Iterative()
 			++pos1;
 			continue;
 			}
-		printf("unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2);
+		//printf("unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2);
 		// increment both and continue
 		++pos1; ++ pos2;
 		

@@ -45,8 +45,8 @@
   </Hardware>
 
   <EventBuilder>
-	  <dumpEvent>1</dumpEvent>
-	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+          <dumpEvent>0</dumpEvent>
+	  <dumpDirName>/tmp/raw/dr5/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress>
 	  <sendEvent>1</sendEvent>
 	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->

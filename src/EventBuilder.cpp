@@ -6,9 +6,9 @@
 #include <sstream>
 
 #define EB_DEBUG
-#define EB_DEBUG_VERBOSE
-#define TIME_DEBUG
-#define EB_ENFORCE_SAMEEVT
+//#define EB_DEBUG_VERBOSE
+//#define TIME_DEBUG
+//#define EB_ENFORCE_SAMEEVT
 
 
 // ---------- Event Builder
