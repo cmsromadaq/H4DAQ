@@ -278,7 +278,7 @@ int FindMatch::Iterative()
 			}
 
 		ofstream myfile;
-		myfile.open("/tmp/debug",ios::out | ios::app);
+		myfile.open("/tmp/debug/findme.txt",ios::out | ios::app);
 		myfile << "Unmerged pos1="<<pos1<< "pos2="<<pos2<<"time1"<<time1[pos1]<<"time2"<<time2[pos2]<<" Delta "<<delta<<"chi2" <<chi2<<endl;
 		myfile.close();
 		//fprintf(file,"unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2); // editing it to print to a file... Originally it was plain printf
