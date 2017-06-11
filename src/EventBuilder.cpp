@@ -456,7 +456,7 @@ void EventBuilder::Clear(){
 void EventBuilder::OpenSpill()
 {
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] OpenSpill",1);
+	Log("[EventBuilder]::[DEBUG] OpenSpill",3);
 #endif
 	if (isSpillOpen_) CloseSpill(); 
 	lastEvent_.spillNum_ ++;
@@ -479,7 +479,7 @@ void EventBuilder::OpenSpill()
 	mySpill_.append( (void*)&zero, WORDSIZE); // spill Size
 	mySpill_.append( (void*)&zero, WORDSIZE); // n.event in Spill
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] OpenSpill Done",1);
+	Log("[EventBuilder]::[DEBUG] OpenSpill Done",3);
 #endif
 	
 }
@@ -487,7 +487,7 @@ void EventBuilder::OpenSpill()
 Command EventBuilder::CloseSpill()
 {
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Close Spill",1);
+	Log("[EventBuilder]::[DEBUG] Close Spill",3);
 #endif
 	Command myCmd; myCmd.cmd=NOP;
 	isSpillOpen_=false;	
@@ -538,7 +538,7 @@ Command EventBuilder::CloseSpill()
 	} 
 	mySpill_.clear();
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Close Spill - Done",1);
+	Log("[EventBuilder]::[DEBUG] Close Spill - Done",3);
 #endif
 	return myCmd;
 }
@@ -560,10 +560,10 @@ void EventBuilder::AddEventToSpill(dataType &event){
 }
 int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 #ifdef EB_DEBUG
-	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static",3);
 	{
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: size1"<<spill1.size()<<";"<<spill2.size() <<" ; "<<spill1.data() <<"!=NULL ;" << spill2.data() <<" !=NULL" ;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	}
 #endif
 
@@ -576,7 +576,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	WordToStream(H1d,H1); H1d.append( (void*)"\0",1);
 	WordToStream(H2d,H2); H2d.append( (void*)"\0",1);
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers"<< (char*)H1d.data() <<";"<< (char*) H2d.data() ;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	}
 #endif
 		
@@ -595,12 +595,12 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 #ifdef EB_DEBUG_VERBOSE
 	{
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging runs"<<runNum1<<"=="<<runNum2;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spillN"<<spillNum1<<"=="<<spillNum2;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	s.str() ="";
 	 s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merging spill Nevents="<<spillNevents1<<"=="<<spillNevents2;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	}
 #endif
 
@@ -626,7 +626,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	spill1.append((void*)&spillNevents1,WORDSIZE); // will be updated
 
 #ifdef EB_DEBUG
-	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers Added",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static: Headers Added",3);
 #endif
 
 	char* ptr1=(char*)oldSpill.data();
@@ -697,7 +697,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	{
 	ostringstream s;
 	s<<"[EventBuilder]::[MergeSpills]::[TIME_DEBUG] Going to run Matching "<<time1.size()<<" - "<<time2.size();
-	Log(s.str(),1);
+	Log(s.str(),3);
 	}
 	timeval tv_start; 
 	gettimeofday(&tv_start,NULL);
@@ -736,7 +736,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 #ifdef EB_DEBUG
 	{
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill 2 static: Merge iEvent="<<iEvent;
-	Log(s.str(),1);
+	Log(s.str(),3);
 	}
 #endif
 #ifdef TIME_DEBUG
@@ -767,7 +767,7 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	(*spillNevtPtr)=(WORD)matched.size();
 	
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill 2 static Done",3);
 #endif
 	lastNeventMerged_=matched.size();
 	if (!(lastNeventMerged_==spillNevents1 && spillNevents1==spillNevents2)){
@@ -780,21 +780,21 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 
 void EventBuilder::MergeSpills(dataType &spill2 ) {
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1",3);
 	ostringstream s; s<<"[EventBuilder]::[DEBUG] Merge Spill: Event Already merged="<<merged_<<" lastBadSpill Was "<<lastBadSpill_ <<" SpillN is "<<ReadSpillNum(spill2);
-	Log(s.str(),1);
+	Log(s.str(),3);
 #endif
 	WORD spillNum=ReadSpillNum(spill2); 
 
 		if ( merged_ == 0 )  // spill structure is empty
 			{
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: NO MERGED EVENTS: CHECK IF SPILL IS MARKED AS BAD",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: NO MERGED EVENTS: CHECK IF SPILL IS MARKED AS BAD",3);
 #endif
 			// TODO -- check spill consistencies to call this function. Check if spill2 is better
 			if (lastBadSpill_ == ReadSpillNum(spill2) ) return;
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: COPY",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: COPY",3);
 #endif
 			mySpill_.copy(spill2);
 			++merged_;
@@ -802,7 +802,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		else 
 			{
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: Merge",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1: Merge",3);
 #endif
 			int badSpill=MergeSpills(mySpill_,spill2);
 			++merged_;
@@ -833,7 +833,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		Dump(mySpill_);
 		dump_->Close();
 #ifdef EB_DEBUG_VERBOSE
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Going To Clear",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Going To Clear",3);
 		usleep(1000);
 #endif
 		// mySpill_.clear(); //wait for the spill close
@@ -849,10 +849,10 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		pid_t childpid=Fork();
 		if (childpid == 0 ) // child
 			{
-			Log("[EventBuilder]::[MergeSpill]::[DEBUG] Executing command:"+myCmd,1);
+			Log("[EventBuilder]::[MergeSpill]::[DEBUG] Executing command:"+myCmd,3);
 			int ret=system(myCmd.c_str());
 			ostringstream s; s<< "[EventBuilder]::[MergeSpill]::[DEBUG] DQM return status " << ret;
-			Log(s.str(),1);
+			Log(s.str(),3);
 			_exit(0);
 			}
 		else if (childpid <0 ) {
@@ -865,7 +865,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		}
 #ifdef EB_DEBUG_VERBOSE
 
-	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Done",1);
+	Log("[EventBuilder]::[DEBUG] Merge Spill - 1 Done",3);
 #endif
 	return;
 } 
