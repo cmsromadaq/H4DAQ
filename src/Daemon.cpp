@@ -54,7 +54,7 @@ int Daemon::Init(string configFileName){
 		while(std::getline(ss, token, ',')) 
 		  testEnableSequence_.push_back(TRG_t(Configurator::GetInt(token)));
 		
-		ostringstream s; s<<" HopeThatThisWorks [Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
+		ostringstream s; s<<" [Daemon]::[Init] Wait For DR: "<< waitForDR_ ;
 		Log(s.str(),1);
 		s.str(""); s<<"[Daemon]::[Init] Use EB: "<< !noEB_;
 		Log(s.str(),1);
