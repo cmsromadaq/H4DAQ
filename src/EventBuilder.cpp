@@ -7,7 +7,7 @@
 
 #define EB_DEBUG
 //#define EB_DEBUG_VERBOSE
-//#define TIME_DEBUG
+#define TIME_DEBUG
 //#define EB_ENFORCE_SAMEEVT
 
 
