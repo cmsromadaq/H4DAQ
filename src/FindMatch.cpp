@@ -244,7 +244,7 @@ int FindMatch::Iterative()
 		{
 		double chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
 		//if ( time1[pos1] -time1[0] > 438000 &&  time1[pos1] -time1[0] < 440000 )printf("INFO : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1]-time1[0],time2[pos2]-time2[0],delta,chi2);
-		if(chi2 < 4000)
+		if(chi2 < 40000)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1,pos2));
@@ -254,7 +254,7 @@ int FindMatch::Iterative()
 			}
 		// try pos1++
 		chi2=sqr( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
-		if(chi2 < 4000)
+		if(chi2 < 40000)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1+1,pos2));
@@ -264,7 +264,7 @@ int FindMatch::Iterative()
 			}
 		// try pos2++
 		chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
-		if(chi2 < 4000)
+		if(chi2 < 40000)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1,pos2+1));
