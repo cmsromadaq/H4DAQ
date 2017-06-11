@@ -702,8 +702,8 @@ int EventBuilder::MergeSpills(dataType &spill1,dataType &spill2 ){  // 0 ok
 	timeval tv_start; 
 	gettimeofday(&tv_start,NULL);
 #endif
-	//int status=A.Run();
-	int status=A.Iterative();
+	int status=A.Run();
+	//int status=A.Iterative();
 	if (status >0 ) 
 		{
 		ostringstream s; s<<"[EventBuilder]::[MergeSpills]::[Error] Matching algorithm exited with error status "<<status;
@@ -821,7 +821,6 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 	if ( merged_ >= recvEvent_)  // dump for recvEvent
 		{
 		WORD myRunNum=ReadRunNumFromSpill(spill2);
-		Log("### [EventBuilder]::[MergeSpill] spill size:" + mySpill_.size(),1) ;
 		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
