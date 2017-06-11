@@ -1,5 +1,6 @@
 #include "interface/FindMatch.hpp"
-#include "stdio.h"
+#include <iostream>
+#include <fstream>
 //#define FM_DEBUG
 //#define FM_TIME_DEBUG
 
@@ -275,11 +276,14 @@ int FindMatch::Iterative()
 			++pos1;
 			continue;
 			}
-		FILE* file;
-		file=fopen("/tmp/debug/find.txt","w");
-		fprintf(file,"unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2); // editing it to print to a file... Originally it was plain printf
+
+		ofstream myfile;
+		myfile.open("/tmp/debug",ios::out | ios::app);
+		myfile << "Unmerged pos1="<<pos1<< "pos2="<<pos2<<"time1"<<time1[pos1]<<"time2"<<time2[pos2]<<" Delta "<<delta<<"chi2" <<chi2<<endl;
+		myfile.close();
+		//fprintf(file,"unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2); // editing it to print to a file... Originally it was plain printf
 		// increment both and continue
-		fclose(file);
+		//fclose(file);
 		++pos1; ++ pos2;
 		
 		}
