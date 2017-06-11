@@ -220,8 +220,10 @@ int FindMatch::CopyResult(vector<uint_t> &x, vector<uint_t> &y)
 	return 0;
 }
 
+// debug this function and understand why the merged events are so few when including the third VFE
 int FindMatch::Iterative()
 {
+
 	long double delta;
 	long double t1_ave= 0.;
 	long double t2_ave= 0.;
