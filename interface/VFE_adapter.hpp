@@ -87,7 +87,7 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         //  3 bits [17-19] -> number of devices (adapters) read by the VFE_adapter instance
         //  5 bits [20-24] -> firmware version
         //  8 bits [25-32] -> unreserved
-        void     setHeadNSamples(int nsamples)    { _header |= (nsamples & 0x3FFF); }
+        void     setHeadNSamples(int nsamples)    { _header |= (nsamples & 0x6FFE); } //Old value is 0x3FFF ansd was edited to 0x6FFE
         void     setHeadFrequency(int ifreq)      { _header |= ((ifreq & 0x3)<<14); }
         void     setHeadNDevices(int ndev)        { _header |= ((ndev & 0x7)<<16);  }
         void     setHeadFwVersion(int ver)        { _header |= ((ver & 0x1F)<<19);  }
