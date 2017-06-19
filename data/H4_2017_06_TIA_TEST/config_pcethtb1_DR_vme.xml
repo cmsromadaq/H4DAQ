@@ -249,7 +249,7 @@
 
       <CHANNEL>
         <ID>1</ID>
-	<ENABLE_INPUT>NO</ENABLE_INPUT>
+	<ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
            # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -273,7 +273,7 @@
 
       <CHANNEL>
         <ID>2</ID>
-        <ENABLE_INPUT>NO</ENABLE_INPUT>
+        <ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
            # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -297,7 +297,7 @@
 
       <CHANNEL>
         <ID>3</ID>
-        <ENABLE_INPUT>NO</ENABLE_INPUT>
+        <ENABLE_INPUT>YES</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
            # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -318,11 +318,11 @@
           -->
         <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
       </CHANNEL>
-     </board>
+    </board>
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>0</dumpEvent>
-	  <dumpDirName>/tmp/raw/dr_vme/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
+	  <dumpDirName>/tmp/raw/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress>
 	  <sendEvent>1</sendEvent>
 	  <recvEvent>0</recvEvent> <!-- Number of machine to wait for -->
