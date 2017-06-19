@@ -17,8 +17,8 @@ int VFE_adapter::Init()
         _dv.push_back(manager.getDevice(d));
     }
 
-    Reset();
-    SetLEDStatus(0);
+    // Reset();
+    // SetLEDStatus(0);
 
     uhal::ValWord<uint32_t> tmp;
     bool first = true;
