@@ -6,9 +6,6 @@
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
     <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo>  <!-- VME crate Data -->
     <ConnectTo>pcethtb1.cern.ch:6030</ConnectTo>  <!-- DR3 Data -->
-    <!-- ConnectTo>pcethtb1.cern.ch:6050</ConnectTo -->  <!-- DR5 Data -->
-    <!-- ConnectTo>pcethtb1.cern.ch:6070</ConnectTo -->  <!-- DR7 Data -->
-    <!-- ConnectTo>pcethtb1.cern.ch:6080</ConnectTo -->  <!-- DR8 Data -->
     <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
     <ConnectTo>pcethtb2.cern.ch:5568</ConnectTo>  <!-- CML INTERFACE -->
