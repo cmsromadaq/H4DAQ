@@ -8,7 +8,7 @@
     <ConnectTo>pcethtb2.cern.ch:5569</ConnectTo> <!-- EMERGENCY CLI -->
   </Network>
   <Hardware>
-    <crateId>1</crateId>
+    <crateId>8</crateId>
 
     <board><!-- Time Board --> 
       <ID>1</ID>
