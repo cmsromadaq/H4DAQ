@@ -10,6 +10,12 @@
 #define VFE_adapter_CAPTURE_START   1
 #define VFE_adapter_CAPTURE_STOP    2
 
+#define VFE_adapter_RESET           1
+
+#define VFE_adapter_GEN_TRIGGER     1
+#define VFE_adapter_GEN_100HZ       2
+#define VFE_adapter_LED_ON          4
+
 // for reference (and debugging messages)
 #define VFE_adapter_DV              1750./16384.; // 14 bits on 1.75V
 
@@ -115,6 +121,8 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         void Decode();
         int StartDAQ();
         int StopDAQ();
+        int Reset();
+        int SetLEDStatus(int status);
         /* reads params from cfg file */  
         int ParseConfiguration(BoardConfig * bc);
 

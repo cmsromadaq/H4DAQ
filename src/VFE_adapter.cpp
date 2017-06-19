@@ -17,13 +17,16 @@ int VFE_adapter::Init()
         _dv.push_back(manager.getDevice(d));
     }
 
+    Reset();
+    SetLEDStatus(0);
+
     uhal::ValWord<uint32_t> tmp;
     bool first = true;
     for (auto & hw : _dv) {
         // Read FW version to check :
         _fw_version = hw.getNode("FW_VER").read();
         // Switch to triggered mode + external trigger :
-        hw.getNode("VICE_CTRL").write((_trigger_self_threshold<<16) + 8 * _trigger_self + 4 * _trigger_loop + 2 * _trigger_type);
+        hw.getNode("VICE_CTRL").write((_trigger_self_threshold<<16) + 8 * _trigger_self + 4 * _trigger_loop + 2 * _trigger_type + VFE_adapter_RESET * 0);
         // Stop DAQ and ask for 16 _nsamples per frame (+timestamp) :
 	int command = ((_nsamples + 1)<<16) + VFE_adapter_CAPTURE_STOP;
         hw.getNode("CAP_CTRL").write(command);
@@ -105,6 +108,32 @@ int VFE_adapter::StopDAQ()
         hw.dispatch();
     }
     if (_debug) Log("[VFE_adapter::StopDAQ] ...returning.", 3);
+    return 0;
+}
+
+
+int VFE_adapter::Reset()
+{
+    if (_debug) Log("[VFE_adapter::Reset] entering...", 3);
+    for (auto & hw : _dv) {
+        hw.getNode("CAP_CTRL").write(VFE_adapter_RESET * 1);
+        hw.dispatch();
+    }
+    usleep(2000000);
+    if (_debug) Log("[VFE_adapter::Reset] ...returning.", 3);
+    return 0;
+}
+
+
+int VFE_adapter::SetLEDStatus(int status)
+{
+    if (_debug) Log("[VFE_adapter::SetLEDStatus] entering...", 3);
+    for (auto & hw : _dv) {
+        int command = VFE_adapter_LED_ON * 0 + VFE_adapter_GEN_100HZ * 0 + VFE_adapter_GEN_TRIGGER * 0;
+        hw.getNode("FW_VER").write(command);
+        hw.dispatch();
+    }
+    if (_debug) Log("[VFE_adapter::SetLEDStatus] ...returning.", 3);
     return 0;
 }
 
