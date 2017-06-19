@@ -249,7 +249,7 @@
 
       <CHANNEL>
         <ID>1</ID>
-	<ENABLE_INPUT>YES</ENABLE_INPUT>
+	<ENABLE_INPUT>NO</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
            # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -271,9 +271,11 @@
         <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
       </CHANNEL>
 
+
+
       <CHANNEL>
         <ID>2</ID>
-        <ENABLE_INPUT>YES</ENABLE_INPUT>
+        <ENABLE_INPUT>NO</ENABLE_INPUT>
         <DC_OFFSET>0</DC_OFFSET>
         <!--
            # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
@@ -297,28 +299,10 @@
 
       <CHANNEL>
         <ID>3</ID>
-        <ENABLE_INPUT>YES</ENABLE_INPUT>
-        <DC_OFFSET>0</DC_OFFSET>
-        <!--
-           # GRP_CH_DC_OFFSET dc_0, dc_1, dc_2, dc_3, dc_4, dc_5, dc_6, dc_7
-           # Available only for model 742, allows to set different DC offset adjust for each channel (DAC channel setting) in percent of the Full Scale. 
-           # -50: analog input dynamic range = -3Vpp/2 to -Vpp/2 (max negative dynamic)
-           # +50: analog input dynamic range = +Vpp/2 to +3Vpp/2 (max positive dynamic)
-           # 0: analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)
-           # options: -50.0 to 50.0  (floating point)
-          -->
-        <GRP_CH_DC_OFFSET>+26 +26 +26 +26 +26 +26 +26 +26</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
-        <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
-        <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
-        <!--
-           # GROUP_TRG_ENABLE_MASK: this option is used only for the Models x740. These models have the
-           # channels grouped 8 by 8; one group of 8 channels has a common trigger that is generated as
-           # the OR of the self trigger of the channels in the group that are enabled by this mask.
-           # options: 0 to FF
-          -->
-        <GROUP_TRG_ENABLE_MASK>0xFF</GROUP_TRG_ENABLE_MASK>
+        <ENABLE_INPUT>NO</ENABLE_INPUT>
       </CHANNEL>
     </board>
+
   </Hardware>
   <EventBuilder>
 	  <dumpEvent>0</dumpEvent>
