@@ -312,6 +312,12 @@ int CAEN_V1742::Read (vector<WORD> &v)
     ErrCode = ERR_EVENT_BUILD ;
     return ErrCode ;
   }    
+  int cnt =0;
+  for(auto& w : v)
+    {
+      s << cnt++ << " " << w << endl; 
+      Log(s.str(), 1);
+    }
   // } //close cycle over events    
   return 0 ;
 
