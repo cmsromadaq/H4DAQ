@@ -119,7 +119,7 @@ int VFE_adapter::Reset()
         hw.getNode("VICE_CTRL").write(VFE_adapter_RESET * 1);
         hw.dispatch();
     }
-    usleep(2000000);
+    usleep(5000000);
     if (_debug) Log("[VFE_adapter::Reset] ...returning.", 3);
     return 0;
 }
