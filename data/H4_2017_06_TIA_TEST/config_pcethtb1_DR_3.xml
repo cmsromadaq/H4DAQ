@@ -24,7 +24,7 @@
            <Device>vice.udp.1</Device>
       -->
       <!-- number of samples to acquire -->
-      <Nsamples>5000</Nsamples>
+      <Nsamples>150</Nsamples>
       <!-- generate self trigger from data (1) or not (0) -->
       <TriggerSelf>0</TriggerSelf>
       <!-- self trigger threshold [ADC count] -->
