@@ -285,7 +285,7 @@
            # 0: analog input dynamic range = -Vpp/2 to +Vpp/2 (bipolar signals)
            # options: -50.0 to 50.0  (floating point)
           -->
-        <GRP_CH_DC_OFFSET>-10 -10 -10 -10 -10 -10 -10 -10</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
+        <GRP_CH_DC_OFFSET>-10 +22 -10 -10 -10 -10 -10 -10</GRP_CH_DC_OFFSET> <!-- -12 negative signal, +22 for positive signals -->
         <TRIGGER_THRESHOLD>100</TRIGGER_THRESHOLD>
         <CHANNEL_TRIGGER>DISABLED</CHANNEL_TRIGGER>
         <!--
