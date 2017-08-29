@@ -19,10 +19,11 @@ dr=""
 drcv=""
 rc=""
 eb=""
+ext=""
 nice=0
 tag=""
 
-TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,rc:,vmecontroller:,gitbranch:,tag:,norecompile,ebrecompile,drcvrecompile,dryrun -n 'startall.sh' -- "$@"`
+TEMP=`getopt -o dv:n: --long nice:,verbose:,logdir:,daquser:,daqhome:,dr:,drcv:,eb:,ext:,rc:,vmecontroller:,gitbranch:,tag:,norecompile,ebrecompile,drcvrecompile,dryrun -n 'startall.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -58,6 +59,8 @@ while true; do
       rc="$2"; shift 2 ;;
     --eb )
       eb="$2"; shift 2 ;;
+    --ext )
+      ext="$2"; shift 2 ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -68,6 +71,7 @@ echo "Starting H4DAQ installed @${daqhome} as ${daquser}"
 [ "${dr}" == "" ] || echo "DR MACHINES: ${dr}"
 [ "${rc}" == "" ] || echo "RC MACHINES: ${rc}"
 [ "${eb}" == "" ] || echo "EB MACHINES: ${eb}"
+[ "${ext}" == "" ] || echo "EXT MACHINES: ${ext}"
 echo "=================================================================="
 
 ## create repository if does not exists, otherwise update and compile
@@ -111,74 +115,78 @@ function col1 { while read line ; do echo "$line" | sed 's:@@@\(.*\)@@@:\x1b[01;
 function col2 { while read line ; do echo "$line" | sed 's:%%%\(.*\)%%%:\x1b[01;31m\1\x1b[00m:g' ; done }
 
 for machine in $dr ; do 
-    if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/${tag}/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
-#	[ "${start_dr}" == "0" ] && continue;
+    # if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
+    mydataro="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/datareadout  -d -c data/${tag}/config_${machine}_DR.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareadout_\$(date +%s)_${daquser}.log  > ${logdir}/log_h4daq_start_dr_${machine}_\$(date +%s)_${daquser}.log" 
+    [ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$mydataro" ; continue; }
+    #	[ "${start_dr}" == "0" ] && continue;
 	## compile
-	[ "${norecompile}" == "1" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
-	## launch the daemon
-	echo "-----------------------------"
-	echo "START DATAREADOUT on $machine"
-	echo "-----------------------------"
-	if  [ "${machine}" == "localhost" ]; then
-	    /bin/bash -i -c "${mydatato}" 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
-	else
-	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
-	fi
+    [ "${norecompile}" == "1" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
+    ## launch the daemon
+    echo "-----------------------------"
+    echo "START DATAREADOUT on $machine"
+    echo "-----------------------------"
+    if  [ "${machine}" == "localhost" ]; then
+	/bin/bash -i -c "${mydatato}" 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
+    else
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydataro}"\' 2>&1 | tee  /tmp/log_h4daq_start_dr_${machine}_$(date +%s)_${USER}.log;
+    fi
 done
 
 for machine in $rc ; do 
-	myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/${tag}/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myrc" ; continue; }
-#	[ "${start_rc}" == "0" ] && continue;
-	## compile
-	[ "${norecompile}" == "1" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
-	## launch the daemon
-	echo "-----------------------------"
-	echo "START RUNCONTROL on $machine"
-	echo "-----------------------------"
-	if  [ "${machine}" == "localhost" ]; then
-	    /bin/bash -i -c "${myrc}" 2>&1 | tee  /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log;
-	else
-	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${myrc}"\' 2>&1 | tee  /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log;
-	fi
+    myrc="cd ${daqhome}; cd DAQ/H4DAQ/ ; nice -n +${nice} ./bin/runcontrol  -d -c data/${tag}/config_${machine}_RC.xml -v ${verbosity} -l ${logdir}/log_h4daq_runcontrol_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_rc_${machine}_\$(date +%s)_${daquser}.log " 
+    [ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myrc" ; continue; }
+        #	[ "${start_rc}" == "0" ] && continue;
+    ## compile
+    [ "${norecompile}" == "1" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
+    ## launch the daemon
+    echo "-----------------------------"
+    echo "START RUNCONTROL on $machine"
+    echo "-----------------------------"
+    if  [ "${machine}" == "localhost" ]; then
+	/bin/bash -i -c "${myrc}" 2>&1 | tee  /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log;
+    else
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${myrc}"\' 2>&1 | tee  /tmp/log_h4daq_start_rc_${machine}_$(date +%s)_${USER}.log;
+    fi
 done
 
 for machine in $eb ; do 
-    if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/${tag}/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myeb" ; continue; }
-#	[ "${start_eb}" == "0" ] && continue;
-	## compile
-	[ "${ebrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
-	## launch the daemon
-	echo "-----------------------------"
-	echo "START EVENTBUILDER on $machine"
-	echo "-----------------------------"
-	if  [ "${machine}" == "localhost" ]; then
-	    /bin/bash -i -c "${myeb}" 2>&1 | tee  /tmp/log_h4daq_start_eb_${machine}_$(date +%s)_${USER}.log;
-	else
-	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${myeb}"\' 2>&1 | tee  /tmp/log_h4daq_start_eb_${machine}_$(date +%s)_${USER}.log;
-	fi
+    # if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
+    myeb="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/eventbuilder  -d -c data/${tag}/config_${machine}_EB.xml -v ${verbosity} -l ${logdir}/log_h4daq_eventbuilder_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_eb_${machine}_\$(date +%s)_${daquser}.log " 
+    [ "${dryrun}" == "0" ] || {  echo "$mycommand" ; echo "$myeb" ; continue; }
+    #	[ "${start_eb}" == "0" ] && continue;
+    ## compile
+    [ "${ebrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommand}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} /bin/bash -i -c \'"${mycommand}"\' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2 ; fi
+    ## launch the daemon
+    echo "-----------------------------"
+    echo "START EVENTBUILDER on $machine"
+    echo "-----------------------------"
+    if  [ "${machine}" == "localhost" ]; then
+	/bin/bash -i -c "${myeb}" 2>&1 | tee  /tmp/log_h4daq_start_eb_${machine}_$(date +%s)_${USER}.log;
+    else
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${myeb}"\' 2>&1 | tee  /tmp/log_h4daq_start_eb_${machine}_$(date +%s)_${USER}.log;
+    fi
 done
 
 for machine in $drcv ; do 
-    if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
-	mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/${tag}/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
-	[ "${dryrun}" == "0" ] || {  echo "$mycommandPlusDQM" ; echo "$mydrcv" ; continue; }
-#	[ "${start_drcv}" == "0" ] && continue;
-	## compile
-	[ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommandPlusDQM}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} "/bin/bash -c '${mycommandPlusDQM}' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log " ; fi
-	## launch the daemon
-	echo "-----------------------------"
-	echo "START DATARECEIVER on $machine"
-	echo "-----------------------------"
-	if  [ "${machine}" == "localhost" ]; then
-	    /bin/bash -i -c "${mydrcv}" 2>&1 | tee  /tmp/log_h4daq_start_drcv_${machine}_$(date +%s)_${USER}.log;
-	else
-	    ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydrcv}"\' 2>&1 | tee  /tmp/log_h4daq_start_drcv_${machine}_$(date +%s)_${USER}.log;
-	fi
+    # if [ "${machine}" == "localhost" ]; then  sshcommand="ssh ${daquser}@${machine} "; else  sshcommand=""; fi
+    mydrcv="cd ${daqhome}; cd DAQ/H4DAQ ; nice -n +${nice} ./bin/datareceiver  -d -c data/${tag}/config_${machine}_DRCV.xml -v ${verbosity} -l ${logdir}/log_h4daq_datareceiver_\$(date +%s)_${daquser}.log >  ${logdir}/log_h4daq_start_drcv_${machine}_\$(date +%s)_${daquser}.log " 
+    [ "${dryrun}" == "0" ] || {  echo "$mycommandPlusDQM" ; echo "$mydrcv" ; continue; }
+    #	[ "${start_drcv}" == "0" ] && continue;
+    ## compile
+    [ "${drcvrecompile}" == "0" ] || if [ "${machine}" == "localhost" ]; then /bin/bash -i -c "${mycommandPlusDQM}" 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log | col1 | col2;  else ssh ${daquser}@${machine} "/bin/bash -c '${mycommandPlusDQM}' 2>&1 | tee /tmp/log_h4daq_update_$machine_${USER}.log " ; fi
+    ## launch the daemon
+    echo "-----------------------------"
+    echo "START DATARECEIVER on $machine"
+    echo "-----------------------------"
+    if  [ "${machine}" == "localhost" ]; then
+	/bin/bash -i -c "${mydrcv}" 2>&1 | tee  /tmp/log_h4daq_start_drcv_${machine}_$(date +%s)_${USER}.log;
+    else
+	ssh ${daquser}@${machine} /bin/bash -i -c \'"${mydrcv}"\' 2>&1 | tee  /tmp/log_h4daq_start_drcv_${machine}_$(date +%s)_${USER}.log;
+    fi
+done
+
+for cmd in $ext; do
+    eval $cmd
 done
 
 
