@@ -464,7 +464,8 @@ void EventBuilder::OpenSpill()
 	if (dumpEvent_ && !recvEvent_) 
 	{ // open dumping file
 		dump_->Close();
-		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + to_string((unsigned long long)lastEvent_.spillNum_);
+		//string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + to_string((unsigned long long)lastEvent_.spillNum_);
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + Form("%03d", (unsigned int)lastEvent_.spillNum_);
 		if (dump_->GetCompress() )  newFileName += ".raw.gz";
 		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
@@ -842,7 +843,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		string myCmd= postBuiltCmd_;
 		// change the cmd strings
 		FindAndReplace(myCmd,"\%\%RUN\%\%", to_string((unsigned long long)myRunNum));	
-		FindAndReplace(myCmd,"\%\%SPILL\%\%", to_string((unsigned long long)spillNum));	
+		FindAndReplace(myCmd,"\%\%SPILL\%\%", string(Form("%03d", (unsigned int)spillNum)));	
 		FindAndReplace(myCmd,"\%\%FILE\%\%", newFileName);	
 		FindAndReplace(myCmd,"\%\%RAWDIR\%\%", dirName_);	
 
