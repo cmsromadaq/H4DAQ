@@ -21,6 +21,9 @@ function kill_machine(){
      ssh ${machine} "killall -9 eventbuilder"
      echo "Killing datareceiver on $machine"
      ssh ${machine} "killall -9 datareceiver"
+     echo "Killing TOFPET on $machine"
+     ssh ${machine} "sudo systemctl stop run_tofpet_daq.service"
+     ssh ${machine} "sudo systemctl stop daqd.service"
      return 0
 }
 
@@ -31,26 +34,25 @@ if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 # Note the quotes around `$TEMP': they are essential!
 eval set -- "$TEMP"
 
-tag=""
+machines=""
 
 while true; do
   case "$1" in
-    -t | --tag )
-      tag="$2"; shift 2 ;;
+    -m | --machines )
+      machines="$2"; shift 2 ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
 done
 
-if [ "${tag}" == "H4_2016" ]; then  
-    machines="pcethtb1 pcethtb2 cms-h4-04 cms-h4-05" ;
-elif [ "${tag}" == "T9_2016" ]; then
-    machines="pcminn03 pccmsrmtb01" ;
-elif [ "${tag}" == "T9_2017" ]; then
-    machines="cmsmi5 pccmsrmtb01" ;
-fi
+# kill on localhost
+killall -9 runcontrol
+killall -9 datareadout
+killall -9 eventbuilder
+killall -9 datareceiver
+sudo systemctl stop run_tofpet_daq.service
+sudo systemctl stop daqd.service
 
-# DRO/RC/EB
 for machine in $machines; do 
     kill_machine $machine
 done
