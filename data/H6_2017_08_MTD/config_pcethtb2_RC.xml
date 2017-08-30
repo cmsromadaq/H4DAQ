@@ -8,7 +8,7 @@
     <ListenPort>6000</ListenPort> <!-- DATA PORT -->
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
-    <ConnectTo>LAPTOPLIP:7004</ConnectTo>  <!-- DR -->
+    <ConnectTo>laptoplip:6004</ConnectTo>  <!-- DR -->
     <ConnectTo>citmtd01:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2:6504</ConnectTo>  <!-- EB  -->
     <ConnectTo>pcethtb2:5567</ConnectTo>  <!-- Emergency CML, this should be used in case of extra comunications outside the GUI -->
