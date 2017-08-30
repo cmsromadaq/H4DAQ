@@ -465,7 +465,7 @@ void EventBuilder::OpenSpill()
 	{ // open dumping file
 		dump_->Close();
 		//string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + to_string((unsigned long long)lastEvent_.spillNum_);
-		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + string(Form("%03d", (unsigned int)lastEvent_.spillNum_));
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + string(Form("%04d", (unsigned int)lastEvent_.spillNum_));
 		if (dump_->GetCompress() )  newFileName += ".raw.gz";
 		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
@@ -825,7 +825,8 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		if (mySpill_.size()>4) goodEventsInThisRun_+=ReadSpillNevents(mySpill_);
 		string myDir=dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/";
 		system( ("mkdir -p " + myDir ) .c_str() );
-		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
+		//string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + to_string((unsigned long long)spillNum);
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) myRunNum) + "/" + string(Form("%04d", (unsigned int)spillNum));
 		if (dump_->GetCompress() )  newFileName += ".raw.gz";
 		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	
@@ -843,7 +844,7 @@ void EventBuilder::MergeSpills(dataType &spill2 ) {
 		string myCmd= postBuiltCmd_;
 		// change the cmd strings
 		FindAndReplace(myCmd,"\%\%RUN\%\%", to_string((unsigned long long)myRunNum));	
-		FindAndReplace(myCmd,"\%\%SPILL\%\%", string(Form("%03d", (unsigned int)spillNum)));	
+		FindAndReplace(myCmd,"\%\%SPILL\%\%", string(Form("%04d", (unsigned int)spillNum)));	
 		FindAndReplace(myCmd,"\%\%FILE\%\%", newFileName);	
 		FindAndReplace(myCmd,"\%\%RAWDIR\%\%", dirName_);	
 
