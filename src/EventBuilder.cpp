@@ -465,7 +465,7 @@ void EventBuilder::OpenSpill()
 	{ // open dumping file
 		dump_->Close();
 		//string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + to_string((unsigned long long)lastEvent_.spillNum_);
-		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + Form("%03d", (unsigned int)lastEvent_.spillNum_);
+		string newFileName= dirName_ + "/" + to_string((unsigned long long) lastEvent_.runNum_) + "/" + string(Form("%03d", (unsigned int)lastEvent_.spillNum_));
 		if (dump_->GetCompress() )  newFileName += ".raw.gz";
 		else newFileName +=".raw";
 		dump_->SetFileName( newFileName );	

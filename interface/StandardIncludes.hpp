@@ -53,6 +53,7 @@ using namespace std;
 //ROOT
 	#include "TTree.h"
 	#include "TFile.h"
+        #include "TString.h"
 #endif
 
 #ifndef NO_ZLIB
