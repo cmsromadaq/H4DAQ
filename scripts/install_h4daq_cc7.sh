@@ -28,24 +28,7 @@ function root ()
 	return 
     fi
     # install pkgs
-    yum install -y sl-release-scl gsl-devel
-    yum install -y freenx nxagent nxauth nxproxy xorg-x11-apps screen
-    yum install -y git make binutils libX11-devel libXpm-devel libXft-devel libXext-devel
-    yum install -y devtoolset-3-gcc-* devtoolset-3-gdb devtoolset-3-binutils devtoolset-3-elfutils python27* 
-    source /opt/rh/python27/enable
-    source /opt/rh/devtoolset-3/enable
-    echo "source /opt/rh/devtoolset-3/enable" > /etc/profile.d/zzzz_dvts-3.sh
-    echo "source /opt/rh/python27/enable" > /etc/profile.d/zzzz_py27.sh
-    echo "source /opt/root/bin/thisroot.sh" > /etc/profile.d/root6.sh
-
-    cd /tmp
-    wget https://root.cern.ch/download/root_v6.04.14.source.tar.gz
-    cd /opt
-    tar -xzf /tmp/root_v6.04.14.source.tar.gz; mv root-6.04.14 root
-    cd root/
-    ./configure --prefix=/usr --enable-genvector --enable-mathmore --enable-minuit2 --enable-opengl --enable-python --enable-reflex --enable-roofit --enable-xrootd
-    make -j 3
-    make install
+    yum install -y root 
 }
 
 function zeromq ()
