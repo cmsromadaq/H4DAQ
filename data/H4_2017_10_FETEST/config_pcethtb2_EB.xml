@@ -12,7 +12,7 @@
     <crateId>10</crateId> <!-- In case it configure it. But it is empty-->
   </Hardware>
   <EventBuilder>
-	  <dumpEvent>0</dumpEvent>
+	  <dumpEvent>1</dumpEvent>
 	  <dumpDirName>/data/raw/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
 	  <sendEvent>1</sendEvent>
