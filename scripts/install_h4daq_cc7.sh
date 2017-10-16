@@ -160,6 +160,9 @@ function h4sw ()
     if [ ${1} == 1 ]; then
 	return 
     fi
+    yum install iptables*
+    systemctl enable iptables.service
+    systemctl start iptables.service
     cat <<EOF > /etc/sysconfig/iptables
 # Firewall configuration written by system-config-firewall                                                                                                                      
 # Manual customization of this file is not recommended.                                                                                                                          
