@@ -24,7 +24,7 @@ function kill_machine(){
     return 0
 }
 
-function kill_tofpet(){
+function kill_fedaq(){
     machine=$1
     #check if machine is alive
     ping -q -c 2 -w 5 ${machine} > /dev/null
@@ -38,13 +38,12 @@ function kill_tofpet(){
         return 1
     fi
     
-    echo "Killing TOFPET on $machine"
-    ssh ${machine} "sudo systemctl stop run_tofpet_daq.service"
-    ssh ${machine} "sudo systemctl stop daqd.service"
+    echo "Killing FEDAQ on $machine"
+    ssh ${machine} "sudo systemctl stop run_fedaq.service"
     return 0
 }
 
-TEMP=`getopt -o m: --long machines:,tofpet: -n 'killall.sh' -- "$@"`
+TEMP=`getopt -o m: --long machines:,fedaq: -n 'killall.sh' -- "$@"`
 
 if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 
@@ -52,14 +51,14 @@ if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 
 machines="pcethtb2 cms-h4-04 cms-h4-05"
-tofpet_machine=""
+fedaq_machine=""
 
 while true; do
   case "$1" in
     -m | --machines )
       machines="$2"; shift 2 ;;
-    -t | --tofpet )
-      tofpet="$2"; shift 2 ;;
+    -t | --fepet )
+      fedaq="$2"; shift 2 ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -70,12 +69,10 @@ killall -9 runcontrol
 killall -9 datareadout
 killall -9 eventbuilder
 killall -9 datareceiver
-#sudo systemctl stop run_tofpet_daq.service
-#sudo systemctl stop daqd.service
 
 for machine in $machines; do 
     kill_machine $machine
 done
 
-kill_tofpet $tofpet
+kill_fedaq $fedaq
 

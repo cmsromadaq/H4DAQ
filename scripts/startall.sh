@@ -186,7 +186,8 @@ for machine in $drcv ; do
 done
 
 for cmd in $ext; do
-    eval $cmd
+    echo $cmd
+    $cmd
 done
 
 
