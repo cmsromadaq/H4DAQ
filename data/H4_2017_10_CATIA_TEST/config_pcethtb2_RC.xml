@@ -12,6 +12,7 @@
 <!--    <ConnectTo>pcethtb1.cern.ch:6034</ConnectTo>  
     <ConnectTo>pcethtb1.cern.ch:6044</ConnectTo>  -->
     <ConnectTo>pcethtb1.cern.ch:6054</ConnectTo>  
+    <ConnectTo>pcethtb1.cern.ch:6074</ConnectTo>  
     <ConnectTo>pcethtb1.cern.ch:6084</ConnectTo>  
 
     <ConnectTo>cms-h4-06.cern.ch:5566</ConnectTo>  <!-- GUI -->
