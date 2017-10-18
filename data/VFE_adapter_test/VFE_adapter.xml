@@ -12,13 +12,31 @@
                         <!-- number of samples to acquire -->
                         <Nsamples>50</Nsamples>
                         <!-- generate self trigger from data (1) or not (0) -->
-                        <TriggerSelf>1</TriggerSelf>
+                        <TriggerSelf>0</TriggerSelf>
                         <!-- self trigger threshold [ADC count] -->
-                        <TriggerSelfThreshold>3000</TriggerSelfThreshold>
+                        <TriggerSelfThreshold>0</TriggerSelfThreshold>
+                        <!-- channel mask to generate self triggers -->
+                        <TriggerSelfMask>0x1F</TriggerSelfMask>
                         <!-- use internal software trigger (1) or external trigger (0) -->
-                        <TriggerLoop>1</TriggerLoop>
+                        <TriggerSoft>0</TriggerSoft>
                         <!-- continous DAQ (0) or triggered DAQ (1) -->
                         <TriggerType>1</TriggerType>
+                        <!-- DAC value 0 ... 65532 -->
+                        <CalibLevel>32768</CalibLevel>
+                        <!-- calib trigger width 0 ... 65532 -->
+                        <CalibWidth>256</CalibWidth>
+                        <!-- DAQ delay for calib triggers: 0 ... 65532 -->
+                        <CalibDelay>0</CalibDelay>
+                        <!-- number of calibration steps for linearity study -->
+                        <CalibN>1</CalibN>
+                        <!-- DAC step for linearity study -->
+                        <CalibStep>-128</CalibStep>
+                        <!-- negate (1) or not (0) the converted data in the ADC -->
+                        <NegateData>1</NegateData>
+                        <!-- set ADC in normal binary mode (0) or 2's complement (1) -->
+                        <SignedData>0</SignedData>
+                        <!-- set ADC input SPAN from 0x1f - 0 - 0x0f (0x010 - 1.383V, 0x1f=1.727V, 0=1.75V, 0x01=1.772V, 0x0f=2.087V) -->
+                        <InputSpan>0</InputSpan>
                         <!-- readout waiting time on external trigger arrival [# clocks @160 MHz] -->
                         <HwDAQDelay>115</HwDAQDelay>
                         <!-- as HwDAQDelay but for internally generated trigger -->
