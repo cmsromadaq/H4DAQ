@@ -70,7 +70,7 @@ killall -9 datareadout
 killall -9 eventbuilder
 killall -9 datareceiver
 
-for machine in $machines; do 
+for machine in ${machines}; do 
     kill_machine $machine
 done
 
