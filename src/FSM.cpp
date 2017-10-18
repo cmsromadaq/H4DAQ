@@ -1134,7 +1134,6 @@ while (true) {
 		    if (connectionManager_->Recv(myMex) ==0 )
 			    {
 			    Command myCmd=ParseData(myMex);
-                            Log("[RunControlFSM]::[ERROR]::Report "+myCmd.cmd,1);
 			    if( myCmd.cmd ==  DR_READY ) 
 			   	 {
 				 ++readyDR_;
@@ -1146,7 +1145,6 @@ while (true) {
 		      gettimeofday(&spillduration_stopwatch_start_time,NULL);
 		      hwManager_->SetTriggerStatus(trgType_,TRIG_ON );
 		      ResetMex();
-                      Log("[RunControlFSM]::[ERROR]::Reset done",1);
 		      if (trgType_ == BEAM_TRIG && testEnableDuringBeam_>0 && testEnableSequence_.size()>0)
 			{
 #ifdef TESTENABLE_DEBUG
@@ -1209,7 +1207,7 @@ while (true) {
 			// something went in error ? -> check
 		    //if (connectionManager_->Recv(myMex) ==0 ){Command myCmd=ParseData(myMex);};
 		    UpdateMex();
-                    Log("[RunControlFSM]::[ERROR]::Entering WAITTRIG",1);
+
 		    // check end of spill conditions
 		    if (!spillSignalsDisabled_ && trgType_== BEAM_TRIG ) 
 		   	{
