@@ -1209,7 +1209,7 @@ while (true) {
 			// something went in error ? -> check
 		    //if (connectionManager_->Recv(myMex) ==0 ){Command myCmd=ParseData(myMex);};
 		    UpdateMex();
-
+                    Log("[RunControlFSM]::[ERROR]::Entering WAITTRIG",1);
 		    // check end of spill conditions
 		    if (!spillSignalsDisabled_ && trgType_== BEAM_TRIG ) 
 		   	{
