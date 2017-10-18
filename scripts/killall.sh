@@ -70,7 +70,9 @@ killall -9 datareadout
 killall -9 eventbuilder
 killall -9 datareceiver
 
+machines=`echo ${machines} | sed 's:,: :g'`
 for machine in ${machines}; do 
+    echo $machine
     kill_machine $machine
 done
 
