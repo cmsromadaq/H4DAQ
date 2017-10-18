@@ -6,9 +6,9 @@
     <!--<ConnectTo>gui.cern.ch:guiport</ConnectTo> -->
     <ConnectTo>pcethtb1.cern.ch:6000</ConnectTo>  <!-- VME crate Data -->
 <!--    <ConnectTo>pcethtb1.cern.ch:6030</ConnectTo>  -->
-    <ConnectTo>pcethtb1.cern.ch:6040</ConnectTo>  
-<!--
     <ConnectTo>pcethtb1.cern.ch:6050</ConnectTo>  
+<!--
+    <ConnectTo>pcethtb1.cern.ch:6040</ConnectTo>  
     <ConnectTo>pcethtb1.cern.ch:6080</ConnectTo>  
 -->
     <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data -->
