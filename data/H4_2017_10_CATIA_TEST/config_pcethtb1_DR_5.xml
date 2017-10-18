@@ -19,7 +19,7 @@
       <ID>5</ID>
       <type>VFE_ADAPTER</type>
       <ManagerCfg>file://./data/VFE_adapter_test/VFE_adapter_connection_file.xml</ManagerCfg>
-      <Device>vice.udp.8</Device>                        
+      <Device>vice.udp.5</Device>                        
       <!-- N.B. it has to be consistent with the connection map
            <Device>vice.udp.1</Device>
       -->
