@@ -50,7 +50,7 @@ if [ $? != 0 ] ; then echo "Options are wrong..." >&2 ; exit 1 ; fi
 # Note the quotes around `$TEMP': they are essential!
 eval set -- "$TEMP"
 
-machines="pcethtb2 cms-h4-04 cms-h4-05"
+machines="pcethtb1 pcethtb2 cms-h4-04 cms-h4-05"
 fedaq_machine=""
 
 while true; do
