@@ -341,7 +341,7 @@ bool VFE_adapter::TriggerReceived()
                 if (free_mem.value() != _buffer_size.value()) //for the moment just signaling a trigger using an event present in memory
 		return 1;
             }
-            usleep(10);
+            usleep(30);
 	    ++timeout;
         }
     } else if(_trigger_loop == 1) { //--self trigger
