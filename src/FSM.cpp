@@ -145,12 +145,11 @@ while (true) {
 		    }
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
-			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->SetBusyOn();
 			hwManager_->TriggerAck();
 			MoveToStatus(READ);
                         }  
-
+                    usleep(30);
 		    break;
 		    }
 	case READ:
@@ -1259,11 +1258,13 @@ while (true) {
 		    	}
 		     /// check trigger
 		    if( hwManager_->TriggerReceived() ){ 
+//			cout<<"TRIGGER RECEIVED"<<endl;
 			hwManager_->TriggerAck();
 			hwManager_->SetBusyOn();
+//			if (trgType_ == PED_TRIG || trgType_==LED_TRIG) usleep(100); //DEBUG
 			MoveToStatus(READ);
                         }  
-                    usleep(10);
+                    usleep(30);
 		    break;
 		    }
 	case READ:
@@ -1276,7 +1277,7 @@ while (true) {
 			++Counter;
 			if (Counter >= 500) {
 				gettimeofday(&stopwatch_stop_time,NULL);
-				long elapsed=  Utility::timebvaldiff(&stopwatch_start_time,&stopwatch_stop_time);
+				long elapsed=  Utility::timevaldiff(&stopwatch_start_time,&stopwatch_stop_time);
 				ostringstream s; s <<"[DataReadOutFSM]::[READ] "<<"Triggers in spill "<< READED<<" Rate "<< double(Counter)/elapsed* 1e6 <<" Hz";
 				cout <<s.str()<<endl;
 				Log(s.str(),1);
