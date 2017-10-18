@@ -138,7 +138,7 @@ int CAEN_V1742::Init ()
     return ErrCode;
   }
   
-  CAEN_DGTZ_SWStartAcquisition (digitizerHandle_) ;
+ 
   s.str(""); s << "[CAEN_V1742]::[INFO]::++++++ CAEN V1742 END INIT ++++++";
   Log(s.str(),1);
 
@@ -174,7 +174,9 @@ int CAEN_V1742::BufferClear (){
   ostringstream s;
   /* clear the digitizer buffers */
 
+  ret |= CAEN_DGTZ_SWStopAcquisition (digitizerHandle_) ;
   ret |= CAEN_DGTZ_ClearData(digitizerHandle_); 
+  ret |= CAEN_DGTZ_SWStartAcquisition (digitizerHandle_) ;
 
   if (ret != 0) {
     s.str(""); s << "[CAEN_V1742]::[ERROR]::Unable to clear buffers";
