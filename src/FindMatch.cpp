@@ -1,6 +1,4 @@
 #include "interface/FindMatch.hpp"
-#include <iostream>
-#include <fstream>
 //#define FM_DEBUG
 //#define FM_TIME_DEBUG
 
@@ -34,7 +32,7 @@ double FindMatch::Distance(vector<uint_t> &x, vector<uint_t> &y)
 	double myMaxChi2=0;
 	for(uint_t i=0;i<x.size();++i)
 	{
-		double chi2=std::sqrt( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
+		double chi2=sqr( (  int64_t(time1[x[i]])-int64_t(time2[y[i]])-delta) );
 		R+= chi2;// ???
 		if (chi2 >myMaxChi2) myMaxChi2=chi2;
 		if ( R> d2_ ) {
@@ -222,17 +220,15 @@ int FindMatch::CopyResult(vector<uint_t> &x, vector<uint_t> &y)
 	return 0;
 }
 
-// debug this function and understand why the merged events are so few when including the third VFE
 int FindMatch::Iterative()
 {
-
-        int64_t delta=0;
-	// long double t1_ave= 0.;
-	// long double t2_ave= 0.;
-	// for(uint_t i=0;i<time1.size() ;++i ) t1_ave += time1[i];
-	// for(uint_t i=0;i<time2.size() ;++i ) t2_ave += time2[i];
-	// t1_ave /= time1.size();
-	// t2_ave /= time2.size();
+	long double delta;
+	long double t1_ave= 0.;
+	long double t2_ave= 0.;
+	for(uint_t i=0;i<time1.size() ;++i ) t1_ave += time1[i];
+	for(uint_t i=0;i<time2.size() ;++i ) t2_ave += time2[i];
+	t1_ave /= time1.size();
+	t2_ave /= time2.size();
 	//delta = t1_ave-t2_ave;
 	delta =  int64_t(time1[0]) - int64_t(time2[0]);
 	/// ----- for(uint_t i=0;i<time1.size() && i<time2.size() ;++i ) 
@@ -244,14 +240,11 @@ int FindMatch::Iterative()
 	// 
 	uint_t pos1=0,pos2=0;
 	double myMaxChi2=0;
-
-	fstream myfile;
-	myfile.open("/tmp/debug/findme.txt", std::fstream::out | std::fstream::app);
 	for(;pos1 <time1.size() && pos2<time2.size() ; )
 		{
-		double chi2=std::sqrt( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
+		double chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2])-delta) );
 		//if ( time1[pos1] -time1[0] > 438000 &&  time1[pos1] -time1[0] < 440000 )printf("INFO : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1]-time1[0],time2[pos2]-time2[0],delta,chi2);
-		if(chi2 < 400)
+		if(chi2 <400)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1,pos2));
@@ -260,8 +253,8 @@ int FindMatch::Iterative()
 			continue;
 			}
 		// try pos1++
-		chi2=sqrt( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
-		if(chi2 < 400)
+		chi2=sqr( (  int64_t(time1[pos1+1])-int64_t(time2[pos2])-delta) );
+		if(chi2 <400)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1+1,pos2));
@@ -270,8 +263,8 @@ int FindMatch::Iterative()
 			continue;
 			}
 		// try pos2++
-		chi2=sqrt( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
-		if(chi2 < 400)
+		chi2=sqr( (  int64_t(time1[pos1])-int64_t(time2[pos2+1])-delta) );
+		if(chi2 <400)
 			{
 			if(chi2>myMaxChi2) myMaxChi2=chi2;
 			R_.push_back(pair<uint_t,uint_t>(pos1,pos2+1));
@@ -279,15 +272,11 @@ int FindMatch::Iterative()
 			++pos1;
 			continue;
 			}
-		#ifdef DEEPDEBUG
-		myfile << "Unmerged pos1= "<<pos1<< "  pos2= "<<pos2<<" time1= "<<time1[pos1]<<" time2= "<<time2[pos2]<<" Delta= "<<delta<<" chi2= " <<chi2<<endl;
-		#endif
+		printf("unmerged : pos1= %u pos2= %u time1= %llu time2= %llu delta= %llf chi2= %lf\n",pos1,pos2,time1[pos1],time2[pos2],delta,chi2);
 		// increment both and continue
 		++pos1; ++ pos2;
 		
 		}
-	
-	myfile.close();
 	d2_=100;
 	d_=1;
 	maxChi2_=myMaxChi2;
