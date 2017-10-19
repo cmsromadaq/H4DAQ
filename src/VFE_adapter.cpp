@@ -7,7 +7,7 @@
 
 #include "TString.h"
 
-#define DEEPDEBUG 1
+//#define DEEPDEBUG 1
 
 int VFE_adapter::Init()
 {
