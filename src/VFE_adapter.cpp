@@ -117,6 +117,11 @@ int VFE_adapter::StartDAQ()
         int command = ((_nsamples + 1)<<16) + VFE_adapter_CAPTURE_START;
         hw.getNode("CAP_CTRL").write(command);
         hw.dispatch();
+
+        // FIXME - unsure this is needed
+        command = VFE_adapter_DAC_WRITE | VFE_adapter_DAC_VAL_REG | (_calib_level&0xffff);
+	hw.getNode("VFE_CTRL").write(command);
+        hw.dispatch();
     }
     if (_debug) Log("[VFE_adapter::StartDAQ] ...returning.", 3);
     return 0;
