@@ -44,7 +44,7 @@
       <!-- number of calibration steps for linearity study -->
       <CalibN>1</CalibN>
       <!-- DAC step for linearity study -->
-      <CalibStep>-128</CalibStep>
+      <CalibStep>128</CalibStep>
       <!-- negate (1) or not (0) the converted data in the ADC -->
       <NegateData>1</NegateData>
       <!-- set ADC in normal binary mode (0) or 2's complement (1) -->
@@ -55,7 +55,7 @@
       <HwDAQDelay>60</HwDAQDelay>
       <!-- as HwDAQDelay but for internally generated trigger -->
       <SwDAQDelay>0x0</SwDAQDelay>
-      <DebugLevel>0</DebugLevel>
+      <DebugLevel>10</DebugLevel>
       <LoggerType>stderr</LoggerType>
     </board>
    
