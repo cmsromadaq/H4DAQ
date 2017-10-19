@@ -10,18 +10,43 @@
 #define VFE_adapter_CAPTURE_START   1
 #define VFE_adapter_CAPTURE_STOP    2
 
-#define VFE_adapter_RESET           1
-
 #define VFE_adapter_GEN_TRIGGER     1
-#define VFE_adapter_GEN_100HZ       2
-#define VFE_adapter_LED_ON          4
+#define VFE_adapter_GEN_CALIB       2
+#define VFE_adapter_GEN_100HZ       4
+#define VFE_adapter_LED_ON          8
+
+
+#define VFE_adapter_RESET                  (1<<0)
+#define VFE_adapter_TRIGGER_MODE           (1<<1)
+#define VFE_adapter_SOFT_TRIGGER           (1<<2)
+#define VFE_adapter_SELF_TRIGGER           (1<<3)
+#define VFE_adapter_CLOCK_PHASE            (1<<4)
+#define VFE_adapter_CLOCK_RESET            (1<<7)
+#define VFE_adapter_SELF_TRIGGER_THRESHOLD (1<<8)
+#define VFE_adapter_SELF_TRIGGER_MASK      (1<<22)
+#define VFE_adapter_BOARD_SN               (1<<28)
+
+#define VFE_adapter_DAC_WRITE       (1<<25)
+#define VFE_adapter_ADC_WRITE       (1<<24)
+#define VFE_adapter_DAC_FULL_RESET  (0xF<<16)
+#define VFE_adapter_DAC_SOFT_RESET  (0x7<<16)
+#define VFE_adapter_DAC_VAL_REG     (0x3<<16)
+#define VFE_adapter_DAC_CTRL_REG    (0x4<<16)
+
+#define VFE_adapter_ADC_OMODE_REG   (0x14<<16) // ADC register to define Output mode of the ADC
+#define VFE_adapter_ADC_ISPAN_REG   (0x18<<16) // ADC register to define input span of the ADC from 1.383V to 2.087V
+
+
+
 
 // for reference (and debugging messages)
 #define VFE_adapter_DV              1750./16384.; // 14 bits on 1.75V
 
-//#define VFE_adapter_NSAMPLE_MAX 28670
+#define VFE_adapter_NSAMPLE_MAX 28670
 // Max ethernet packet = 1536 bytes, max user payload = 1500 bytes
 #define VFE_adapter_MAX_PAYLOAD 1380
+////////////////#define MAX_VFE     10
+////////////////#define MAX_STEP    10000
 
 /*  Data format
  *  -----------
@@ -81,7 +106,7 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         int    NSamples()             { return _nsamples;               }
         int    SelfTrigger()          { return _trigger_self;           }
         int    SelfTriggerThreshold() { return _trigger_self_threshold; }
-        int    TriggerLoop()          { return _trigger_loop;           }
+        int    TriggerLoop()          { return _trigger_soft;           }
         int    TriggerType()          { return _trigger_type;           }
         int    HwDAQDelay()           { return _hw_daq_delay;           }
         int    SwDAQDelay()           { return _sw_daq_delay;           }
@@ -123,6 +148,8 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         int StopDAQ();
         int Reset();
         int SetLEDStatus(int status);
+        int ProgramDAC();
+        int CalibrationTriggerSetting();
         /* reads params from cfg file */  
         int ParseConfiguration(BoardConfig * bc);
 
@@ -148,13 +175,25 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         std::string _manager_cfg;
         std::vector<std::string> _devices;
         int _nsamples;                // number of samples to acquire
-        int _trigger_self;            // generate self trigger from data (1) or not (0)
-        int _trigger_self_threshold;  // signal threshold [ADC count] to generate self trigger
-        int _trigger_loop;            // use internal software trigger (1) or Laser with external trigger (0)
-        int _trigger_type;            // continuous DAQ (0) or triggered DAQ (1)
+        int _trigger_soft;            // 0: use external trigger (GPIO); 1: generate trigger from software (1 written in FW register)
+        int _trigger_type;            // 0: pedestal;  1: calibration;  2: laser
+        int _trigger_self;            // 0: don't generate trigger from data themselves; 1: generate trigger if any data > self_trigger_threshold
+        int _trigger_self_threshold;  // threshold in ADC counts
+        int _trigger_self_mask;       // channel mask to generate self trigger lsb=ch0 ... msb=ch4
+        int _calib_level;             // DAC value 0 ... 65532
+        int _calib_width;             // calib trigger width 0 ... 65532
+        int _calib_delay;             // DAQ elay for calib triggers: 0 ... 65532
+        int _calib_n;                 // number of calibration steps for linearity study
+        int _calib_step;              // DAC step for linearity study
+        int _negate_data;             // negate (1) or not (0) the converted data in the ADC
+        int _signed_data;             // set ADC in normal binary mode (0) or 2's complement (1)
+        int _input_span;              // set ADC input SPAN from 0x1f - 0 - 0x0f (0x10 = 1.383V, 0x1f=1.727V, 0=1.75V, 0x01=1.772V, 0x0f=2.087V)
         int _hw_daq_delay;            // readout waiting time on external trigger arrival [# clocks @ 160 MHz]
         // greater values moves the signal *left*
         int _sw_daq_delay;            // as _hw_daq_delay but for internally generated trigger (e.g. when using the internal trigger to trigger external HW, like a laser)
+
+        int _nevent;
+
         int _debug;                   // debug level: 0: none, 1: functions, 2: detailed
 };
 
