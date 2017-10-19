@@ -9,10 +9,10 @@
     <ListenPort>6002</ListenPort> <!-- STATUS PORT -->
     <ListenPort>6004</ListenPort> <!-- CMD PORT -->
     <ConnectTo>cmsmi5.cern.ch:6004</ConnectTo>   <!-- cmsmi5 VME crate -->
-    <ConnectTo>pcethtb1.cern.ch:6034</ConnectTo> <!-- pcethtb1 VFE --> 
+    <ConnectTo>pcethtb1.cern.ch:6084</ConnectTo> <!-- pcethtb1 VFE --> 
 <!--    <ConnectTo>pcethtb1.cern.ch:6044</ConnectTo>
         <ConnectTo>pcethtb1.cern.ch:6054</ConnectTo>
-        <ConnectTo>pcethtb1.cern.ch:6084</ConnectTo> -->
+        <ConnectTo>pcethtb1.cern.ch:6034</ConnectTo> -->
 
     <ConnectTo>cms-h4-06.cern.ch:5566</ConnectTo>  <!-- GUI -->
     <ConnectTo>pcethtb2.cern.ch:6504</ConnectTo>  <!-- EB  -->
