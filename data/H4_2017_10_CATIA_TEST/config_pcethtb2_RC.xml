@@ -1,5 +1,5 @@
 <general>
-  <waitForDR>6</waitForDR>  
+  <waitForDR>5</waitForDR>  
   <noEB>0</noEB> 
   <spillSignalsDisabled>0</spillSignalsDisabled> 
   <testEnableDuringBeam>0</testEnableDuringBeam> 
@@ -12,7 +12,6 @@
     <ConnectTo>pcethtb1.cern.ch:6034</ConnectTo> <!-- pcethtb1 VFE --> 
     <ConnectTo>pcethtb1.cern.ch:6044</ConnectTo> <!-- pcethtb1 VFE --> 
     <ConnectTo>pcethtb1.cern.ch:6054</ConnectTo> <!-- pcethtb1 VFE -->  
-    <ConnectTo>pcethtb1.cern.ch:6074</ConnectTo> <!-- pcethtb1 VFE -->  
     <ConnectTo>pcethtb1.cern.ch:6084</ConnectTo> <!-- pcethtb1 VFE -->  
 
     <ConnectTo>cms-h4-06.cern.ch:5566</ConnectTo>  <!-- GUI -->

@@ -8,7 +8,6 @@
     <ConnectTo>pcethtb1.cern.ch:6030</ConnectTo> <!-- VFE Data --> 
     <ConnectTo>pcethtb1.cern.ch:6040</ConnectTo> <!-- VFE Data --> 
     <ConnectTo>pcethtb1.cern.ch:6050</ConnectTo> <!-- VFE Data --> 
-    <ConnectTo>pcethtb1.cern.ch:6070</ConnectTo> <!-- VFE Data --> 
     <ConnectTo>pcethtb1.cern.ch:6080</ConnectTo> <!-- VFE Data --> 
     <ConnectTo>pcethtb2.cern.ch:6000</ConnectTo>  <!-- RC Data -->
     <ConnectTo>pcethtb2.cern.ch:6004</ConnectTo>  <!-- RC Cmd -->
@@ -22,7 +21,7 @@
 	  <dumpDirName>/data/raw/EB/</dumpDirName> <!-- /tmp/RUN/spill[.gz][.txt] -->
 	  <dumpCompress>0</dumpCompress> <!-- for the moment the file is not closed correctly but content is fine -->
 	  <sendEvent>1</sendEvent>
-	  <recvEvent>7</recvEvent> <!-- Number of deamons to wait for -->
+	  <recvEvent>6</recvEvent> <!-- Number of deamons to wait for -->
 	  <!--<postBuiltCmd>xmessage "built %%RUN%% %%FILE%% %%SPILL%%" &amp;  sleep 10s; kill %% </postBuiltCmd> -->
 	  <postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/bin/unpack -i %%RAWDIR%% -o /tmp/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd>
 	  <!--<postBuiltCmd>source /opt/root/bin/thisroot.sh &amp;&amp; /home/cmsdaq/DAQ/H4DQM/scripts/runDQM.sh -i %%RAWDIR%% -o /data/DQM/ -r %%RUN%% -s %%SPILL%% ;</postBuiltCmd>-->
