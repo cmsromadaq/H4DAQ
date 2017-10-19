@@ -415,9 +415,18 @@ int VFE_adapter::Print()
     }
     Log(Form("  **  Number of samples      : %d", _nsamples              ), 1);
     Log(Form("  **  Self trigger           : %d", _trigger_self          ), 1);
-    Log(Form("  **  Trigger loop           : %d", _trigger_soft          ), 1);
+    Log(Form("  **  Trigger soft           : %d", _trigger_soft          ), 1);
     Log(Form("  **  Trigger type           : %d", _trigger_type          ), 1);
-    Log(Form("  **  Self trigger threshold : %d", _trigger_self_threshold), 1);
+    Log(Form("  **  Trigger self threshold : %d", _trigger_self_threshold), 1);
+    Log(Form("  **  Trigger self mask      : %d", _trigger_self_mask     ), 1);
+    Log(Form("  **  Calib level            : %d", _calib_level           ), 1);
+    Log(Form("  **  Calib width            : %d", _calib_width           ), 1);
+    Log(Form("  **  Calib delay            : %d", _calib_delay           ), 1);
+    Log(Form("  **  Calib N                : %d", _calib_n               ), 1);
+    Log(Form("  **  Calib step             : %d", _calib_step            ), 1);
+    Log(Form("  **  Negate data            : %d", _negate_data           ), 1);
+    Log(Form("  **  Signed data            : %d", _signed_data           ), 1);
+    Log(Form("  **  Input span             : %d", _input_span            ), 1);
     Log(Form("  **  HW DAQ delay           : %d", _hw_daq_delay          ), 1);
     Log(Form("  **  SW DAQ delay           : %d", _sw_daq_delay          ), 1);
 

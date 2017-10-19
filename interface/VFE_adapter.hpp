@@ -104,9 +104,18 @@ class VFE_adapter : public TriggerBoard, IOControlBoard
         // accessors for config parameters
         size_t NDevices()             { return _devices.size();         }
         int    NSamples()             { return _nsamples;               }
-        int    SelfTrigger()          { return _trigger_self;           }
-        int    SelfTriggerThreshold() { return _trigger_self_threshold; }
-        int    TriggerLoop()          { return _trigger_soft;           }
+        int    TriggerSelf()          { return _trigger_self;           }
+        int    TriggerSelfThreshold() { return _trigger_self_threshold; }
+        int    TriggerSelfMask()      { return _trigger_self_mask;      }
+        int    CalibLevel()           { return _calib_level;            }
+        int    CalibWidth()           { return _calib_width;            }
+        int    CalibDelay()           { return _calib_delay;            }
+        int    CalibN()               { return _calib_n;                }
+        int    CalibStep()            { return _calib_step;             }
+        int    NegateData()           { return _negate_data;            }
+        int    SignedData()           { return _signed_data;            }
+        int    InputSpan()            { return _input_span;             }
+        int    TriggerSoft()          { return _trigger_soft;           }
         int    TriggerType()          { return _trigger_type;           }
         int    HwDAQDelay()           { return _hw_daq_delay;           }
         int    SwDAQDelay()           { return _sw_daq_delay;           }
